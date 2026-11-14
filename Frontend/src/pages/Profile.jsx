@@ -4,8 +4,8 @@ import { useData } from '../context/DataContext';
 import '../styles/Profile.css';
 
 export default function Profile() {
-    const { 
-        currentUser, logout, updateProfile, 
+    const {
+        currentUser, logout, updateProfile,
         inquiries, removeInquiry,
         events, removeEvent,
         links, removeLink
@@ -30,24 +30,21 @@ export default function Profile() {
         const file = e.target.files[0];
         if (!file) return;
 
-        setIsUploading(true);
         const formData = new FormData();
         formData.append('image', file);
-
         try {
+            setIsUploading(true);
+
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/upload`, {
                 method: 'POST',
-                body: formData
+                body: formData,
             });
-
             if (!response.ok) throw new Error('Image upload failed');
             const data = await response.json();
-            setImgUrl(`${import.meta.env.VITE_API_URL}${data.imageUrl}`);
-            
-            await updateProfile(currentUserId, { imgUrl: newImgUrl });
+            await updateProfile(currentUser.id, { imgUrl: data.imageUrl });
         } catch (error) {
-            console.error("Upload Error:", error);
-            alert("Failed to upload image. Ensure the backend server is running.");
+            console.error('Upload Error:', error);
+            alert('Failed to upload image. Ensure the backend server is running.');
         } finally {
             setIsUploading(false);
         }
@@ -74,7 +71,7 @@ export default function Profile() {
 
     return (
         <div className="dashboard-wrapper page-animate">
-            
+
             <header className="profile-hero-modern stagger-1">
                 <div className="profile-hero-content">
                     <div className="profile-avatar-container">
@@ -83,10 +80,10 @@ export default function Profile() {
                                 <Loader2 size={36} className="pulse-anim" color="#fff" />
                             </div>
                         ) : (
-                            <img 
-                                src={currentUser.imgUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name)}&background=${currentUser.isSupremeAdmin ? '0f172a' : 'e5e7eb'}&color=${currentUser.isSupremeAdmin ? 'fff' : '374151'}&size=150`} 
-                                alt={currentUser.name} 
-                                className="profile-main-avatar" 
+                            <img
+                                src={currentUser.imgUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name)}&background=${currentUser.isSupremeAdmin ? '0f172a' : 'e5e7eb'}&color=${currentUser.isSupremeAdmin ? 'fff' : '374151'}&size=150`}
+                                alt={currentUser.name}
+                                className="profile-main-avatar"
                             />
                         )}
                         <label className="avatar-edit-overlay">
@@ -94,16 +91,16 @@ export default function Profile() {
                             <Camera size={24} color="white" />
                         </label>
                         {currentUser.isSupremeAdmin && (
-                            <div className="admin-badge-modern" title="Supreme Admin"><ShieldAlert size={18}/></div>
+                            <div className="admin-badge-modern" title="Supreme Admin"><ShieldAlert size={18} /></div>
                         )}
                     </div>
-                    
+
                     <div className="profile-hero-text">
                         <h1 className="profile-greeting-title">{currentUser.name}</h1>
                         <span className="hero-role-badge">{currentUser.role}</span>
                         <div className="profile-hero-contacts">
-                            <span><Mail size={14}/> {currentUser.email}</span>
-                            {currentUser.phone && <span><Phone size={14}/> {currentUser.phone}</span>}
+                            <span><Mail size={14} /> {currentUser.email}</span>
+                            {currentUser.phone && <span><Phone size={14} /> {currentUser.phone}</span>}
                         </div>
                     </div>
                 </div>
@@ -115,7 +112,7 @@ export default function Profile() {
                         <div className="widget-header">
                             <h3>Personal Information</h3>
                             <button className="text-btn" onClick={() => setIsEditing(!isEditing)}>
-                                {isEditing ? <><X size={14} style={{display:'inline', marginBottom:'-2px'}}/> Cancel</> : <><Edit3 size={14} style={{display:'inline', marginBottom:'-2px'}}/> Edit Info</>}
+                                {isEditing ? <><X size={14} style={{ display: 'inline', marginBottom: '-2px' }} /> Cancel</> : <><Edit3 size={14} style={{ display: 'inline', marginBottom: '-2px' }} /> Edit Info</>}
                             </button>
                         </div>
                         <div className="widget-body">
@@ -228,20 +225,20 @@ export default function Profile() {
             <div className="activity-section-header stagger-3">
                 <h2 style={{ fontSize: '1.5rem', color: '#0f172a', margin: '1.5rem 0 0 0' }}>My Contributions</h2>
             </div>
-            
+
             <section className="activity-grid stagger-3">
                 <div className="premium-widget">
                     <div className="widget-header">
-                        <h3><FileQuestion size={16} className="icon-orange"/> My Inquiries</h3>
+                        <h3><FileQuestion size={16} className="icon-orange" /> My Inquiries</h3>
                     </div>
                     <div className="widget-feed">
                         {myTasks.length === 0 ? <p className="empty-subtext">You haven't created any tasks.</p> : myTasks.map(t => (
-                            <div key={t._id || t.id} className="feed-item fade-in-row" style={{justifyContent: 'space-between'}}>
+                            <div key={t._id || t.id} className="feed-item fade-in-row" style={{ justifyContent: 'space-between' }}>
                                 <div>
                                     <h4 className="feed-title">{t.title}</h4>
                                     <span className="feed-meta">For: {t.assignedTo}</span>
                                 </div>
-                                <button onClick={() => removeInquiry(t._id || t.id)} className="btn-icon-danger hover-pop"><Trash2 size={16}/></button>
+                                <button onClick={() => removeInquiry(t._id || t.id)} className="btn-icon-danger hover-pop"><Trash2 size={16} /></button>
                             </div>
                         ))}
                     </div>
@@ -249,16 +246,16 @@ export default function Profile() {
 
                 <div className="premium-widget">
                     <div className="widget-header">
-                        <h3><CalendarDays size={16} className="icon-blue"/> My Meetings</h3>
+                        <h3><CalendarDays size={16} className="icon-blue" /> My Meetings</h3>
                     </div>
                     <div className="widget-feed">
                         {myEvents.length === 0 ? <p className="empty-subtext">You haven't scheduled events.</p> : myEvents.map(e => (
-                            <div key={e._id || e.id} className="feed-item fade-in-row" style={{justifyContent: 'space-between'}}>
+                            <div key={e._id || e.id} className="feed-item fade-in-row" style={{ justifyContent: 'space-between' }}>
                                 <div>
                                     <h4 className="feed-title">{e.title}</h4>
                                     <span className="feed-meta">{e.date} at {e.time}</span>
                                 </div>
-                                <button onClick={() => removeEvent(e._id || e.id)} className="btn-icon-danger hover-pop"><Trash2 size={16}/></button>
+                                <button onClick={() => removeEvent(e._id || e.id)} className="btn-icon-danger hover-pop"><Trash2 size={16} /></button>
                             </div>
                         ))}
                     </div>
@@ -266,16 +263,16 @@ export default function Profile() {
 
                 <div className="premium-widget">
                     <div className="widget-header">
-                        <h3><LinkIcon size={16} style={{color: '#10b981'}}/> My Quick Links</h3>
+                        <h3><LinkIcon size={16} style={{ color: '#10b981' }} /> My Quick Links</h3>
                     </div>
                     <div className="widget-feed">
                         {myLinks.length === 0 ? <p className="empty-subtext">You haven't added any links.</p> : myLinks.map(l => (
-                            <div key={l._id || l.id} className="feed-item fade-in-row" style={{justifyContent: 'space-between'}}>
-                                <div style={{overflow: 'hidden', paddingRight: '1rem'}}>
-                                    <h4 className="feed-title" style={{whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{l.title}</h4>
-                                    <a href={l.url} target="_blank" rel="noreferrer" className="feed-meta" style={{color:'#2563eb', textDecoration:'none'}}>{l.url}</a>
+                            <div key={l._id || l.id} className="feed-item fade-in-row" style={{ justifyContent: 'space-between' }}>
+                                <div style={{ overflow: 'hidden', paddingRight: '1rem' }}>
+                                    <h4 className="feed-title" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{l.title}</h4>
+                                    <a href={l.url} target="_blank" rel="noreferrer" className="feed-meta" style={{ color: '#2563eb', textDecoration: 'none' }}>{l.url}</a>
                                 </div>
-                                <button onClick={() => removeLink(l._id || l.id)} className="btn-icon-danger hover-pop"><Trash2 size={16}/></button>
+                                <button onClick={() => removeLink(l._id || l.id)} className="btn-icon-danger hover-pop"><Trash2 size={16} /></button>
                             </div>
                         ))}
                     </div>

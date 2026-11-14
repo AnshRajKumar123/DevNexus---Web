@@ -195,9 +195,6 @@ export default function ChatHub() {
                                             <div className={`chat-hub-bubble ${isMe ? 'bubble-mine' : 'bubble-theirs'}`}>
                                                 <div className="chat-hub-text">{chat.message}</div>
                                                 <div className="chat-hub-bubble-footer">
-                                                    <span className="chat-hub-lock-icon" title="Encrypted">
-                                                        <Lock size={10} />
-                                                    </span>
                                                     <span className="chat-hub-timestamp">{chat.timestamp}</span>
                                                 </div>
                                             </div>
