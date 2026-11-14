@@ -29,7 +29,8 @@ export default function Team() {
             });
             if (!response.ok) throw new Error('Image upload failed');
             const data = await response.json();
-            setImgUrl(`${import.meta.env.VITE_API_URL}${data.imageUrl}`);
+            // Store the relative path in state, but display with full URL
+            setImgUrl(data.imageUrl);
         } catch (error) {
             console.error("Upload Error:", error);
             alert("Failed to upload image.");
@@ -50,7 +51,6 @@ export default function Team() {
                     <h1 className="hero-greeting">Team <span className="highlight-name">Directory</span></h1>
                     <p className="hero-subtitle">Manage your organization's members, roles, and access.</p>
                 </div>
-                {/* Always allow opening modal if clicked, or restrict button visibility cleanly */}
                 <button className="btn-modern-primary hover-pop" onClick={() => setShowModal(true)}>
                     <UserPlus size={18} /> Invite Member
                 </button>
@@ -64,48 +64,51 @@ export default function Team() {
                         </div>
                         
                         <div className="team-list-container">
-                            {team.map(member => (
-                                <div key={member._id} className="team-list-item fade-in-row">
-                                    <div className="team-member-info">
-                                        <div className="member-avatar-box">
-                                            <img 
-                                                src={member.imgUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=${member.isSupremeAdmin ? '0f172a' : 'e5e7eb'}&color=${member.isSupremeAdmin ? 'fff' : '374151'}&size=150`} 
-                                                alt={member.name} 
-                                            />
-                                            {member.isSupremeAdmin && <div className="admin-star"><ShieldAlert size={10} color="white"/></div>}
-                                        </div>
-                                        <div className="member-details">
-                                            <h4>{member.name}</h4>
-                                            <div className="member-tags">
-                                                <span className={`role-pill ${member.isSupremeAdmin ? 'admin-pill' : 'standard-pill'}`}>
-                                                    <Briefcase size={12}/> {member.role}
-                                                </span>
+                            {team.map(member => {
+                                const avatarSrc = member.imgUrl 
+                                    ? (member.imgUrl.startsWith('http') ? member.imgUrl : `${import.meta.env.VITE_API_URL}${member.imgUrl}`)
+                                    : `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=${member.isSupremeAdmin ? '0f172a' : 'e5e7eb'}&color=${member.isSupremeAdmin ? 'fff' : '374151'}&size=150`;
+
+                                return (
+                                    <div key={member._id} className="team-list-item fade-in-row">
+                                        <div className="team-member-info">
+                                            <div className="member-avatar-box">
+                                                <img src={avatarSrc} alt={member.name} />
+                                                {member.isSupremeAdmin && <div className="admin-star"><ShieldAlert size={10} color="white"/></div>}
+                                            </div>
+                                            <div className="member-details">
+                                                <h4>{member.name}</h4>
+                                                <div className="member-tags">
+                                                    <span className={`role-pill ${member.isSupremeAdmin ? 'admin-pill' : 'standard-pill'}`}>
+                                                        <Briefcase size={12}/> {member.role}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div className="member-contact-info">
-                                        <a href={`mailto:${member.email}`} className="contact-link"><Mail size={14}/> {member.email}</a>
-                                        {member.phone ? (
-                                            <a href={`tel:${member.phone}`} className="contact-link"><Phone size={14}/> {member.phone}</a>
-                                        ) : (
-                                            <span className="contact-link disabled"><Phone size={14}/> No number</span>
-                                        )}
-                                    </div>
+                                        <div className="member-contact-info">
+                                            <a href={`mailto:${member.email}`} className="contact-link"><Mail size={14}/> {member.email}</a>
+                                            {member.phone ? (
+                                                <a href={`tel:${member.phone}`} className="contact-link"><Phone size={14}/> {member.phone}</a>
+                                            ) : (
+                                                <span className="contact-link disabled"><Phone size={14}/> No number</span>
+                                            )}
+                                        </div>
 
-                                    <div className="member-actions">
-                                        {isMainAdmin && !member.isSupremeAdmin ? (
-                                            <button className="btn-icon-danger hover-pop" onClick={() => removeTeamMember(member._id)} title="Remove Member">
-                                                <Trash2 size={16} />
-                                            </button>
-                                        ) : (
-                                            <button className="btn-icon-ghost" disabled>
-                                                <MoreVertical size={16} color="#cbd5e1" />
-                                            </button>
-                                        )}
+                                        <div className="member-actions">
+                                            {isMainAdmin && !member.isSupremeAdmin ? (
+                                                <button className="btn-icon-danger hover-pop" onClick={() => removeTeamMember(member._id)} title="Remove Member">
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            ) : (
+                                                <button className="btn-icon-ghost" disabled>
+                                                    <MoreVertical size={16} color="#cbd5e1" />
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
@@ -151,7 +154,7 @@ export default function Team() {
                                         <input type="file" accept="image/*" onChange={handleImageUpload} hidden />
                                     </label>
                                     {imgUrl ? (
-                                        <img src={imgUrl} alt="Preview" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
+                                        <img src={`${import.meta.env.VITE_API_URL}${imgUrl}`} alt="Preview" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
                                     ) : (
                                         <span style={{fontSize:'0.8rem', color:'#94a3b8'}}>No image selected</span>
                                     )}
