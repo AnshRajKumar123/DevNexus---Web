@@ -20,7 +20,6 @@ export default function Team() {
     const teamCacheRef = useRef('');
     const [localTeam, setLocalTeam] = useState(team);
 
-    // Fetch team periodically to update online statuses
     const fetchTeam = async () => {
         try {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/api/team`);
@@ -38,7 +37,6 @@ export default function Team() {
         }
     };
 
-    // Ping the backend to update current user's lastSeen
     const pingStatus = async () => {
         if (!currentUser) return;
         try {
@@ -54,7 +52,7 @@ export default function Team() {
         const interval = setInterval(() => {
             fetchTeam();
             pingStatus();
-        }, 5000); // Check statuses every 5 seconds
+        }, 5000); 
         return () => clearInterval(interval);
     }, [currentUser]);
 
@@ -84,11 +82,11 @@ export default function Team() {
         setShowModal(false);
     };
 
-    // Helper to determine online status (active within last 30 seconds)
+    // Tolerate up to 2 minutes of difference for clock skew between mobile/laptop
     const isUserOnline = (lastSeen) => {
         if (!lastSeen) return false;
         const diff = Date.now() - new Date(lastSeen).getTime();
-        return diff < 30000;
+        return diff < 120000; 
     };
 
     return (
@@ -132,7 +130,6 @@ export default function Team() {
                                             <div className="member-avatar-box">
                                                 <img src={getAvatarSrc(member)} alt={member.name} />
                                                 
-                                                {/* ONLINE STATUS INDICATOR (HIDDEN FOR CURRENT USER) */}
                                                 {!isMe && (
                                                     <div className={`status-indicator ${isOnline ? 'online' : 'offline'}`}></div>
                                                 )}

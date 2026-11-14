@@ -61,6 +61,15 @@ export default function ChatHub() {
         };
     }, []);
 
+    const pingStatus = async () => {
+        if (!currentUser) return;
+        try {
+            await fetch(`${import.meta.env.VITE_API_URL}/api/team/${currentUser.email}/ping`, {
+                method: 'PUT',
+            });
+        } catch (err) {}
+    };
+
     const fetchChats = async () => {
         try {
             const res = await fetch(`${API_URL}/chats`);
@@ -92,7 +101,11 @@ export default function ChatHub() {
 
     useEffect(() => {
         fetchChats();
-        const interval = setInterval(fetchChats, 3000);
+        pingStatus();
+        const interval = setInterval(() => {
+            fetchChats();
+            pingStatus(); // Ensures you stay online while on the chat page!
+        }, 3000);
         return () => clearInterval(interval);
     }, []);
 
@@ -590,6 +603,7 @@ export default function ChatHub() {
                             onTouchEnd={onSwipeEnd}
                             onMouseLeave={onSwipeEnd}
                         >
+                            {/* --- ADDED BACK THE MISSING SKELETON LOADER HERE --- */}
                             {isLoading ? (
                                 <>
                                     <div className="chat-hub-bubble-wrapper other-msg"><div className="skeleton skeleton-bubble" style={{ width: '220px', height: '60px' }}></div></div>
@@ -635,6 +649,7 @@ export default function ChatHub() {
                                                 <div className="chat-hub-bubble-footer" style={isPoll ? { color: '#64748b', marginTop: '0.2rem' } : {}}>
                                                     {chat.isPinned && <Pin size={10} style={{ marginRight: '4px' }} />}
                                                     <span className="chat-hub-timestamp">{chat.timestamp}</span>
+                                                    
                                                     {isMe && chat.message !== '[DELETED]' && (
                                                         <span className={`read-receipt ${isRead ? 'read' : 'unread'}`}>
                                                             <CheckCheck size={14} />
