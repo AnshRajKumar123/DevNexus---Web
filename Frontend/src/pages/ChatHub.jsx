@@ -1,9 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, ShieldCheck, Lock, Users, Sparkles, MessageSquareCode, ArrowLeft, Plus, Video, Image, FileText, File, BarChart2, X, Check, Download, CheckCircle2, Circle } from 'lucide-react';
+import { Send, Lock, Users, Sparkles, MessageSquareCode, ArrowLeft, Plus, Video, Image, FileText, File, BarChart2, X, Check, CheckCircle2, Circle, Ban, Pin } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import '../styles/ChatHub.css';
 
 const API_URL = `${import.meta.env.VITE_API_URL}/api`;
+
+export const getAvatarSrc = (user) => {
+    if (!user || !user.imgUrl) return `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=e5e7eb&color=374151&bold=true`;
+    if (user.imgUrl.startsWith('http')) return user.imgUrl;
+    return `${import.meta.env.VITE_API_URL}${user.imgUrl.startsWith('/') ? '' : '/'}${user.imgUrl}`;
+};
 
 export default function ChatHub() {
     const { currentUser, team = [] } = useData();
@@ -12,40 +18,60 @@ export default function ChatHub() {
     const [selectedRecipient, setSelectedRecipient] = useState('all');
     const [mobileChatOpen, setMobileChatOpen] = useState(false);
     
-    // Attachment & Modal states
     const [showAttachMenu, setShowAttachMenu] = useState(false);
     const [showPollModal, setShowPollModal] = useState(false);
     const [pollQuestion, setPollQuestion] = useState('');
     const [pollOptions, setPollOptions] = useState(['', '']);
     const [allowMultiple, setAllowMultiple] = useState(false);
     
-    // View Votes Modal State
     const [viewVotesPoll, setViewVotesPoll] = useState(null);
     const [localVotes, setLocalVotes] = useState({});
 
-    // File Preview States
     const fileInputRef = useRef(null);
     const [attachments, setAttachments] = useState([]);
     const [isUploading, setIsUploading] = useState(false);
 
-    // --- SWIPE TO REPLY STATE ---
-    const [replyingTo, setReplyingTo] = useState(null); // Stores the chat object being replied to
-    const [swipeOffsets, setSwipeOffsets] = useState({}); // Tracks swipe X distance per chat _id
+    const [replyingTo, setReplyingTo] = useState(null);
+    const [swipeOffsets, setSwipeOffsets] = useState({});
     const swipeStartX = useRef(null);
     const swipeTargetId = useRef(null);
 
+    const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, chat: null });
+    const [pinModal, setPinModal] = useState({ visible: false, chat: null });
+    const [deleteModal, setDeleteModal] = useState({ visible: false, chat: null });
+    const [hiddenChats, setHiddenChats] = useState(new Set()); 
+    const [localReactions, setLocalReactions] = useState({}); 
+
+    // --- NEW: Track the currently active pinned message index ---
+    const [activePinIndex, setActivePinIndex] = useState(0);
+
     const messagesEndRef = useRef(null);
+    const chatCacheRef = useRef(''); 
+
+    useEffect(() => {
+        const handleGlobalContextMenu = (e) => e.preventDefault();
+        document.addEventListener('contextmenu', handleGlobalContextMenu);
+        const handleClickOutside = () => setContextMenu({ visible: false, x: 0, y: 0, chat: null });
+        document.addEventListener('click', handleClickOutside);
+        
+        return () => {
+            document.removeEventListener('contextmenu', handleGlobalContextMenu);
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, []);
 
     const fetchChats = async () => {
         try {
             const res = await fetch(`${API_URL}/chats`);
             if (res.ok) {
                 const data = await res.json();
-                setChats(data);
+                const dataString = JSON.stringify(data);
+                if (dataString !== chatCacheRef.current) {
+                    chatCacheRef.current = dataString;
+                    setChats(data);
+                }
             }
-        } catch (err) {
-            console.error('Error fetching chats:', err);
-        }
+        } catch (err) {}
     };
 
     const markAsRead = async (recipient) => {
@@ -54,15 +80,10 @@ export default function ChatHub() {
             await fetch(`${API_URL}/chats/read`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userEmail: currentUser.email,
-                    recipientEmail: recipient
-                })
+                body: JSON.stringify({ userEmail: currentUser.email, recipientEmail: recipient })
             });
             fetchChats();
-        } catch (err) {
-            console.error('Error marking as read:', err);
-        }
+        } catch (err) {}
     };
 
     useEffect(() => {
@@ -72,14 +93,14 @@ export default function ChatHub() {
     }, []);
 
     useEffect(() => {
-        if (currentUser) {
-            markAsRead(selectedRecipient);
-        }
+        if (currentUser) markAsRead(selectedRecipient);
     }, [selectedRecipient, currentUser]);
 
+    // Scroll to bottom when chats array grows, and reset pin index on channel switch
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [chats, selectedRecipient]);
+        setActivePinIndex(0); 
+    }, [chats.length, selectedRecipient]);
 
     const handleSelectRecipient = (recipientKey) => {
         setSelectedRecipient(recipientKey);
@@ -98,15 +119,10 @@ export default function ChatHub() {
 
     const handleFileChange = (e) => {
         const newFiles = Array.from(e.target.files);
-        if (attachments.length + newFiles.length > 10) {
-            alert('You can only upload up to 10 files at once.');
-            return;
-        }
+        if (attachments.length + newFiles.length > 10) return alert('Max 10 files allowed.');
         const newAttachments = newFiles.map(file => ({
-            file,
-            previewUrl: URL.createObjectURL(file),
-            type: file.type.startsWith('image/') ? 'image' : 
-                  file.type.startsWith('video/') ? 'video' : 'document'
+            file, previewUrl: URL.createObjectURL(file),
+            type: file.type.startsWith('image/') ? 'image' : file.type.startsWith('video/') ? 'video' : 'document'
         }));
         setAttachments([...attachments, ...newAttachments]);
         if (fileInputRef.current) fileInputRef.current.value = '';
@@ -129,17 +145,12 @@ export default function ChatHub() {
             const formData = new FormData();
             formData.append('image', att.file);
             try {
-                const response = await fetch(`${API_URL}/upload`, {
-                    method: 'POST',
-                    body: formData,
-                });
+                const response = await fetch(`${API_URL}/upload`, { method: 'POST', body: formData });
                 if (response.ok) {
                     const data = await response.json();
                     uploadedUrls.push({ url: data.imageUrl, type: att.type, name: att.file.name });
                 }
-            } catch (error) {
-                console.error("File upload failed:", error);
-            }
+            } catch (error) {}
         }
         return uploadedUrls;
     };
@@ -156,9 +167,7 @@ export default function ChatHub() {
             fileUrls = await uploadFiles();
         }
 
-        // If replying to a message, embed the replied context into the text payload
         if (replyingTo && !customMessage) {
-            // Encode replied text to avoid breaking our simple parsing logic
             const safeRepliedText = replyingTo.message.replace(/\n/g, ' ').substring(0, 60);
             finalMessageText = `[REPLY:${replyingTo.senderName}|${safeRepliedText}...]\n${finalMessageText}`;
         }
@@ -183,28 +192,138 @@ export default function ChatHub() {
         }
 
         try {
-            const res = await fetch(`${API_URL}/chats`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            const res = await fetch(`${API_URL}/chats`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             if (res.ok) {
                 if (!customMessage) setMessageText('');
                 clearAttachments();
-                setReplyingTo(null); // Clear reply state
+                setReplyingTo(null);
                 setShowAttachMenu(false);
                 fetchChats();
             }
-        } catch (err) {
-            console.error('Error sending message:', err);
-        } finally {
-            setIsUploading(false);
+        } catch (err) {} finally { setIsUploading(false); }
+    };
+
+    const handleRightClick = (e, chat) => {
+        if (chat.message === '[DELETED]') return; 
+        e.preventDefault();
+        e.stopPropagation();
+        
+        let x = e.pageX;
+        let y = e.pageY;
+        if (window.innerWidth - x < 180) x -= 180;
+        if (window.innerHeight - y < 350) y -= 350;
+        setContextMenu({ visible: true, x, y, chat });
+    };
+
+    const handleMenuReact = async (emoji) => {
+        const chat = contextMenu.chat;
+        setContextMenu({ visible: false, x: 0, y: 0, chat: null });
+
+        setChats(prev => prev.map(c => {
+            if (c._id === chat._id) {
+                const newReactions = { ...(c.reactions || {}) };
+                if (newReactions[currentUser.email] === emoji) {
+                    delete newReactions[currentUser.email];
+                } else {
+                    newReactions[currentUser.email] = emoji;
+                }
+                return { ...c, reactions: newReactions };
+            }
+            return c;
+        }));
+
+        try {
+            await fetch(`${API_URL}/chats/${chat._id}/react`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userEmail: currentUser.email, emoji })
+            });
+            fetchChats();
+        } catch (err) {}
+    };
+
+    const handleMenuReply = () => {
+        setReplyingTo(contextMenu.chat);
+        setContextMenu({ visible: false, x: 0, y: 0, chat: null });
+    };
+
+    const handleMenuCopy = () => {
+        navigator.clipboard.writeText(contextMenu.chat.message.replace(/\[(?:REPLY|IMG|VID|FILE):.*?\]/g, '').trim());
+        setContextMenu({ visible: false, x: 0, y: 0, chat: null });
+    };
+
+    const togglePin = async (chatId, isPinned) => {
+        setChats(prev => prev.map(c => c._id === chatId ? { ...c, isPinned } : c));
+        try {
+            await fetch(`${API_URL}/chats/${chatId}/pin`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ isPinned })
+            });
+            fetchChats();
+        } catch (err) {}
+    };
+
+    const handleMenuPin = () => {
+        const chat = contextMenu.chat;
+        setContextMenu({ visible: false, x: 0, y: 0, chat: null });
+        if (chat.isPinned) {
+            togglePin(chat._id, false); 
+        } else {
+            setPinModal({ visible: true, chat }); 
         }
     };
 
-    // --- SWIPE TO REPLY HANDLERS ---
+    const handleMenuDownload = () => {
+        const text = contextMenu.chat.message;
+        const match = text.match(/\[(?:IMG|VID|FILE):(?:.*?\|)?(.*?)\]/);
+        if (match && match[1]) {
+            const link = document.createElement('a');
+            link.href = match[1];
+            link.download = 'download';
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        setContextMenu({ visible: false, x: 0, y: 0, chat: null });
+    };
+
+    const handleMenuDelete = () => {
+        const chat = contextMenu.chat;
+        setContextMenu({ visible: false, x: 0, y: 0, chat: null });
+        if (chat.senderEmail === currentUser.email) {
+            setDeleteModal({ visible: true, chat }); 
+        } else {
+            handleConfirmDelete('me', chat); 
+        }
+    };
+
+    const handleConfirmDelete = async (type, chatTarget = null) => {
+        const chat = chatTarget || deleteModal.chat;
+        setDeleteModal({ visible: false, chat: null });
+
+        if (type === 'me') {
+            setChats(prev => prev.filter(c => c._id !== chat._id)); 
+            try {
+                await fetch(`${API_URL}/chats/${chat._id}/deleteForMe`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userEmail: currentUser.email })
+                });
+                fetchChats();
+            } catch (err) {}
+        } else if (type === 'everyone') {
+            setChats(prev => prev.map(c => c._id === chat._id ? { ...c, message: '[DELETED]', isPinned: false } : c));
+            try {
+                await fetch(`${API_URL}/chats/${chat._id}`, { method: 'DELETE' });
+                fetchChats();
+            } catch (err) {}
+        }
+    };
+
     const onSwipeStart = (e, chatId) => {
-        // Support touch or mouse drag
+        if(e.button === 2) return; 
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         swipeStartX.current = clientX;
         swipeTargetId.current = chatId;
@@ -214,8 +333,6 @@ export default function ChatHub() {
         if (!swipeStartX.current || !swipeTargetId.current) return;
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         let deltaX = clientX - swipeStartX.current;
-        
-        // Only allow swiping to the right (deltaX > 0) up to a max of 70px
         if (deltaX > 0) {
             if (deltaX > 70) deltaX = 70;
             setSwipeOffsets({ ...swipeOffsets, [swipeTargetId.current]: deltaX });
@@ -225,19 +342,15 @@ export default function ChatHub() {
     const onSwipeEnd = () => {
         if (swipeTargetId.current) {
             const finalOffset = swipeOffsets[swipeTargetId.current] || 0;
-            // If dragged past threshold (50px), trigger reply mode
             if (finalOffset > 50) {
                 const chatToReply = chats.find(c => c._id === swipeTargetId.current);
-                if (chatToReply) setReplyingTo(chatToReply);
+                if (chatToReply && chatToReply.message !== '[DELETED]') setReplyingTo(chatToReply);
             }
-            
-            // Snap back to 0
             setSwipeOffsets({ ...swipeOffsets, [swipeTargetId.current]: 0 });
         }
         swipeStartX.current = null;
         swipeTargetId.current = null;
     };
-
 
     const handleAddPollOption = () => setPollOptions([...pollOptions, '']);
     const handlePollOptionChange = (index, value) => {
@@ -248,14 +361,8 @@ export default function ChatHub() {
 
     const handleCreatePoll = (e) => {
         e.preventDefault();
-        if (!pollQuestion.trim() || pollOptions.filter(o => o.trim()).length < 2) {
-            alert('Please enter a question and at least 2 options.');
-            return;
-        }
-        const validOptions = pollOptions.filter(o => o.trim()).map(opt => ({
-            text: opt,
-            votes: [] 
-        }));
+        if (!pollQuestion.trim() || pollOptions.filter(o => o.trim()).length < 2) return alert('Please enter a question and at least 2 options.');
+        const validOptions = pollOptions.filter(o => o.trim()).map(opt => ({ text: opt, votes: [] }));
         const pollData = { question: pollQuestion, allowMultiple, options: validOptions, creatorEmail: currentUser.email };
         handleSendMessage(null, `[POLL_JSON]:${JSON.stringify(pollData)}`);
         setPollQuestion('');
@@ -268,28 +375,40 @@ export default function ChatHub() {
         setLocalVotes(prev => {
             const currentVotes = prev[chatId] || [];
             if (allowMultiple) {
-                if (currentVotes.includes(optionIndex)) {
-                    return { ...prev, [chatId]: currentVotes.filter(idx => idx !== optionIndex) };
-                } else {
-                    return { ...prev, [chatId]: [...currentVotes, optionIndex] };
-                }
+                if (currentVotes.includes(optionIndex)) return { ...prev, [chatId]: currentVotes.filter(idx => idx !== optionIndex) };
+                else return { ...prev, [chatId]: [...currentVotes, optionIndex] };
             } else {
                 return { ...prev, [chatId]: [optionIndex] };
             }
         });
     };
 
-    const getAvatarSrc = (user) => {
-        return user.imgUrl 
-            ? (user.imgUrl.startsWith('http') ? user.imgUrl : `${import.meta.env.VITE_API_URL}${user.imgUrl}`)
-            : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=e5e7eb&color=374151&bold=true`;
+    // --- NEW: Multiple Pinned Messages Logic ---
+    const handleBannerClick = () => {
+        if (pinnedChats.length === 0) return;
+        
+        // Target the current active pin from the list
+        const chatTarget = pinnedChats[activePinIndex];
+        
+        const element = document.getElementById(`chat-${chatTarget._id}`);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            element.classList.add('highlight-flash');
+            setTimeout(() => element.classList.remove('highlight-flash'), 2000);
+        }
+
+        // Cycle to the next pin index for the next click
+        setActivePinIndex((prevIndex) => (prevIndex + 1) % pinnedChats.length);
     };
 
     const renderMessageContent = (chat) => {
         if (!chat.message) return null;
         let text = chat.message;
 
-        // Render JSON Poll UI
+        if (text === '[DELETED]') {
+            return <div className="deleted-message-bubble"><Ban size={14} /> This message was deleted</div>;
+        }
+
         if (text.startsWith('[POLL_JSON]:')) {
             try {
                 const poll = JSON.parse(text.substring(12));
@@ -300,17 +419,13 @@ export default function ChatHub() {
                     <div className="custom-poll-bubble">
                         <div className="poll-question-header">
                             <h4>{poll.question}</h4>
-                            <span className="poll-subtitle">
-                                <CheckCircle2 size={12}/> {poll.allowMultiple ? 'Select multiple' : 'Select one'}
-                            </span>
+                            <span className="poll-subtitle"><CheckCircle2 size={12}/> {poll.allowMultiple ? 'Select multiple' : 'Select one'}</span>
                         </div>
-                        
                         <div className="poll-options-container">
                             {poll.options.map((opt, idx) => {
                                 const isSelected = userSelectedOptions.includes(idx);
                                 const simulatedOptionVotes = opt.votes.length + (isSelected ? 1 : 0);
                                 const percent = totalVotes > 0 ? (simulatedOptionVotes / totalVotes) * 100 : 0;
-
                                 return (
                                     <div key={idx} className="poll-option-row" onClick={() => handleVoteToggle(chat._id, idx, poll.allowMultiple)}>
                                         <div className="poll-progress-bg" style={{ width: `${percent}%` }}></div>
@@ -334,14 +449,11 @@ export default function ChatHub() {
                         )}
                     </div>
                 );
-            } catch (e) {
-                return <span>[Invalid Poll Data]</span>;
-            }
+            } catch (e) { return <span>[Invalid Poll Data]</span>; }
         }
         
         const lines = text.split('\n');
         return lines.map((line, idx) => {
-            // Render Embedded Reply Box Block
             if (line.startsWith('[REPLY:') && line.endsWith(']')) {
                 const replyContent = line.substring(7, line.length - 1);
                 const [repliedName, repliedText] = replyContent.split('|');
@@ -357,7 +469,6 @@ export default function ChatHub() {
                 return (
                     <div key={idx} className="chat-bubble-image-container">
                         <img src={url} alt="attachment" className="chat-bubble-image" />
-                        <a href={url} download target="_blank" rel="noreferrer" className="image-download-overlay" title="Download Image"><Download size={16} /></a>
                     </div>
                 );
             }
@@ -370,7 +481,7 @@ export default function ChatHub() {
                 const [name, url] = content.split('|');
                 return (
                     <a key={idx} href={url} target="_blank" rel="noreferrer" className="chat-bubble-file">
-                        <FileText size={18} /> {name} <Download size={14} className="download-icon" />
+                        <FileText size={18} /> {name}
                     </a>
                 );
             }
@@ -379,6 +490,8 @@ export default function ChatHub() {
     };
 
     const filteredChats = chats.filter(c => {
+        if (c.deletedFor && c.deletedFor.includes(currentUser.email)) return false; 
+        if (hiddenChats.has(c._id)) return false; 
         if (selectedRecipient === 'all') return c.recipientEmail === 'all';
         return (
             (c.senderEmail === currentUser.email && c.recipientEmail === selectedRecipient) ||
@@ -386,20 +499,20 @@ export default function ChatHub() {
         );
     });
 
-    const activeRecipientName = selectedRecipient === 'all' 
-        ? 'Team Chat' 
-        : team.find(t => t.email === selectedRecipient)?.name;
+    const activeRecipientName = selectedRecipient === 'all' ? 'Team Chat' : team.find(t => t.email === selectedRecipient)?.name;
+    
+    // Grab all pinned chats for the current channel
+    const pinnedChats = filteredChats.filter(c => c.isPinned);
+    
+    // Select the currently active pin from the list to display in the banner
+    const activePinnedChat = pinnedChats.length > 0 ? pinnedChats[activePinIndex % pinnedChats.length] : null;
 
     return (
         <div className="chatbox-wrapper page-animate">
             <header className="team-hero stagger-1">
                 <div className="hero-text-content">
-                    <h1 className="hero-greeting">
-                        DevNexus <span className="highlight-name">Secure Chat Hub</span>
-                    </h1>
-                    <p className="hero-subtitle">
-                        End-to-end encrypted workspace messaging for the DevNexus team.
-                    </p>
+                    <h1 className="hero-greeting">DevNexus <span className="highlight-name">Secure Chat Hub</span></h1>
+                    <p className="hero-subtitle">End-to-end encrypted workspace messaging for the DevNexus team.</p>
                 </div>
             </header>
 
@@ -449,6 +562,26 @@ export default function ChatHub() {
                             </div>
                         </div>
 
+                        {/* PINNED MESSAGE BANNER */}
+                        {activePinnedChat && (
+                            <div className="pinned-message-banner pop-in" onClick={handleBannerClick}>
+                                <div className="pinned-banner-indicator">
+                                    <Pin size={16} color="#059669" />
+                                    {pinnedChats.length > 1 && (
+                                        <span className="pinned-counter">{activePinIndex + 1}/{pinnedChats.length}</span>
+                                    )}
+                                </div>
+                                <div className="pinned-banner-content">
+                                    <span className="pinned-banner-title">Pinned Message</span>
+                                    <span className="pinned-banner-text">
+                                        {activePinnedChat.message.startsWith('[POLL') ? '📊 Poll' :
+                                         activePinnedChat.message.startsWith('[IMG') ? '🖼️ Image attached' :
+                                         activePinnedChat.message.length > 50 ? activePinnedChat.message.substring(0,50) + '...' : activePinnedChat.message}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+
                         <div 
                             className="chat-hub-messages-scroll"
                             onMouseMove={onSwipeMove}
@@ -468,25 +601,40 @@ export default function ChatHub() {
                                     const isMe = chat.senderEmail === currentUser?.email;
                                     const isPoll = chat.message && chat.message.startsWith('[POLL_JSON]:');
                                     
-                                    // Swipe transformation calculation
                                     const offset = swipeOffsets[chat._id] || 0;
                                     const transformStyle = { transform: `translateX(${offset}px)` };
 
+                                    const renderedReactions = chat.reactions ? Array.from(new Set(Object.values(chat.reactions))) : [];
+
                                     return (
                                         <div 
+                                            id={`chat-${chat._id}`}
                                             key={chat._id || idx} 
                                             className={`chat-hub-bubble-wrapper ${isMe ? 'my-msg' : 'other-msg'} ${isPoll ? 'poll-msg-wrapper' : ''}`}
                                             onMouseDown={(e) => onSwipeStart(e, chat._id)}
                                             onTouchStart={(e) => onSwipeStart(e, chat._id)}
+                                            onContextMenu={(e) => handleRightClick(e, chat)}
                                             style={transformStyle}
                                         >
                                             {!isMe && !isPoll && <span className="chat-hub-sender-label">{chat.senderName}</span>}
                                             <div className={`chat-hub-bubble ${isPoll ? 'poll-bubble-whatsapp' : (isMe ? 'bubble-mine' : 'bubble-theirs')}`}>
+                                                
                                                 <div className="chat-hub-text">{renderMessageContent(chat)}</div>
+                                                
                                                 <div className="chat-hub-bubble-footer" style={isPoll ? { color: '#64748b', marginTop: '0.2rem' } : {}}>
-                                                    <span className="chat-hub-lock-icon" title="Encrypted"><Lock size={10} /></span>
+                                                    {chat.isPinned && <Pin size={10} style={{ marginRight: '4px' }} />}
                                                     <span className="chat-hub-timestamp">{chat.timestamp}</span>
                                                 </div>
+
+                                                {/* EMOJI REACTION POPUP BADGE */}
+                                                {renderedReactions.length > 0 && (
+                                                    <div className="chat-reaction-badge pop-in">
+                                                        {renderedReactions.join(' ')}
+                                                        {Object.keys(chat.reactions).length > 1 && (
+                                                            <span className="reaction-count">{Object.keys(chat.reactions).length}</span>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     );
@@ -570,6 +718,59 @@ export default function ChatHub() {
                 </div>
             </section>
 
+            {/* --- CUSTOM CONTEXT MENU --- */}
+            {contextMenu.visible && (
+                <div className="custom-context-menu pop-in" style={{ top: contextMenu.y, left: contextMenu.x }} onClick={(e) => e.stopPropagation()}>
+                    <div className="context-menu-reactions">
+                        {['👍','❤️','😂','😮','😢','👏'].map(emoji => (
+                            <button key={emoji} onClick={() => handleMenuReact(emoji)} className="reaction-btn">{emoji}</button>
+                        ))}
+                    </div>
+                    <div className="context-menu-actions">
+                        <button onClick={handleMenuReply}>Reply</button>
+                        <button onClick={handleMenuPin}>
+                            {contextMenu.chat?.isPinned ? 'Unpin' : 'Pin'}
+                        </button>
+                        <button onClick={handleMenuCopy}>Copy</button>
+                        {contextMenu.chat?.message?.match(/\[(?:IMG|VID|FILE):/) && (
+                            <button onClick={handleMenuDownload}>Download</button>
+                        )}
+                        <button onClick={handleMenuDelete} className="context-menu-danger">Delete</button>
+                    </div>
+                </div>
+            )}
+
+            {/* --- PIN DURATION MODAL --- */}
+            {pinModal.visible && (
+                <div className="modal-overlay fade-in">
+                    <div className="pin-duration-modal pop-in">
+                        <h3>Choose how long your new pin lasts</h3>
+                        <p>You can unpin at any time.</p>
+                        <div className="pin-duration-options">
+                            <button onClick={() => { togglePin(pinModal.chat._id, true); setPinModal({ visible: false, chat: null }); }}>24 hours</button>
+                            <button onClick={() => { togglePin(pinModal.chat._id, true); setPinModal({ visible: false, chat: null }); }}>7 days</button>
+                            <button onClick={() => { togglePin(pinModal.chat._id, true); setPinModal({ visible: false, chat: null }); }}>30 days</button>
+                            <button onClick={() => setPinModal({ visible: false, chat: null })}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* --- DELETE MESSAGE MODAL --- */}
+            {deleteModal.visible && (
+                <div className="modal-overlay fade-in">
+                    <div className="delete-action-modal pop-in">
+                        <h3>Delete Message?</h3>
+                        <p>Are you sure you want to delete this message?</p>
+                        <div className="delete-action-options">
+                            <button className="btn-modern-danger" onClick={() => handleConfirmDelete('everyone')}>Delete for everyone</button>
+                            <button className="btn-modern-secondary" onClick={() => handleConfirmDelete('me')}>Delete for me</button>
+                            <button className="text-btn" onClick={() => setDeleteModal({ visible: false, chat: null })}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* --- View Votes Modal Popup --- */}
             {viewVotesPoll && (
                 <div className="modal-overlay fade-in">
@@ -583,26 +784,17 @@ export default function ChatHub() {
                             <div className="poll-votes-question-bubble">
                                 {viewVotesPoll.poll.question}
                             </div>
-
                             {viewVotesPoll.poll.options.map((opt, i) => {
                                 const optionVotes = [...opt.votes];
                                 const userSelectedOptions = localVotes[viewVotesPoll.chatId] || [];
-                                
                                 if (userSelectedOptions.includes(i)) {
-                                    optionVotes.push({
-                                        user: currentUser.name,
-                                        avatar: getAvatarSrc(currentUser),
-                                        time: 'Just now'
-                                    });
+                                    optionVotes.push({ user: currentUser.name, avatar: getAvatarSrc(currentUser), time: 'Just now' });
                                 }
-
                                 return (
                                     <div key={i} className="poll-votes-option-group">
                                         <div className="poll-votes-option-header">
                                             <h4>{opt.text}</h4>
-                                            <span className="vote-count-text">
-                                                {optionVotes.length} {optionVotes.length === 1 ? 'vote' : 'votes'}
-                                            </span>
+                                            <span className="vote-count-text">{optionVotes.length} {optionVotes.length === 1 ? 'vote' : 'votes'}</span>
                                         </div>
                                         {optionVotes.length === 0 ? (
                                             <div className="no-votes-text">No votes yet</div>

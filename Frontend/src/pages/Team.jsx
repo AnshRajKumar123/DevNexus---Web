@@ -21,6 +21,7 @@ export default function Team() {
 
         const formData = new FormData();
         formData.append('image', file);
+        formData.append('isProfile', 'true'); // Required for subfolder routing
 
         try {
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/upload`, {
@@ -29,7 +30,6 @@ export default function Team() {
             });
             if (!response.ok) throw new Error('Image upload failed');
             const data = await response.json();
-            // Store the relative path in state, but display with full URL
             setImgUrl(data.imageUrl);
         } catch (error) {
             console.error("Upload Error:", error);

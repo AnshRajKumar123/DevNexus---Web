@@ -32,11 +32,11 @@ export default function Profile() {
 
         const formData = new FormData();
         formData.append('image', file);
-        formData.append('userId', currentUserId); // Passes userId so the backend can delete the old image file
+        formData.append('userId', currentUserId); 
+        formData.append('isProfile', 'true'); // Required for subfolder routing
 
         try {
             setIsUploading(true);
-
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/upload`, {
                 method: 'POST',
                 body: formData,
