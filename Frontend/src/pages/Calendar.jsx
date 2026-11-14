@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar as CalIcon, Plus, Video, MapPin, Clock, Users, X, CalendarDays } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import '../styles/Calendar.css';
@@ -6,11 +6,17 @@ import '../styles/Calendar.css';
 export default function Calendar() {
     const { events, addEvent, currentUser } = useData();
 
+    const [isLoading, setIsLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [title, setTitle] = useState('');
     const [date, setDate] = useState('');
     const [time, setTime] = useState('');
     const [type, setType] = useState('Google Meet');
+
+    useEffect(() => {
+        const timer = setTimeout(() => setIsLoading(false), 800);
+        return () => clearTimeout(timer);
+    }, []);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -47,7 +53,22 @@ export default function Calendar() {
                             <h3><CalendarDays size={18} className="icon-blue" /> Scheduled Events ({events.length})</h3>
                         </div>
 
-                        {events.length === 0 ? (
+                        {isLoading ? (
+                            <div className="calendar-list-modern">
+                                {Array.from({ length: 3 }).map((_, i) => (
+                                    <div key={i} className="calendar-card-item">
+                                        <div className="skeleton skeleton-btn" style={{ width: '100px', height: '50px' }}></div>
+                                        <div className="calendar-main-info">
+                                            <div className="skeleton skeleton-text medium"></div>
+                                            <div className="skeleton skeleton-text short"></div>
+                                        </div>
+                                        <div className="calendar-attendees-col">
+                                            <div className="skeleton skeleton-btn" style={{ width: '120px', height: '25px', borderRadius: '99px' }}></div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : events.length === 0 ? (
                             <div className="empty-state">
                                 <CalendarDays size={48} color="#94a3b8" />
                                 <h3>No Events Scheduled</h3>

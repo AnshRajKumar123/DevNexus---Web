@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { AlertTriangle, XCircle, ShieldAlert } from 'lucide-react';
 import '../styles/Login.css';
 import { DashPic } from '../assets/assets';
@@ -27,10 +27,8 @@ export default function Login() {
         
         if (!result.success) {
             if (result.status === 429) {
-                // Backend blocked the IP (Max 3 reached)
                 showToast(result.message, 'blocked');
             } else if (result.status === 401) {
-                // Incorrect password/email
                 const newAttempts = attempts + 1;
                 setAttempts(newAttempts);
                 
@@ -51,7 +49,6 @@ export default function Login() {
 
     return (
         <div className="login-wrapper">
-            {/* Custom Toast Notification */}
             {toast.show && (
                 <div className={`security-toast pop-in toast-${toast.type}`}>
                     {toast.type === 'warning' && <AlertTriangle size={20} />}
@@ -71,41 +68,53 @@ export default function Login() {
                 <form className="login-form" onSubmit={handleSignIn}>
                     <div className="input-group">
                         <label htmlFor="email">Work Email</label>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            placeholder="enter your email" 
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required 
-                            disabled={attempts >= 3}
-                        />
+                        {isLoading ? (
+                            <div className="skeleton skeleton-text" style={{ height: '46px', width: '100%', borderRadius: '8px', marginBottom: 0 }}></div>
+                        ) : (
+                            <input 
+                                type="email" 
+                                id="email" 
+                                placeholder="enter your email" 
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required 
+                                disabled={attempts >= 3}
+                            />
+                        )}
                     </div>
 
                     <div className="input-group">
                         <label htmlFor="password">Password</label>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            placeholder="••••••••" 
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required 
-                            disabled={attempts >= 3}
-                        />
+                        {isLoading ? (
+                            <div className="skeleton skeleton-text" style={{ height: '46px', width: '100%', borderRadius: '8px', marginBottom: 0 }}></div>
+                        ) : (
+                            <input 
+                                type="password" 
+                                id="password" 
+                                placeholder="••••••••" 
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required 
+                                disabled={attempts >= 3}
+                            />
+                        )}
                     </div>
 
                     <div className="login-options">
                         <label className="remember-me">
-                            <input type="checkbox" disabled={attempts >= 3} />
+                            <input type="checkbox" disabled={attempts >= 3 || isLoading} />
                             <span>Remember me</span>
                         </label>
                         <a href="#" className="forgot-password">Forgot password?</a>
                     </div>
 
-                    <button type="submit" className="login-button hover-pop" disabled={isLoading || attempts >= 3}>
-                        {isLoading ? 'Verifying...' : 'Sign In'}
-                    </button>
+                    {isLoading ? (
+                        <div className="skeleton skeleton-btn" style={{ height: '46px', width: '100%', borderRadius: '8px', marginTop: '0.5rem' }}></div>
+                    ) : (
+                        <button type="submit" className="login-button hover-pop" disabled={attempts >= 3}>
+                            Sign In
+                        </button>
+                    )}
                 </form>
             </div>
         </div>

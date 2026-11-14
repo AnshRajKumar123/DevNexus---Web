@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FileQuestion, Plus, X, MessageSquarePlus, PlayCircle, CheckCircle2, AlertCircle, User, Layers } from 'lucide-react';
 import { useData } from '../context/DataContext'; 
 import '../styles/Inquiry.css';
@@ -6,10 +6,16 @@ import '../styles/Inquiry.css';
 export default function Inquiry() {
     const { inquiries, addInquiry, updateInquiryStatus, team, currentUser } = useData(); 
 
+    const [isLoading, setIsLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [title, setTitle] = useState('');
     const [desc, setDesc] = useState('');
     const [assignedTo, setAssignedTo] = useState('All Members');
+
+    useEffect(() => {
+        const timer = setTimeout(() => setIsLoading(false), 800);
+        return () => clearTimeout(timer);
+    }, []);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -44,7 +50,25 @@ export default function Inquiry() {
                             <h3><Layers size={18} className="icon-orange" /> Active Tasks & Issues ({inquiries.length})</h3>
                         </div>
 
-                        {inquiries.length === 0 ? (
+                        {isLoading ? (
+                            <div className="inquiry-list-modern">
+                                {Array.from({ length: 3 }).map((_, i) => (
+                                    <div key={i} className="inquiry-card-item">
+                                        <div className="skeleton skeleton-avatar" style={{ width: '6px', height: '40px', borderRadius: '99px' }}></div>
+                                        <div className="inquiry-main-info">
+                                            <div className="skeleton skeleton-text medium"></div>
+                                            <div className="skeleton skeleton-text short"></div>
+                                        </div>
+                                        <div className="inquiry-status-col">
+                                            <div className="skeleton skeleton-btn" style={{ width: '80px', height: '25px', borderRadius: '99px' }}></div>
+                                        </div>
+                                        <div className="inquiry-actions-col">
+                                            <div className="skeleton skeleton-btn" style={{ width: '80px', height: '30px' }}></div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : inquiries.length === 0 ? (
                             <div className="empty-state">
                                 <FileQuestion size={48} color="#94a3b8" />
                                 <h3>No pending tasks or inquiries</h3>

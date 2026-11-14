@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Mail, MessageCircle, Camera, Calendar, Plug, CheckCircle2, AlertCircle, X, Key, ShieldCheck, ExternalLink, Lock } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import '../styles/ConnectedApps.css';
@@ -7,9 +7,15 @@ export default function ConnectedApps() {
     const { integrations = [], connectIntegration, disconnectIntegration, currentUser } = useData();
     const isMainAdmin = currentUser?.isSupremeAdmin;
 
+    const [isLoading, setIsLoading] = useState(true);
     const [selectedApp, setSelectedApp] = useState(null);
     const [apiKey, setApiKey] = useState('');
     const [apiSecret, setApiSecret] = useState('');
+
+    useEffect(() => {
+        const timer = setTimeout(() => setIsLoading(false), 800);
+        return () => clearTimeout(timer);
+    }, []);
 
     const apps = [
         { 
@@ -87,7 +93,21 @@ export default function ConnectedApps() {
                         </div>
 
                         <div className="apps-list-modern">
-                            {apps.map(app => {
+                            {isLoading ? Array.from({ length: 4 }).map((_, i) => (
+                                <div key={i} className="app-card-item">
+                                    <div className="skeleton skeleton-avatar" style={{ borderRadius: '12px' }}></div>
+                                    <div className="app-main-info">
+                                        <div className="skeleton skeleton-text medium"></div>
+                                        <div className="skeleton skeleton-text short"></div>
+                                    </div>
+                                    <div className="app-status-col">
+                                        <div className="skeleton skeleton-btn" style={{ width: '100px', height: '25px', borderRadius: '99px' }}></div>
+                                    </div>
+                                    <div className="app-actions-col">
+                                        <div className="skeleton skeleton-btn" style={{ width: '110px', height: '35px' }}></div>
+                                    </div>
+                                </div>
+                            )) : apps.map(app => {
                                 const isConnected = integrations.some(i => i.appName === app.name);
 
                                 return (

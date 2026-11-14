@@ -14,6 +14,7 @@ export const getAvatarSrc = (user) => {
 export default function ChatHub() {
     const { currentUser, team = [] } = useData();
     const [chats, setChats] = useState([]);
+    const [isLoading, setIsLoading] = useState(true); // NEW: Skeleton Loading State
     const [messageText, setMessageText] = useState('');
     const [selectedRecipient, setSelectedRecipient] = useState('all');
     const [mobileChatOpen, setMobileChatOpen] = useState(false);
@@ -43,7 +44,7 @@ export default function ChatHub() {
     const [localReactions, setLocalReactions] = useState({}); 
 
     const [activePinIndex, setActivePinIndex] = useState(0);
-    const [isFullScreen, setIsFullScreen] = useState(false); // NEW: Full Screen State
+    const [isFullScreen, setIsFullScreen] = useState(false);
 
     const messagesEndRef = useRef(null);
     const chatCacheRef = useRef(''); 
@@ -70,8 +71,11 @@ export default function ChatHub() {
                     chatCacheRef.current = dataString;
                     setChats(data);
                 }
+                setIsLoading(false); // Disable skeleton once data arrives
             }
-        } catch (err) {}
+        } catch (err) {
+            setIsLoading(false);
+        }
     };
 
     const markAsRead = async (recipient) => {
@@ -524,7 +528,16 @@ export default function ChatHub() {
                                 </div>
                             </div>
                             <div className="chat-hub-section-title">Team Members</div>
-                            {team.filter(t => t.email !== currentUser?.email).map(member => (
+                            {/* SIDEBAR SKELETON LOADER */}
+                            {isLoading ? Array.from({ length: 4 }).map((_, i) => (
+                                <div key={i} className="chat-hub-channel-item">
+                                    <div className="skeleton skeleton-avatar"></div>
+                                    <div className="chat-hub-channel-info" style={{ flex: 1 }}>
+                                        <div className="skeleton skeleton-text medium"></div>
+                                        <div className="skeleton skeleton-text short"></div>
+                                    </div>
+                                </div>
+                            )) : team.filter(t => t.email !== currentUser?.email).map(member => (
                                 <div key={member._id} className={`chat-hub-channel-item ${selectedRecipient === member.email ? 'active-channel' : ''}`} onClick={() => handleSelectRecipient(member.email)}>
                                     <img src={getAvatarSrc(member)} alt={member.name} className="chat-hub-member-avatar" />
                                     <div className="chat-hub-channel-info">
@@ -548,7 +561,6 @@ export default function ChatHub() {
                             </div>
                             <div className="chat-hub-security-tag">
                                 <Lock size={13} color="#10b981" /> Encrypted
-                                {/* --- FULL SCREEN TOGGLE BUTTON --- */}
                                 <button onClick={() => setIsFullScreen(!isFullScreen)} className="fullscreen-btn" title="Toggle Fullscreen">
                                     {isFullScreen ? <Minimize size={14} /> : <Maximize size={14} />}
                                 </button>
@@ -582,7 +594,14 @@ export default function ChatHub() {
                             onTouchEnd={onSwipeEnd}
                             onMouseLeave={onSwipeEnd}
                         >
-                            {filteredChats.length === 0 ? (
+                            {/* MAIN CHAT SKELETON LOADER */}
+                            {isLoading ? (
+                                <>
+                                    <div className="chat-hub-bubble-wrapper other-msg"><div className="skeleton skeleton-bubble" style={{ width: '220px', height: '60px' }}></div></div>
+                                    <div className="chat-hub-bubble-wrapper my-msg"><div className="skeleton skeleton-bubble" style={{ width: '300px', height: '80px' }}></div></div>
+                                    <div className="chat-hub-bubble-wrapper other-msg"><div className="skeleton skeleton-bubble" style={{ width: '250px', height: '50px' }}></div></div>
+                                </>
+                            ) : filteredChats.length === 0 ? (
                                 <div className="chat-hub-empty-state">
                                     <Sparkles size={36} color="#94a3b8" />
                                     <h3>No encrypted messages yet</h3>

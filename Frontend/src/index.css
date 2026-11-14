@@ -139,13 +139,92 @@ body {
 }
 
 /* =========================================
+   SKELETON LOADING SYSTEM
+   ========================================= */
+
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.skeleton {
+    background: #e2e8f0;
+    background-image: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite linear forwards;
+    border-radius: 8px;
+    color: transparent !important;
+    pointer-events: none;
+    user-select: none;
+    overflow: hidden;
+}
+
+/* Hide any inner content if wrapping an existing element */
+.skeleton * {
+    visibility: hidden !important;
+}
+
+/* Helpful Presets for Skeletons */
+.skeleton-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.skeleton-text {
+    height: 1rem;
+    border-radius: 4px;
+    width: 100%;
+    margin-bottom: 0.4rem;
+}
+
+.skeleton-text.short {
+    width: 40%;
+}
+
+.skeleton-text.medium {
+    width: 70%;
+}
+
+.skeleton-title {
+    height: 1.5rem;
+    width: 50%;
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+}
+
+.skeleton-btn {
+    height: 40px;
+    width: 100px;
+    border-radius: 8px;
+}
+
+.skeleton-card {
+    height: 150px;
+    width: 100%;
+    border-radius: 16px;
+}
+
+.skeleton-bubble {
+    height: 60px;
+    width: 250px;
+    border-radius: 16px;
+    margin-bottom: 1rem;
+}
+
+/* =========================================
    DARK MODE GLOBAL OVERRIDES
    ========================================= */
 
 /* 1. Global Background & Text */
 body.dark-mode {
     background-color: #0f172a;
-    /* Deep slate background */
     color: #f8fafc;
 }
 
@@ -168,7 +247,6 @@ body.dark-mode .nav-link {
 body.dark-mode .nav-link:hover {
     background-color: #334155;
     color: #60a5fa;
-    /* Light blue accent */
 }
 
 body.dark-mode .nav-link.active {
@@ -180,7 +258,7 @@ body.dark-mode .sidebar-bottom {
     border-top-color: #334155;
 }
 
-/* 3. Cards & Widgets (Dashboard, Team, Profile) */
+/* 3. Cards & Widgets */
 body.dark-mode .dashboard-hero-modern,
 body.dark-mode .kpi-card-modern,
 body.dark-mode .premium-widget,
@@ -257,7 +335,7 @@ body.dark-mode .links-table td {
     border-bottom: 1px solid #334155;
 }
 
-/* 6. Forms, Inputs, and Modals */
+/* 6. Forms, Inputs, Modals & Skeletons */
 body.dark-mode .modal-content {
     background-color: #1e293b;
     border: 1px solid #334155;
@@ -288,6 +366,12 @@ body.dark-mode .file-btn:hover,
 body.dark-mode .btn-cancel:hover,
 body.dark-mode .btn-secondary:hover {
     background-color: #475569;
+}
+
+/* Dark Mode Skeleton Loading Overrides */
+body.dark-mode .skeleton {
+    background: #334155;
+    background-image: linear-gradient(90deg, #334155 25%, #475569 50%, #334155 75%);
 }
 
 /* 7. Empty States */

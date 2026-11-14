@@ -1,14 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link as LinkIcon, Plus, Trash2, ExternalLink, X, Compass, Globe } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import '../styles/QuickLinks.css';
 
 export default function QuickLinks() {
     const { links, addLink, removeLink, currentUser } = useData();
+    const [isLoading, setIsLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     
     const [title, setTitle] = useState('');
     const [url, setUrl] = useState('');
+
+    useEffect(() => {
+        const timer = setTimeout(() => setIsLoading(false), 800);
+        return () => clearTimeout(timer);
+    }, []);
 
     const handleAdd = (e) => {
         e.preventDefault();
@@ -36,7 +42,25 @@ export default function QuickLinks() {
                             <h3><Compass size={18} className="icon-blue" /> Saved Resources ({links.length})</h3>
                         </div>
 
-                        {links.length === 0 ? (
+                        {isLoading ? (
+                            <div className="links-list-modern">
+                                {Array.from({ length: 4 }).map((_, i) => (
+                                    <div key={i} className="link-card-item">
+                                        <div className="skeleton skeleton-avatar" style={{ borderRadius: '10px', width: '40px', height: '40px' }}></div>
+                                        <div className="link-main-info">
+                                            <div className="skeleton skeleton-text medium"></div>
+                                            <div className="skeleton skeleton-text short"></div>
+                                        </div>
+                                        <div className="link-creator-col">
+                                            <div className="skeleton skeleton-text short"></div>
+                                        </div>
+                                        <div className="link-actions-col">
+                                            <div className="skeleton skeleton-btn" style={{ width: '80px', height: '34px' }}></div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : links.length === 0 ? (
                             <div className="empty-state">
                                 <LinkIcon size={48} color="#94a3b8" />
                                 <h3>No links added</h3>
