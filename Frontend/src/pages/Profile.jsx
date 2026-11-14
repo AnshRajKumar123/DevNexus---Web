@@ -41,7 +41,8 @@ export default function Profile() {
             });
             if (!response.ok) throw new Error('Image upload failed');
             const data = await response.json();
-            await updateProfile(currentUser.id, { imgUrl: data.imageUrl });
+            // Fixed: use currentUserId instead of currentUser.id
+            await updateProfile(currentUserId, { imgUrl: data.imageUrl });
         } catch (error) {
             console.error('Upload Error:', error);
             alert('Failed to upload image. Ensure the backend server is running.');
@@ -81,7 +82,7 @@ export default function Profile() {
                             </div>
                         ) : (
                             <img
-                                src={currentUser.imgUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name)}&background=${currentUser.isSupremeAdmin ? '0f172a' : 'e5e7eb'}&color=${currentUser.isSupremeAdmin ? 'fff' : '374151'}&size=150`}
+                                src={currentUser.imgUrl ? `${import.meta.env.VITE_API_URL}${currentUser.imgUrl}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name)}&background=${currentUser.isSupremeAdmin ? '0f172a' : 'e5e7eb'}&color=${currentUser.isSupremeAdmin ? 'fff' : '374151'}&size=150`}
                                 alt={currentUser.name}
                                 className="profile-main-avatar"
                             />
