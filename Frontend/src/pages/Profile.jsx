@@ -35,14 +35,14 @@ export default function Profile() {
         formData.append('image', file);
 
         try {
-            const response = await fetch('http://localhost:5001/api/upload', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/upload`, {
                 method: 'POST',
                 body: formData
             });
 
             if (!response.ok) throw new Error('Image upload failed');
             const data = await response.json();
-            const newImgUrl = `http://localhost:5001${data.imageUrl}`;
+            setImgUrl(`${import.meta.env.VITE_API_URL}${data.imageUrl}`);
             
             await updateProfile(currentUserId, { imgUrl: newImgUrl });
         } catch (error) {

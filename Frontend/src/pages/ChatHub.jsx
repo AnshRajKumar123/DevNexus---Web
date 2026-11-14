@@ -3,7 +3,8 @@ import { Send, ShieldCheck, Lock, Users, Sparkles, MessageSquareCode, ArrowLeft 
 import { useData } from '../context/DataContext';
 import '../styles/ChatHub.css';
 
-const API_URL = 'http://localhost:5001/api';
+const API_URL = `${import.meta.env.VITE_API_URL}/api`;
+
 
 export default function ChatHub() {
     const { currentUser, team = [] } = useData();

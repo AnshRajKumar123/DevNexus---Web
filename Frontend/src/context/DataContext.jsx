@@ -3,7 +3,8 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 const DataContext = createContext();
 export const useData = () => useContext(DataContext);
 
-const API_URL = 'http://localhost:5001/api';
+const API_URL = `${import.meta.env.VITE_API_URL}/api`;
+
 
 export const DataProvider = ({ children }) => {
     // --- Global Theme State ---
