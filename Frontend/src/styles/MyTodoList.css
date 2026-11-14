@@ -1,0 +1,153 @@
+.todo-list-modern {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 1.5rem 1.5rem 1.5rem;
+}
+
+.todo-card-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 0;
+    border-bottom: 1px dashed #e2e8f0;
+    gap: 1.5rem;
+}
+
+.todo-card-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.todo-main-info {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.todo-main-info h4 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.todo-main-info h4.completed-text {
+    text-decoration: line-through;
+    color: #94a3b8;
+}
+
+.todo-meta-tags {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.priority-badge {
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.priority-low { background: #f1f5f9; color: #475569; }
+.priority-medium { background: #eff6ff; color: #2563eb; }
+.priority-high { background: #fef2f2; color: #dc2626; }
+
+.todo-status-col {
+    flex: 0.8;
+    display: flex;
+    justify-content: center;
+}
+
+.todo-actions-col {
+    flex: 1.2;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.action-button-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.btn-action-start {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+    padding: 0.4rem 0.9rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: all 0.2s;
+}
+.btn-action-start:hover { background: #dbeafe; }
+
+.btn-action-finish {
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid #a7f3d0;
+    padding: 0.4rem 0.9rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: all 0.2s;
+}
+.btn-action-finish:hover { background: #d1fae5; }
+
+.btn-action-reset {
+    background: #f8fafc;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    padding: 0.4rem 0.9rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-action-reset:hover { background: #f1f5f9; }
+
+/* --- RESPONSIVE MOBILE ADJUSTMENTS --- */
+@media (max-width: 768px) {
+    .todo-card-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .todo-main-info {
+        width: 100%;
+    }
+
+    .todo-status-col {
+        justify-content: flex-start;
+    }
+
+    .todo-actions-col {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .kpi-grid {
+        grid-template-columns: 3, 1fr;
+
+    }
+
+    .modal-content {
+        max-width: 90% !important;
+        padding: 1.25rem !important;
+        margin: 1rem;
+    }
+}

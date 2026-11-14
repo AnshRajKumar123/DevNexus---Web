@@ -1,0 +1,460 @@
+.sidebar {
+    width: 260px;
+    background-color: #ffffff;
+    /* White main background */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-right: 1px solid #e5e7eb;
+    color: #111827;
+    /* Black/Dark Gray main text */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    height: 100vh;
+}
+
+/* --- TOP BRAND SECTION --- */
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem 1rem 0 1.25rem;
+}
+
+.brand-logo {
+    height: 36px;
+    width: 36px;
+    border-radius: 8px;
+    margin-right: 0.75rem;
+    object-fit: contain;
+}
+
+.brand-text {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #111827;
+    /* Black text */
+    font-family: var(--Font3);
+    letter-spacing: -0.025em;
+}
+
+.sidebar-scrollable {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* Hide scrollbar for cleaner look */
+.sidebar-scrollable::-webkit-scrollbar {
+    display: none;
+}
+
+.sidebar-scrollable {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.sidebar-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.section-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #9ca3af;
+    /* Light gray for section headers */
+    margin-bottom: 0.5rem;
+    padding-left: 0.75rem;
+}
+
+.sidebar-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-item {
+    margin: 0;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #374151;
+    /* Dark gray for standard links */
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.nav-link-left {
+    display: flex;
+    align-items: center;
+}
+
+.nav-icon {
+    margin-right: 0.75rem;
+    display: flex;
+    align-items: center;
+    color: #6b7280;
+    /* Default icon color */
+}
+
+/* Hover State - Dark Blue text & light background */
+.nav-link:hover {
+    background-color: #f3f4f6;
+    color: #1e3a8a;
+    /* Dark Blue */
+}
+
+.nav-link:hover .nav-icon {
+    color: #1e3a8a;
+}
+
+/* Active State - Dark Blue background tint & bold Dark Blue text */
+.nav-link.active {
+    background-color: #eff6ff;
+    color: #1e3a8a;
+    font-weight: 600;
+}
+
+/* Badges - Dark Blue background */
+.nav-badge {
+    background-color: #1e3a8a;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.125rem 0.4rem;
+    border-radius: 9999px;
+    min-width: 1.25rem;
+    text-align: center;
+}
+
+/* --- BOTTOM PROFILE SECTION --- */
+.sidebar-bottom {
+    padding: 1rem;
+    border-top: 1px solid #f3f4f6;
+}
+
+.profile-widget {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.profile-widget:hover {
+    background-color: #f3f4f6;
+}
+
+.profile-pic {
+    height: 36px;
+    width: 36px;
+    border-radius: 50%;
+    margin-right: 0.75rem;
+    object-fit: cover;
+}
+
+.profile-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+.profile-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 0.1rem 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.profile-role {
+    font-size: 0.7rem;
+    color: #6b7280;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* --- ANIMATED SVG THEME TOGGLE --- */
+.theme-toggle-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+#theme-toggle-button {
+    font-size: 17px;
+    position: relative;
+    display: inline-block;
+    width: 6em;
+    cursor: pointer;
+}
+
+#theme-toggle-button #toggle {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+#container,
+#patches,
+#stars,
+#button,
+#sun,
+#moon,
+#cloud {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 0.25s;
+}
+
+/* night sky background */
+#toggle:checked+svg #container {
+    fill: #2b4360;
+}
+
+/* move button to right when checked */
+#toggle:checked+svg #button {
+    transform: translate(28px, 2.333px);
+}
+
+/* show/hide sun and moon */
+#sun {
+    opacity: 1;
+}
+
+#toggle:checked+svg #sun {
+    opacity: 0;
+}
+
+#moon {
+    opacity: 0;
+}
+
+#toggle:checked+svg #moon {
+    opacity: 1;
+}
+
+/* show/hide background items */
+#cloud {
+    opacity: 1;
+}
+
+#toggle:checked+svg #cloud {
+    opacity: 0;
+}
+
+#stars {
+    opacity: 0;
+}
+
+#toggle:checked+svg #stars {
+    opacity: 1;
+}
+
+/* Badges - Dark Blue background with clean counter pill layout */
+.nav-badge {
+    background-color: #2563eb;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.125rem 0.45rem;
+    border-radius: 9999px;
+    min-width: 1.25rem;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3);
+}
+
+/* --- MOBILE NAVIGATION STYLES --- */
+.mobile-top-navbar {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0 1.25rem;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 1000;
+}
+
+.mobile-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.mobile-hamburger-btn {
+    background: none;
+    border: none;
+    color: #111827;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-bottom-navbar {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: #ffffff;
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.05);
+    z-index: 1000;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 0.5rem;
+}
+
+.mobile-btm-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #6b7280;
+    font-size: 0.7rem;
+    font-weight: 600;
+    gap: 0.2rem;
+    flex: 1;
+    transition: color 0.2s;
+}
+
+.mobile-btm-item.active {
+    color: #2563eb;
+}
+
+.mobile-btm-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-btm-badge {
+    position: absolute;
+    top: -6px;
+    right: -10px;
+    background-color: #2563eb;
+    color: white;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 0.05rem 0.35rem;
+    border-radius: 9999px;
+}
+
+/* Slide-out Drawer */
+.mobile-drawer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 1100;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.mobile-drawer-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.mobile-slide-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 280px;
+    height: 100vh;
+    background: #ffffff;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+    z-index: 1200;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-slide-drawer.open {
+    transform: translateX(0);
+}
+
+.drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.drawer-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #0f172a;
+}
+
+.drawer-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #64748b;
+}
+
+.drawer-scrollable {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.25rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* --- MEDIA QUERY FOR MOBILE BREAKPOINT --- */
+@media (max-width: 768px) {
+    .desktop-sidebar {
+        display: none !important;
+    }
+
+    .mobile-top-navbar {
+        display: flex !important;
+    }
+
+    .mobile-bottom-navbar {
+        display: flex !important;
+    }
+
+    .main-content-wrapper {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding-top: 76px !important;
+        padding-bottom: 80px !important;
+    }
+
+    .dashboard-wrapper {
+        max-width: 100% !important;
+        padding: 0 1rem;
+    }
+}

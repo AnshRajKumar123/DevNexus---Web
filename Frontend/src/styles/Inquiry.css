@@ -1,0 +1,154 @@
+
+/* Modern Inquiry List Layout */
+.inquiry-list-modern {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 1.5rem 1.5rem 1.5rem;
+}
+
+.inquiry-card-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 0;
+    border-bottom: 1px dashed #e2e8f0;
+    gap: 1.5rem;
+}
+
+.inquiry-card-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.status-pill-indicator {
+    width: 6px;
+    height: 40px;
+    border-radius: 99px;
+    flex-shrink: 0;
+}
+
+.status-pill-indicator.pending { background: #f59e0b; }
+.status-pill-indicator.in-progress { background: #3b82f6; }
+.status-pill-indicator.completed { background: #10b981; }
+
+.inquiry-main-info {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.inquiry-main-info h4 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.inquiry-main-info p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+.inquiry-meta-tags {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-weight: 500;
+    margin-top: 0.35rem;
+}
+
+.meta-tag {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.inquiry-status-col {
+    flex: 0.8;
+    display: flex;
+    justify-content: center;
+}
+
+.inquiry-actions-col {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.action-button-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-action-start {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+    padding: 0.4rem 0.9rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: all 0.2s;
+}
+
+.btn-action-start:hover {
+    background: #dbeafe;
+}
+
+.btn-action-finish {
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid #a7f3d0;
+    padding: 0.4rem 0.9rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: all 0.2s;
+}
+
+.btn-action-finish:hover {
+    background: #d1fae5;
+}
+
+.done-text {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #10b981;
+}
+
+.restricted-text {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+/* --- RESPONSIVE MOBILE ADJUSTMENTS --- */
+@media (max-width: 768px) {
+    .inquiry-card-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .inquiry-main-info {
+        width: 100%;
+    }
+
+    .inquiry-status-col,
+    .inquiry-actions-col {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}

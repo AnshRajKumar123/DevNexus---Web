@@ -1,0 +1,229 @@
+/* Custom Team Hero */
+.team-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 2.5rem 3rem;
+    box-shadow: 0 10px 40px -10px rgba(0,0,0,0.04);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(229, 231, 235, 0.5);
+}
+
+.team-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, rgba(255,255,255,0) 70%);
+    border-radius: 50%;
+    z-index: -1;
+}
+
+/* Modern List View */
+.team-list-container {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 1.5rem 1.5rem 1.5rem;
+}
+
+.team-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 0;
+    border-bottom: 1px dashed #e2e8f0;
+    transition: background 0.2s;
+}
+
+.team-list-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+/* Avatar & Info */
+.team-member-info {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex: 2;
+}
+
+.member-avatar-box {
+    position: relative;
+    width: 48px;
+    height: 48px;
+}
+
+.member-avatar-box img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.admin-star {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    background: #f59e0b;
+    border: 2px solid white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.member-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.member-details h4 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+/* Badges */
+.role-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 99px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.admin-pill {
+    background: #fffbeb;
+    color: #d97706;
+    border: 1px solid #fde68a;
+}
+
+.standard-pill {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+/* Contact Details */
+.member-contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1.5;
+}
+
+.contact-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: #475569;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.contact-link:hover {
+    color: #2563eb;
+}
+
+.contact-link.disabled {
+    color: #cbd5e1;
+    pointer-events: none;
+}
+
+/* Actions */
+.member-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 0.5;
+}
+
+.btn-icon-ghost {
+    background: transparent;
+    border: none;
+    padding: 0.5rem;
+    cursor: default;
+}
+
+/* --- RESPONSIVE MOBILE ADJUSTMENTS --- */
+@media (max-width: 768px) {
+    .team-list-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem 0;
+    }
+
+    .team-member-info {
+        width: 100%;
+    }
+
+    .member-contact-info {
+        width: 100%;
+        padding-left: 3.5rem;
+    }
+
+    .member-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .modal-content {
+        max-width: 90% !important;
+        padding: 1.25rem !important;
+        margin: 1rem;
+    }
+
+    .form-group-row {
+        flex-direction: column !important;
+        gap: 0 !important;
+    }
+
+    /* --- RESPONSIVE MOBILE ADJUSTMENTS FOR HERO BANNER --- */
+    .team-hero {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1.25rem !important;
+        padding: 1.5rem !important;
+        text-align: left !important;
+    }
+
+    .team-hero .hero-text-content {
+        width: 100% !important;
+    }
+
+    .team-hero .hero-greeting {
+        font-size: 1.8rem !important;
+        line-height: 1.2 !important;
+    }
+
+    .team-hero .hero-subtitle {
+        font-size: 0.9rem !important;
+    }
+
+    /* Make buttons inside headers fit nicely on mobile */
+    .team-hero button,
+    .team-hero .btn-modern-primary {
+        width: 100% !important;
+        justify-content: center !important;
+        margin-top: 0.5rem;
+    }
+
+}

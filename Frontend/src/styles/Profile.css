@@ -1,0 +1,431 @@
+/* Modern Profile Hero */
+.profile-hero-modern {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-radius: 24px;
+    padding: 3rem;
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-hero-modern::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.profile-hero-content {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+    position: relative;
+    z-index: 2;
+    width: 100%;
+}
+
+/* Avatar Setup */
+.profile-avatar-container {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    min-width: 140px;
+    border-radius: 50%;
+    background: #1e293b;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-main-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.avatar-loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+}
+
+.avatar-edit-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    cursor: pointer;
+}
+
+.profile-avatar-container:hover .avatar-edit-overlay {
+    opacity: 1;
+}
+
+.admin-badge-modern {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: #f59e0b;
+    color: white;
+    padding: 8px;
+    border-radius: 50%;
+    border: 3px solid #0f172a;
+    display: flex;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Profile Specific Hero Text */
+.profile-hero-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.profile-hero-text .profile-greeting-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -1px;
+    font-family: var(--Font3);
+}
+
+.hero-role-badge {
+    background: rgba(59, 130, 246, 0.2);
+    color: #93c5fd;
+    padding: 0.35rem 0.8rem;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    margin-bottom: 1rem;
+}
+
+.profile-hero-contacts {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    color: #bfdbfe;
+    font-size: 0.9rem;
+    font-weight: 500;
+    flex-wrap: wrap;
+}
+
+.profile-hero-contacts span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Forms & Widgets */
+.widget-body {
+    padding: 1.5rem;
+}
+
+.modern-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.form-group-row {
+    display: flex;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group.flex-1 {
+    flex: 1;
+    min-width: 0;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.locked-label {
+    color: #ef4444;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-left: 0.3rem;
+}
+
+.modern-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: #0f172a;
+    transition: all 0.2s;
+    background: white;
+    box-sizing: border-box;
+}
+
+.modern-input:focus:not(:disabled) {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.modern-input:disabled {
+    background: #f8fafc;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.locked-input {
+    background: #f1f5f9 !important;
+}
+
+/* Modern Buttons */
+.btn-modern-primary {
+    background: #1e3a8a;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.2s;
+}
+
+.btn-modern-primary:hover {
+    background: #1e40af;
+}
+
+.btn-modern-secondary {
+    background: white;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.2s;
+}
+
+.btn-modern-secondary:hover {
+    background: #f8fafc;
+}
+
+.btn-modern-danger {
+    background: #fef2f2;
+    color: #ef4444;
+    border: 1px solid #fca5a5;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+}
+
+.btn-modern-danger:hover {
+    background: #ef4444;
+    color: white;
+}
+
+/* Security Flow Cards */
+.security-state-idle p {
+    margin: 0 0 1rem 0;
+    color: #64748b;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.security-flow-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.flow-icon-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-circle.blue {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.icon-circle.green {
+    background: #ecfdf5;
+    color: #10b981;
+}
+
+.flow-icon-header h4 {
+    margin: 0 0 0.2rem 0;
+    font-size: 1.1rem;
+    color: #0f172a;
+}
+
+.flow-icon-header p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.flow-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1.25rem;
+    margin-top: 0.5rem;
+}
+
+.security-success-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2.5rem;
+    background: #ecfdf5;
+    border-radius: 16px;
+    border: 1px solid #a7f3d0;
+    text-align: center;
+    color: #065f46;
+}
+
+.security-success-card h4 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+/* Danger Widget */
+.danger-widget {
+    background: linear-gradient(to right, #fff1f2, #ffffff);
+    border-color: #fecaca;
+}
+
+.flex-row-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.danger-title {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.05rem;
+    color: #991b1b;
+    font-weight: 700;
+}
+
+.danger-desc {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #b91c1c;
+    font-weight: 500;
+}
+
+/* Contributions Grid */
+.activity-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.empty-subtext {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    padding: 1rem 0;
+    margin: 0;
+    text-align: center;
+}
+
+.btn-icon-danger {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 0.4rem;
+    border-radius: 6px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon-danger:hover {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+body.dark-mode .activity-section-header h2 {
+    color: #f8fafc !important;
+}
+
+@media (max-width: 1024px) {
+    .profile-hero-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .form-group-row {
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .activity-grid {
+        grid-template-columns: 1fr;
+    }
+}
