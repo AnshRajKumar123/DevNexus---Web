@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Lock, Users, Sparkles, MessageSquareCode, ArrowLeft, Plus, Video, Image, FileText, File, BarChart2, X, Check, CheckCircle2, Circle, Ban, Pin } from 'lucide-react';
+import { Send, Lock, Users, Sparkles, MessageSquareCode, ArrowLeft, Plus, Video, Image, FileText, File, BarChart2, X, Check, CheckCircle2, Circle, Ban, Pin, Maximize, Minimize } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import '../styles/ChatHub.css';
 
@@ -42,8 +42,8 @@ export default function ChatHub() {
     const [hiddenChats, setHiddenChats] = useState(new Set()); 
     const [localReactions, setLocalReactions] = useState({}); 
 
-    // --- NEW: Track the currently active pinned message index ---
     const [activePinIndex, setActivePinIndex] = useState(0);
+    const [isFullScreen, setIsFullScreen] = useState(false); // NEW: Full Screen State
 
     const messagesEndRef = useRef(null);
     const chatCacheRef = useRef(''); 
@@ -96,7 +96,6 @@ export default function ChatHub() {
         if (currentUser) markAsRead(selectedRecipient);
     }, [selectedRecipient, currentUser]);
 
-    // Scroll to bottom when chats array grows, and reset pin index on channel switch
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
         setActivePinIndex(0); 
@@ -383,21 +382,15 @@ export default function ChatHub() {
         });
     };
 
-    // --- NEW: Multiple Pinned Messages Logic ---
     const handleBannerClick = () => {
         if (pinnedChats.length === 0) return;
-        
-        // Target the current active pin from the list
         const chatTarget = pinnedChats[activePinIndex];
-        
         const element = document.getElementById(`chat-${chatTarget._id}`);
         if (element) {
             element.scrollIntoView({ behavior: 'smooth', block: 'center' });
             element.classList.add('highlight-flash');
             setTimeout(() => element.classList.remove('highlight-flash'), 2000);
         }
-
-        // Cycle to the next pin index for the next click
         setActivePinIndex((prevIndex) => (prevIndex + 1) % pinnedChats.length);
     };
 
@@ -500,15 +493,11 @@ export default function ChatHub() {
     });
 
     const activeRecipientName = selectedRecipient === 'all' ? 'Team Chat' : team.find(t => t.email === selectedRecipient)?.name;
-    
-    // Grab all pinned chats for the current channel
     const pinnedChats = filteredChats.filter(c => c.isPinned);
-    
-    // Select the currently active pin from the list to display in the banner
     const activePinnedChat = pinnedChats.length > 0 ? pinnedChats[activePinIndex % pinnedChats.length] : null;
 
     return (
-        <div className="chatbox-wrapper page-animate">
+        <div className={`chatbox-wrapper page-animate ${isFullScreen ? 'fullscreen-mode' : ''}`}>
             <header className="team-hero stagger-1">
                 <div className="hero-text-content">
                     <h1 className="hero-greeting">DevNexus <span className="highlight-name">Secure Chat Hub</span></h1>
@@ -516,7 +505,7 @@ export default function ChatHub() {
                 </div>
             </header>
 
-            <section className="stagger-2" style={{ height: 'calc(100vh - 240px)' }}>
+            <section className="stagger-2" style={{ height: isFullScreen ? '100vh' : 'calc(100vh - 240px)' }}>
                 <div className={`chat-hub-layout ${mobileChatOpen ? 'mobile-chat-active' : ''}`}>
                     
                     {/* Left Sidebar */}
@@ -559,10 +548,13 @@ export default function ChatHub() {
                             </div>
                             <div className="chat-hub-security-tag">
                                 <Lock size={13} color="#10b981" /> Encrypted
+                                {/* --- FULL SCREEN TOGGLE BUTTON --- */}
+                                <button onClick={() => setIsFullScreen(!isFullScreen)} className="fullscreen-btn" title="Toggle Fullscreen">
+                                    {isFullScreen ? <Minimize size={14} /> : <Maximize size={14} />}
+                                </button>
                             </div>
                         </div>
 
-                        {/* PINNED MESSAGE BANNER */}
                         {activePinnedChat && (
                             <div className="pinned-message-banner pop-in" onClick={handleBannerClick}>
                                 <div className="pinned-banner-indicator">
@@ -600,10 +592,8 @@ export default function ChatHub() {
                                 filteredChats.map((chat, idx) => {
                                     const isMe = chat.senderEmail === currentUser?.email;
                                     const isPoll = chat.message && chat.message.startsWith('[POLL_JSON]:');
-                                    
                                     const offset = swipeOffsets[chat._id] || 0;
                                     const transformStyle = { transform: `translateX(${offset}px)` };
-
                                     const renderedReactions = chat.reactions ? Array.from(new Set(Object.values(chat.reactions))) : [];
 
                                     return (
@@ -626,7 +616,6 @@ export default function ChatHub() {
                                                     <span className="chat-hub-timestamp">{chat.timestamp}</span>
                                                 </div>
 
-                                                {/* EMOJI REACTION POPUP BADGE */}
                                                 {renderedReactions.length > 0 && (
                                                     <div className="chat-reaction-badge pop-in">
                                                         {renderedReactions.join(' ')}
@@ -662,7 +651,6 @@ export default function ChatHub() {
                             <input type="file" ref={fileInputRef} multiple style={{ display: 'none' }} onChange={handleFileChange} />
 
                             <div className="chat-input-wrapper">
-                                {/* Replied Message Preview Overlay */}
                                 {replyingTo && (
                                     <div className="replying-preview-box pop-in">
                                         <div className="replying-accent-bar"></div>
@@ -678,7 +666,6 @@ export default function ChatHub() {
                                     </div>
                                 )}
 
-                                {/* Attachments Gallery */}
                                 {attachments.length > 0 && (
                                     <div className="chat-attachment-gallery pop-in">
                                         {attachments.map((att, index) => (
@@ -718,7 +705,6 @@ export default function ChatHub() {
                 </div>
             </section>
 
-            {/* --- CUSTOM CONTEXT MENU --- */}
             {contextMenu.visible && (
                 <div className="custom-context-menu pop-in" style={{ top: contextMenu.y, left: contextMenu.x }} onClick={(e) => e.stopPropagation()}>
                     <div className="context-menu-reactions">
@@ -740,7 +726,6 @@ export default function ChatHub() {
                 </div>
             )}
 
-            {/* --- PIN DURATION MODAL --- */}
             {pinModal.visible && (
                 <div className="modal-overlay fade-in">
                     <div className="pin-duration-modal pop-in">
@@ -756,7 +741,6 @@ export default function ChatHub() {
                 </div>
             )}
 
-            {/* --- DELETE MESSAGE MODAL --- */}
             {deleteModal.visible && (
                 <div className="modal-overlay fade-in">
                     <div className="delete-action-modal pop-in">
@@ -771,7 +755,6 @@ export default function ChatHub() {
                 </div>
             )}
 
-            {/* --- View Votes Modal Popup --- */}
             {viewVotesPoll && (
                 <div className="modal-overlay fade-in">
                     <div className="poll-votes-modal pop-in">
@@ -817,7 +800,6 @@ export default function ChatHub() {
                 </div>
             )}
 
-            {/* --- Create Poll Modal Popup --- */}
             {showPollModal && (
                 <div className="modal-overlay fade-in">
                     <div className="modal-content pop-in poll-modal-content">
