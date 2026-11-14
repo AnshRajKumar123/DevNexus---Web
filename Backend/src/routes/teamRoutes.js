@@ -40,6 +40,19 @@ router.post('/', async (req, res) => {
     }
 });
 
+// --- NEW: Heartbeat Ping (Updates lastSeen timestamp) ---
+router.put('/:email/ping', async (req, res) => {
+    try {
+        await Team.findOneAndUpdate(
+            { email: req.params.email }, 
+            { lastSeen: Date.now() }
+        );
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 // Delete a team member
 router.delete('/:id', async (req, res) => {
     try {

@@ -96,7 +96,6 @@ export default function ChatHub() {
         return () => clearInterval(interval);
     }, []);
 
-    // Also mark incoming messages as read instantly if we are actively sitting in the chat
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
         setActivePinIndex(0); 
@@ -611,10 +610,9 @@ export default function ChatHub() {
                                     const transformStyle = { transform: `translateX(${offset}px)` };
                                     const renderedReactions = chat.reactions ? Array.from(new Set(Object.values(chat.reactions))) : [];
 
-                                    // Check if message is read
                                     let isRead = false;
                                     if (chat.recipientEmail === 'all') {
-                                        isRead = chat.readBy && chat.readBy.length > 1; // Read if at least 1 other person saw it
+                                        isRead = chat.readBy && chat.readBy.length > 1; 
                                     } else {
                                         isRead = chat.readBy && chat.readBy.includes(chat.recipientEmail);
                                     }
@@ -636,8 +634,8 @@ export default function ChatHub() {
                                                 
                                                 <div className="chat-hub-bubble-footer" style={isPoll ? { color: '#64748b', marginTop: '0.2rem' } : {}}>
                                                     {chat.isPinned && <Pin size={10} style={{ marginRight: '4px' }} />}
+                                                    <span className="chat-hub-lock-icon" title="Encrypted"><Lock size={10} /></span>
                                                     <span className="chat-hub-timestamp">{chat.timestamp}</span>
-                                                    {/* --- DOUBLE TICK READ RECEIPT --- */}
                                                     {isMe && chat.message !== '[DELETED]' && (
                                                         <span className={`read-receipt ${isRead ? 'read' : 'unread'}`}>
                                                             <CheckCheck size={14} />

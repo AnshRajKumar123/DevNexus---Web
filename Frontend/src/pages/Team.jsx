@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Trash2, UserPlus, Mail, Phone, ImagePlus, ShieldAlert, X, MoreVertical, Briefcase, Users } from 'lucide-react';
 import { useData } from '../context/DataContext';
-import { getAvatarSrc } from './ChatHub'; // Reuse the robust avatar formatter
+import { getAvatarSrc } from './ChatHub'; 
 import '../styles/Team.css';
 
 export default function Team() {
@@ -17,10 +17,46 @@ export default function Team() {
     const [phone, setPhone] = useState('');
     const [imgUrl, setImgUrl] = useState('');
 
+    const teamCacheRef = useRef('');
+    const [localTeam, setLocalTeam] = useState(team);
+
+    // Fetch team periodically to update online statuses
+    const fetchTeam = async () => {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/team`);
+            if (res.ok) {
+                const data = await res.json();
+                const dataString = JSON.stringify(data);
+                if (dataString !== teamCacheRef.current) {
+                    teamCacheRef.current = dataString;
+                    setLocalTeam(data);
+                }
+                setIsLoading(false);
+            }
+        } catch (err) {
+            setIsLoading(false);
+        }
+    };
+
+    // Ping the backend to update current user's lastSeen
+    const pingStatus = async () => {
+        if (!currentUser) return;
+        try {
+            await fetch(`${import.meta.env.VITE_API_URL}/api/team/${currentUser.email}/ping`, {
+                method: 'PUT',
+            });
+        } catch (err) {}
+    };
+
     useEffect(() => {
-        const timer = setTimeout(() => setIsLoading(false), 800);
-        return () => clearTimeout(timer);
-    }, []);
+        fetchTeam();
+        pingStatus();
+        const interval = setInterval(() => {
+            fetchTeam();
+            pingStatus();
+        }, 5000); // Check statuses every 5 seconds
+        return () => clearInterval(interval);
+    }, [currentUser]);
 
     const handleImageUpload = async (e) => {
         const file = e.target.files[0];
@@ -28,7 +64,7 @@ export default function Team() {
 
         const formData = new FormData();
         formData.append('image', file);
-        formData.append('isProfile', 'true');
+        formData.append('isProfile', 'true'); 
 
         try {
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/upload`, {
@@ -48,6 +84,13 @@ export default function Team() {
         setShowModal(false);
     };
 
+    // Helper to determine online status (active within last 30 seconds)
+    const isUserOnline = (lastSeen) => {
+        if (!lastSeen) return false;
+        const diff = Date.now() - new Date(lastSeen).getTime();
+        return diff < 30000;
+    };
+
     return (
         <div className="dashboard-wrapper page-animate">
             <header className="team-hero stagger-1">
@@ -64,7 +107,7 @@ export default function Team() {
                 <div className="grid-col" style={{ gridColumn: 'span 2' }}>
                     <div className="premium-widget">
                         <div className="widget-header">
-                            <h3><Users size={18} className="icon-blue" /> Active Members ({team.length})</h3>
+                            <h3><Users size={18} className="icon-blue" /> Active Members ({localTeam.length})</h3>
                         </div>
                         
                         <div className="team-list-container">
@@ -79,45 +122,56 @@ export default function Team() {
                                     </div>
                                     <div className="member-contact-info"><div className="skeleton skeleton-text medium"></div></div>
                                 </div>
-                            )) : team.map(member => (
-                                <div key={member._id} className="team-list-item fade-in-row">
-                                    <div className="team-member-info">
-                                        <div className="member-avatar-box">
-                                            <img src={getAvatarSrc(member)} alt={member.name} />
-                                            {member.isSupremeAdmin && <div className="admin-star"><ShieldAlert size={10} color="white"/></div>}
-                                        </div>
-                                        <div className="member-details">
-                                            <h4>{member.name}</h4>
-                                            <div className="member-tags">
-                                                <span className={`role-pill ${member.isSupremeAdmin ? 'admin-pill' : 'standard-pill'}`}>
-                                                    <Briefcase size={12}/> {member.role}
-                                                </span>
+                            )) : localTeam.map(member => {
+                                const isOnline = isUserOnline(member.lastSeen);
+                                const isMe = currentUser && member.email === currentUser.email;
+
+                                return (
+                                    <div key={member._id} className="team-list-item fade-in-row">
+                                        <div className="team-member-info">
+                                            <div className="member-avatar-box">
+                                                <img src={getAvatarSrc(member)} alt={member.name} />
+                                                
+                                                {/* ONLINE STATUS INDICATOR (HIDDEN FOR CURRENT USER) */}
+                                                {!isMe && (
+                                                    <div className={`status-indicator ${isOnline ? 'online' : 'offline'}`}></div>
+                                                )}
+
+                                                {member.isSupremeAdmin && <div className="admin-star"><ShieldAlert size={10} color="white"/></div>}
+                                            </div>
+                                            <div className="member-details">
+                                                <h4>{member.name}</h4>
+                                                <div className="member-tags">
+                                                    <span className={`role-pill ${member.isSupremeAdmin ? 'admin-pill' : 'standard-pill'}`}>
+                                                        <Briefcase size={12}/> {member.role}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div className="member-contact-info">
-                                        <a href={`mailto:${member.email}`} className="contact-link"><Mail size={14}/> {member.email}</a>
-                                        {member.phone ? (
-                                            <a href={`tel:${member.phone}`} className="contact-link"><Phone size={14}/> {member.phone}</a>
-                                        ) : (
-                                            <span className="contact-link disabled"><Phone size={14}/> No number</span>
-                                        )}
-                                    </div>
+                                        <div className="member-contact-info">
+                                            <a href={`mailto:${member.email}`} className="contact-link"><Mail size={14}/> {member.email}</a>
+                                            {member.phone ? (
+                                                <a href={`tel:${member.phone}`} className="contact-link"><Phone size={14}/> {member.phone}</a>
+                                            ) : (
+                                                <span className="contact-link disabled"><Phone size={14}/> No number</span>
+                                            )}
+                                        </div>
 
-                                    <div className="member-actions">
-                                        {isMainAdmin && !member.isSupremeAdmin ? (
-                                            <button className="btn-icon-danger hover-pop" onClick={() => removeTeamMember(member._id)} title="Remove Member">
-                                                <Trash2 size={16} />
-                                            </button>
-                                        ) : (
-                                            <button className="btn-icon-ghost" disabled>
-                                                <MoreVertical size={16} color="#cbd5e1" />
-                                            </button>
-                                        )}
+                                        <div className="member-actions">
+                                            {isMainAdmin && !member.isSupremeAdmin ? (
+                                                <button className="btn-icon-danger hover-pop" onClick={() => removeTeamMember(member._id)} title="Remove Member">
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            ) : (
+                                                <button className="btn-icon-ghost" disabled>
+                                                    <MoreVertical size={16} color="#cbd5e1" />
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
