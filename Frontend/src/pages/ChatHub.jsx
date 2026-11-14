@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Lock, Users, Sparkles, MessageSquareCode, ArrowLeft, Plus, Video, Image, FileText, File, BarChart2, X, Check, CheckCircle2, Circle, Ban, Pin, Maximize, Minimize } from 'lucide-react';
+import { Send, Lock, Users, Sparkles, MessageSquareCode, ArrowLeft, Plus, Video, Image, FileText, File, BarChart2, X, Check, CheckCircle2, Circle, Ban, Pin, Maximize, Minimize, CheckCheck } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import '../styles/ChatHub.css';
 
@@ -14,7 +14,7 @@ export const getAvatarSrc = (user) => {
 export default function ChatHub() {
     const { currentUser, team = [] } = useData();
     const [chats, setChats] = useState([]);
-    const [isLoading, setIsLoading] = useState(true); // NEW: Skeleton Loading State
+    const [isLoading, setIsLoading] = useState(true);
     const [messageText, setMessageText] = useState('');
     const [selectedRecipient, setSelectedRecipient] = useState('all');
     const [mobileChatOpen, setMobileChatOpen] = useState(false);
@@ -71,7 +71,7 @@ export default function ChatHub() {
                     chatCacheRef.current = dataString;
                     setChats(data);
                 }
-                setIsLoading(false); // Disable skeleton once data arrives
+                setIsLoading(false);
             }
         } catch (err) {
             setIsLoading(false);
@@ -96,13 +96,11 @@ export default function ChatHub() {
         return () => clearInterval(interval);
     }, []);
 
-    useEffect(() => {
-        if (currentUser) markAsRead(selectedRecipient);
-    }, [selectedRecipient, currentUser]);
-
+    // Also mark incoming messages as read instantly if we are actively sitting in the chat
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
         setActivePinIndex(0); 
+        if (currentUser) markAsRead(selectedRecipient);
     }, [chats.length, selectedRecipient]);
 
     const handleSelectRecipient = (recipientKey) => {
@@ -528,7 +526,6 @@ export default function ChatHub() {
                                 </div>
                             </div>
                             <div className="chat-hub-section-title">Team Members</div>
-                            {/* SIDEBAR SKELETON LOADER */}
                             {isLoading ? Array.from({ length: 4 }).map((_, i) => (
                                 <div key={i} className="chat-hub-channel-item">
                                     <div className="skeleton skeleton-avatar"></div>
@@ -594,7 +591,6 @@ export default function ChatHub() {
                             onTouchEnd={onSwipeEnd}
                             onMouseLeave={onSwipeEnd}
                         >
-                            {/* MAIN CHAT SKELETON LOADER */}
                             {isLoading ? (
                                 <>
                                     <div className="chat-hub-bubble-wrapper other-msg"><div className="skeleton skeleton-bubble" style={{ width: '220px', height: '60px' }}></div></div>
@@ -615,6 +611,14 @@ export default function ChatHub() {
                                     const transformStyle = { transform: `translateX(${offset}px)` };
                                     const renderedReactions = chat.reactions ? Array.from(new Set(Object.values(chat.reactions))) : [];
 
+                                    // Check if message is read
+                                    let isRead = false;
+                                    if (chat.recipientEmail === 'all') {
+                                        isRead = chat.readBy && chat.readBy.length > 1; // Read if at least 1 other person saw it
+                                    } else {
+                                        isRead = chat.readBy && chat.readBy.includes(chat.recipientEmail);
+                                    }
+
                                     return (
                                         <div 
                                             id={`chat-${chat._id}`}
@@ -633,6 +637,12 @@ export default function ChatHub() {
                                                 <div className="chat-hub-bubble-footer" style={isPoll ? { color: '#64748b', marginTop: '0.2rem' } : {}}>
                                                     {chat.isPinned && <Pin size={10} style={{ marginRight: '4px' }} />}
                                                     <span className="chat-hub-timestamp">{chat.timestamp}</span>
+                                                    {/* --- DOUBLE TICK READ RECEIPT --- */}
+                                                    {isMe && chat.message !== '[DELETED]' && (
+                                                        <span className={`read-receipt ${isRead ? 'read' : 'unread'}`}>
+                                                            <CheckCheck size={14} />
+                                                        </span>
+                                                    )}
                                                 </div>
 
                                                 {renderedReactions.length > 0 && (

@@ -1242,3 +1242,18 @@
     color: #064e3b;
     transform: scale(1.1);
 }
+
+/* --- DOUBLE TICK READ RECEIPT STYLES --- */
+.read-receipt {
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.read-receipt.unread {
+    color: #60a5fa; /* Default delivered color (light blue) */
+}
+
+.read-receipt.read {
+    color: #10b981; /* Read color (green) */
+}
