@@ -16,7 +16,7 @@ import { useData } from './context/DataContext';
 import { DashPic } from './assets/assets';
 import { Sparkles, Loader2, Home, AlertTriangle } from 'lucide-react';
 
-// --- Custom 404 Error Page for Restricted/Unknown URLs ---
+// --- Custom 404 Error Page ---
 const NotFound404 = () => (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', width: '100vw', textAlign: 'center', padding: '2rem', background: '#f8fafc' }}>
         <AlertTriangle size={64} color="#ef4444" style={{ marginBottom: '1.5rem' }} />
@@ -31,12 +31,12 @@ const NotFound404 = () => (
     </div>
 );
 
-// --- Layout Wrapper for Dashboard Pages ---
+// --- Layout Wrapper ---
 const DashboardLayout = () => (
     <div className="dashboard-container" style={{ display: 'flex', minHeight: '100vh', background: '#f8fafc' }}>
         <Sidebar />
         <div className="main-content-wrapper" style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-            <main className="main-content" style={{ flex: 1, padding: '0px' }}>
+            <main className="main-content" style={{ flex: 1, padding: '0' }}>
                 <Outlet />
             </main>
         </div>
@@ -48,11 +48,66 @@ export default function App() {
     const [showSplash, setShowSplash] = useState(false);
     const [progress, setProgress] = useState(0);
 
+    // --- HELPER: Converts VAPID key string to Uint8Array for browser Push API ---
+    const urlBase64ToUint8Array = (base64String) => {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+    };
+
+    // --- UPDATED: Notification & Service Worker Registration ---
+    const requestNotificationPermission = async () => {
+        if ('Notification' in window && 'serviceWorker' in navigator) {
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                try {
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    console.log('Service Worker Registered');
+                    
+                    // 1. Get existing subscription or create a new one
+                    let subscription = await registration.pushManager.getSubscription();
+                    if (!subscription) {
+                        const publicVapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+                        if (!publicVapidKey) {
+                            console.error("VITE_VAPID_PUBLIC_KEY is missing from frontend .env");
+                            return;
+                        }
+                        
+                        subscription = await registration.pushManager.subscribe({
+                            userVisibleOnly: true,
+                            applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
+                        });
+                    }
+
+                    // 2. Send the subscription securely to the backend
+                    await fetch(`${import.meta.env.VITE_API_URL || ''}/api/team/${currentUser.email}/subscribe`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ subscription })
+                    });
+                    
+                    console.log('Push Notifications Active!');
+                } catch (err) {
+                    console.error('Service Worker/Push registration failed:', err);
+                }
+            }
+        }
+    };
+
     useEffect(() => {
-        const hasSeenSplash = sessionStorage.getItem('hasSeenSplash');
-        if (currentUser && !hasSeenSplash) {
-            setShowSplash(true);
-            sessionStorage.setItem('hasSeenSplash', 'true');
+        if (currentUser) {
+            requestNotificationPermission(); 
+            
+            const hasSeenSplash = sessionStorage.getItem('hasSeenSplash');
+            if (!hasSeenSplash) {
+                setShowSplash(true);
+                sessionStorage.setItem('hasSeenSplash', 'true');
+            }
         }
     }, [currentUser]);
 
@@ -123,7 +178,7 @@ export default function App() {
                         </div>
                     </div>
 
-                    <p className="splash-meta">Welcome back to the DevNexus</p>
+                    <p className="splash-meta">Welcome back to the DevNexus hub</p>
                 </div>
             </div>
         );
@@ -144,7 +199,6 @@ export default function App() {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/chat" element={<ChatHub />} />
                 </Route>
-                {/* 404 Route outside the DashboardLayout */}
                 <Route path="*" element={<NotFound404 />} /> 
             </Routes>
         </Router>

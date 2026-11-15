@@ -40,7 +40,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-// --- NEW: Heartbeat Ping (Updates lastSeen timestamp) ---
+// Heartbeat Ping (Updates lastSeen timestamp)
 router.put('/:email/ping', async (req, res) => {
     try {
         await Team.findOneAndUpdate(
@@ -50,6 +50,22 @@ router.put('/:email/ping', async (req, res) => {
         res.json({ success: true });
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+});
+
+// --- NEW: Save Push Notification Subscription ---
+router.post('/:email/subscribe', async (req, res) => {
+    try {
+        // This dynamically adds the subscription object to the user's database document
+        await Team.findOneAndUpdate(
+            { email: req.params.email },
+            { pushSubscription: req.body.subscription },
+            { strict: false } // Ensures it saves even if you didn't define it in your Mongoose schema yet
+        );
+        res.status(200).json({ success: true, message: 'Push subscription saved securely.' });
+    } catch (error) {
+        console.error('Subscription error:', error);
+        res.status(500).json({ message: 'Failed to save push subscription' });
     }
 });
 

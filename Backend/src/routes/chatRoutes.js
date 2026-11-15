@@ -2,7 +2,16 @@ const express = require('express');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
+const webpush = require('web-push'); // NEW: Import web-push
+const { Team } = require('../models'); // NEW: Import Team to get subscriptions
 const router = express.Router();
+
+// --- NEW: Configure Web Push with VAPID keys ---
+webpush.setVapidDetails(
+    process.env.VAPID_SUBJECT,
+    process.env.VAPID_PUBLIC_KEY,
+    process.env.VAPID_PRIVATE_KEY
+);
 
 const ChatSchema = new mongoose.Schema({
     senderName: { type: String, required: true },
@@ -13,8 +22,8 @@ const ChatSchema = new mongoose.Schema({
     isEncrypted: { type: Boolean, default: true },
     readBy: [{ type: String }],
     deletedFor: [{ type: String }],
-    isPinned: { type: Boolean, default: false }, // NEW: Pin tracker
-    reactions: { type: Map, of: String, default: {} }, // NEW: Emoji tracker (UserEmail -> Emoji)
+    isPinned: { type: Boolean, default: false }, 
+    reactions: { type: Map, of: String, default: {} }, 
     timestamp: { type: String, default: () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) },
     createdAt: { type: Date, default: Date.now }
 });
@@ -37,9 +46,62 @@ router.post('/', async (req, res) => {
         const payload = { ...req.body, readBy: [req.body.senderEmail] };
         const newChat = new Chat(payload);
         const saved = await newChat.save();
+        
+        // Respond to the sender immediately so the UI feels fast
         res.status(201).json(saved);
+
+        // --- NEW: Send Push Notification (Runs in the background) ---
+        try {
+            const { senderName, senderEmail, recipientEmail, message } = req.body;
+            
+            // Format the message preview for the push notification banner
+            let notificationBody = message;
+            if (message.startsWith('[IMG')) notificationBody = '📷 Sent an image';
+            else if (message.startsWith('[VID')) notificationBody = '🎥 Sent a video';
+            else if (message.startsWith('[POLL')) notificationBody = '📊 Sent a poll';
+            else if (message.startsWith('[FILE')) notificationBody = '📎 Sent a file';
+            else if (message.length > 40) notificationBody = message.substring(0, 40) + '...';
+
+            if (recipientEmail !== 'all') {
+                // Direct Message Notification
+                const recipientUser = await Team.findOne({ email: recipientEmail });
+                
+                if (recipientUser && recipientUser.pushSubscription) {
+                    const pushPayload = JSON.stringify({
+                        senderName: senderName,
+                        message: notificationBody,
+                        senderAvatar: '/vite.svg',
+                        url: '/chat'
+                    });
+                    await webpush.sendNotification(recipientUser.pushSubscription, pushPayload);
+                }
+            } else {
+                // Team Chat Broadcast (Notifies everyone except the sender)
+                const allTeam = await Team.find({ email: { $ne: senderEmail } });
+                
+                const pushPromises = allTeam
+                    .filter(user => user.pushSubscription) // Only target devices that have opted in
+                    .map(user => {
+                        const pushPayload = JSON.stringify({
+                            senderName: `${senderName} (Team Chat)`,
+                            message: notificationBody,
+                            senderAvatar: '/vite.svg',
+                            url: '/chat'
+                        });
+                        return webpush.sendNotification(user.pushSubscription, pushPayload);
+                    });
+                
+                await Promise.allSettled(pushPromises);
+            }
+        } catch (pushError) {
+            console.error('Failed to send push notification:', pushError);
+        }
+        // ------------------------------------------------------------
+
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        if (!res.headersSent) {
+            res.status(400).json({ message: err.message });
+        }
     }
 });
 
@@ -64,7 +126,7 @@ router.put('/read', async (req, res) => {
     }
 });
 
-// NEW PUT: Toggle Emoji Reaction
+// PUT: Toggle Emoji Reaction
 router.put('/:id/react', async (req, res) => {
     try {
         const { userEmail, emoji } = req.body;
@@ -87,7 +149,7 @@ router.put('/:id/react', async (req, res) => {
     }
 });
 
-// NEW PUT: Toggle Pinned Status
+// PUT: Toggle Pinned Status
 router.put('/:id/pin', async (req, res) => {
     try {
         const { isPinned } = req.body;
@@ -117,14 +179,7 @@ router.delete('/:id', async (req, res) => {
         const chat = await Chat.findById(req.params.id);
         if (!chat) return res.status(404).json({ message: 'Chat not found' });
 
-        if (chat.attachments && chat.attachments.length > 0) {
-            chat.attachments.forEach(att => {
-                if (att.url) {
-                    const filePath = path.join(__dirname, '../..', att.url);
-                    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-                }
-            });
-        }
+        // Cloudinary cleanup logic can be added here later if needed
         chat.message = '[DELETED]';
         chat.attachments = [];
         await chat.save();
