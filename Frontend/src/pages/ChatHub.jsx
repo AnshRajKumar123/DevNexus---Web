@@ -63,6 +63,10 @@ export default function ChatHub() {
 
     const pingStatus = async () => {
         if (!currentUser) return;
+        
+        // INSTANT OFFLINE DETECTION
+        if (!navigator.onLine || document.visibilityState === 'hidden') return;
+
         try {
             await fetch(`${import.meta.env.VITE_API_URL}/api/team/${currentUser.email}/ping`, {
                 method: 'PUT',
@@ -104,8 +108,9 @@ export default function ChatHub() {
         pingStatus();
         const interval = setInterval(() => {
             fetchChats();
-            pingStatus(); // Ensures you stay online while on the chat page!
-        }, 3000);
+            pingStatus();
+        }, 5000); // 5 second polling matches the 15 second offline timeout window
+        
         return () => clearInterval(interval);
     }, []);
 
@@ -492,7 +497,7 @@ export default function ChatHub() {
                     </a>
                 );
             }
-            return <span key={idx}>{line}<br /></span>;
+            return <span key={idx}>{line}</span>;
         });
     };
 
@@ -603,7 +608,6 @@ export default function ChatHub() {
                             onTouchEnd={onSwipeEnd}
                             onMouseLeave={onSwipeEnd}
                         >
-                            {/* --- ADDED BACK THE MISSING SKELETON LOADER HERE --- */}
                             {isLoading ? (
                                 <>
                                     <div className="chat-hub-bubble-wrapper other-msg"><div className="skeleton skeleton-bubble" style={{ width: '220px', height: '60px' }}></div></div>
@@ -649,7 +653,6 @@ export default function ChatHub() {
                                                 <div className="chat-hub-bubble-footer" style={isPoll ? { color: '#64748b', marginTop: '0.2rem' } : {}}>
                                                     {chat.isPinned && <Pin size={10} style={{ marginRight: '4px' }} />}
                                                     <span className="chat-hub-timestamp">{chat.timestamp}</span>
-                                                    
                                                     {isMe && chat.message !== '[DELETED]' && (
                                                         <span className={`read-receipt ${isRead ? 'read' : 'unread'}`}>
                                                             <CheckCheck size={14} />

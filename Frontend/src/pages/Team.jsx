@@ -39,6 +39,10 @@ export default function Team() {
 
     const pingStatus = async () => {
         if (!currentUser) return;
+        
+        // INSTANT OFFLINE DETECTION: Stop pinging if the user loses internet or minimizes the tab
+        if (!navigator.onLine || document.visibilityState === 'hidden') return;
+
         try {
             await fetch(`${import.meta.env.VITE_API_URL}/api/team/${currentUser.email}/ping`, {
                 method: 'PUT',
@@ -49,10 +53,13 @@ export default function Team() {
     useEffect(() => {
         fetchTeam();
         pingStatus();
+        
+        // Ping every 5 seconds while active
         const interval = setInterval(() => {
             fetchTeam();
             pingStatus();
         }, 5000); 
+        
         return () => clearInterval(interval);
     }, [currentUser]);
 
@@ -82,11 +89,11 @@ export default function Team() {
         setShowModal(false);
     };
 
-    // Tolerate up to 2 minutes of difference for clock skew between mobile/laptop
+    // FAST TIMEOUT: Shows offline if no heartbeat received in the last 15 seconds
     const isUserOnline = (lastSeen) => {
         if (!lastSeen) return false;
         const diff = Date.now() - new Date(lastSeen).getTime();
-        return diff < 120000; 
+        return diff < 15000; 
     };
 
     return (
