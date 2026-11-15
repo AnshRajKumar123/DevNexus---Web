@@ -1,47 +1,63 @@
 const express = require('express');
-const rateLimit = require('express-rate-limit');
 const bcrypt = require('bcryptjs');
-const { Team } = require('../models');
+const jwt = require('jsonwebtoken');
+const { Team } = require('../models'); // Adjust path to your models
 const router = express.Router();
 
-const loginLimiter = rateLimit({
-    windowMs: 30 * 60 * 1000, 
-    max: 3, 
-    message: { message: 'Too many login attempts from this IP. You have been temporarily blocked for 30 minutes.' },
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+// In-memory store for IP-based rate limiting
+const loginRateLimits = new Map(); 
 
-router.post('/login', loginLimiter, async (req, res) => {
-    const { email, password } = req.body;
-
+router.post('/login', async (req, res) => {
     try {
+        const { email, password } = req.body;
+        const ip = req.ip || req.connection.remoteAddress;
+
+        // 1. Check if IP is currently blocked
+        const ipRecord = loginRateLimits.get(ip) || { attempts: 0, lockUntil: 0 };
+        if (ipRecord.lockUntil > Date.now()) {
+            const minutesLeft = Math.ceil((ipRecord.lockUntil - Date.now()) / 60000);
+            return res.status(429).json({ 
+                success: false, 
+                message: `IP blocked due to too many failed attempts. Try again in ${minutesLeft} minutes.` 
+            });
+        }
+
         const user = await Team.findOne({ email });
-        
-        if (!user) {
-            return res.status(401).json({ message: 'Invalid email or password' });
+
+        // 2. Validate Credentials
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            ipRecord.attempts += 1;
+            
+            // Block IP on 5th failed attempt
+            if (ipRecord.attempts >= 5) {
+                ipRecord.lockUntil = Date.now() + 30 * 60 * 1000; // 30 minute lock
+            }
+            
+            loginRateLimits.set(ip, ipRecord);
+
+            return res.status(401).json({ 
+                success: false, 
+                message: 'Invalid email or password.', 
+                attempts: ipRecord.attempts 
+            });
         }
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        
-        if (!isMatch) {
-            return res.status(401).json({ message: 'Invalid email or password' });
-        }
+        // 3. SUCCESSFUL LOGIN: Reset the IP rate limit entirely
+        loginRateLimits.delete(ip);
 
-        // Added `phone` to the response so it persists on login
-        res.json({
-            _id: user._id, 
-            name: user.name,
-            email: user.email,
-            phone: user.phone,
-            role: user.role,
-            imgUrl: user.imgUrl,
-            isSupremeAdmin: user.isSupremeAdmin
-        });
+        // 4. Generate Token & Return User
+        const token = jwt.sign(
+            { id: user._id, email: user.email, role: user.role }, 
+            process.env.JWT_SECRET || 'fallback_secret', 
+            { expiresIn: '7d' }
+        );
 
+        const userResponse = user.toObject();
+        delete userResponse.password;
+
+        res.json({ success: true, token, user: userResponse });
     } catch (error) {
-        console.error('Login error:', error);
-        res.status(500).json({ message: 'Internal server error during login' });
+        res.status(500).json({ success: false, message: 'Server error during login' });
     }
 });
 

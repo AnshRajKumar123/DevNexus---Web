@@ -1,44 +1,71 @@
 .login-wrapper {
-    min-height: 100vh;
+    height: 100vh;
     width: 100vw;
+    display: flex;
+    background: #f8fafc;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden;
+}
+
+/* --- SPLIT SCREEN LAYOUT --- */
+.login-banner-side {
+    flex: 2;
+    /* Ensures the professional vertical banner has prime real estate */
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #061026;
+    /* Perfectly matches the deep dark edge of the graphic design banner */
+    overflow: hidden;
+    position: relative;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+.login-banner-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Banner will now fit naturally on all sizes without clipping */
+}
+
+.login-form-side {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    padding: 2rem;
+}
+
+/* --- CARD STYLES --- */
 .login-card {
     background: #ffffff;
     width: 100%;
-    max-width: 420px;
-    padding: 2.5rem;
-    border-radius: 16px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+    max-width: 400px;
 }
 
 .login-header {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
 }
 
 .login-logo {
-    height: 56px;
-    width: 56px;
+    height: 72px;
+    width: 72px;
     border-radius: 12px;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     object-fit: contain;
 }
 
 .login-header h2 {
-    color: #102a43;
-    font-size: 1.5rem;
+    color: #0f172a;
+    font-size: 1.75rem;
     margin-bottom: 0.5rem;
-    font-weight: 700;
+    font-weight: 800;
 }
 
 .login-header p {
-    color: #627d98;
+    color: #64748b;
     font-size: 0.95rem;
 }
 
@@ -55,19 +82,20 @@
 }
 
 .input-group label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #334e68;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #334155;
 }
 
 .input-group input {
-    padding: 0.75rem 1rem;
-    border: 1px solid #d9e2ec;
-    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
     font-size: 1rem;
-    color: #102a43;
+    color: #0f172a;
     transition: all 0.2s ease;
-    background-color: #f8fbfa;
+    background-color: #f8fafc;
+    width: 100%;
 }
 
 .input-group input:focus {
@@ -77,25 +105,59 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
+/* --- TOGGLE PASSWORD eye button --- */
+.password-input-container {
+    position: relative;
+    width: 100%;
+}
+
+.password-input-container input {
+    padding-right: 3.25rem;
+    /* Space for the toggle eye icon */
+}
+
+.password-toggle-btn {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.password-toggle-btn:hover {
+    color: #0f172a;
+    background-color: rgba(148, 163, 184, 0.15);
+}
+
 .login-options {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.875rem;
+    font-size: 0.85rem;
 }
 
 .remember-me {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: #486581;
+    color: #475569;
     cursor: pointer;
+    font-weight: 500;
 }
 
 .forgot-password {
     color: #2563eb;
     text-decoration: none;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .forgot-password:hover {
@@ -103,24 +165,25 @@
 }
 
 .login-button {
-    margin-top: 0.5rem;
-    padding: 0.875rem;
+    margin-top: 1rem;
+    padding: 0.9rem;
     background-color: #2563eb;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
-.login-button:hover {
+.login-button:hover:not(:disabled) {
     background-color: #1d4ed8;
 }
 
-.login-button:active {
-    transform: scale(0.98);
+.login-button:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
 }
 
 /* Security Toast Styles */
@@ -137,7 +200,7 @@
     font-weight: 600;
     font-size: 0.9rem;
     z-index: 1000;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
 .toast-error {
@@ -163,6 +226,281 @@
 }
 
 @keyframes popIn {
-    0% { opacity: 0; transform: translate(-50%, -20px) scale(0.9); }
-    100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -20px) scale(0.9);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1);
+    }
+}
+
+/* --- IMMERSIVE SPLASH SCREEN STYLES --- */
+.splash-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at center, #0a0f1d 0%, #030712 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #f8fafc;
+    z-index: 99999;
+    overflow: hidden;
+    padding: 2rem;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Glowing Back-color Circles */
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.35;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.blob-1 {
+    top: 10%;
+    left: 15%;
+    width: 350px;
+    height: 350px;
+    background: #4f46e5;
+    animation: floatingBlob 10s infinite ease-in-out;
+}
+
+.blob-2 {
+    bottom: 10%;
+    right: 15%;
+    width: 400px;
+    height: 400px;
+    background: #0284c7;
+    animation: floatingBlob 12s infinite ease-in-out reverse;
+}
+
+.blob-3 {
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 250px;
+    height: 250px;
+    background: #7c3aed;
+    animation: floatingBlob 8s infinite ease-in-out;
+}
+
+@keyframes floatingBlob {
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-40px) scale(1.1);
+    }
+}
+
+/* Sparking Star Overlay */
+.sparkle-star {
+    position: absolute;
+    z-index: 2;
+    animation: sparkleAnim 3s infinite ease-in-out;
+}
+
+.s1 {
+    top: 15%;
+    left: 10%;
+    animation-delay: 0.5s;
+}
+
+.s2 {
+    top: 25%;
+    right: 15%;
+    animation-delay: 1.2s;
+}
+
+.s3 {
+    bottom: 30%;
+    left: 18%;
+    animation-delay: 0.2s;
+}
+
+.s4 {
+    bottom: 15%;
+    right: 10%;
+    animation-delay: 2s;
+}
+
+@keyframes sparkleAnim {
+
+    0%,
+    100% {
+        opacity: 0.2;
+        transform: scale(0.8) rotate(0deg);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.2) rotate(180deg);
+    }
+}
+
+/* Loader Container and Content */
+.splash-content {
+    z-index: 10;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.splash-logo {
+    height: 90px;
+    width: 90px;
+    object-fit: contain;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 0 40px rgba(99, 102, 241, 0.4);
+    animation: logoEntrance 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes logoEntrance {
+    0% {
+        transform: scale(0) rotate(-45deg);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+.splash-greeting-wrapper {
+    margin-bottom: 2.5rem;
+}
+
+.splash-greeting-wrapper h2 {
+    font-size: 2.25rem;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -0.5px;
+    color: #f8fafc;
+}
+
+.splash-name {
+    background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.splash-greeting-wrapper h3 {
+    font-size: 1.15rem;
+    color: #94a3b8;
+    font-weight: 500;
+    margin: 0.5rem 0 1rem 0;
+}
+
+.splash-slogan {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #4f46e5;
+    background-color: rgba(79, 70, 229, 0.15);
+    border: 1px solid rgba(79, 70, 229, 0.3);
+    padding: 0.4rem 1.25rem;
+    border-radius: 99px;
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+/* Loading Bar Track and Fill */
+.splash-loader-wrapper {
+    width: 100%;
+    margin-bottom: 3rem;
+}
+
+.progress-track {
+    width: 100%;
+    height: 8px;
+    background-color: rgba(255, 255, 255, 0.08);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #2563eb 0%, #6366f1 50%, #a855f7 100%);
+    border-radius: 99px;
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.6);
+    transition: width 0.05s linear;
+    /* Responsive update logic matching the 2.5s window precisely */
+}
+
+.splash-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: #94a3b8;
+    font-size: 0.82rem;
+    font-weight: 500;
+}
+
+.spinner-icon {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.splash-meta {
+    font-size: 0.75rem;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+/* --- RESPONSIVE MOBILE ADJUSTMENTS --- */
+@media (max-width: 900px) {
+    .login-wrapper {
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .login-banner-side {
+        display: none;
+        /* Hide image banner entirely on mobile for clean vertical alignment */
+    }
+
+    .login-form-side {
+        padding: 1.5rem;
+        background: #f8fafc;
+    }
+
+    .login-card {
+        padding: 2.5rem 2rem;
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+    }
 }
