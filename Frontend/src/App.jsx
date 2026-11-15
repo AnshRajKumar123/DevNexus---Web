@@ -72,9 +72,9 @@ export default function App() {
                     // 1. Get existing subscription or create a new one
                     let subscription = await registration.pushManager.getSubscription();
                     if (!subscription) {
-                        const publicVapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+                        const publicVapidKey = import.meta.env.VITE_VAPID_KEY;
                         if (!publicVapidKey) {
-                            console.error("VITE_VAPID_PUBLIC_KEY is missing from frontend .env");
+                            console.error("VITE_VAPID_KEY is missing from frontend .env");
                             return;
                         }
                         
