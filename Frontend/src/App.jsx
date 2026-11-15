@@ -12,7 +12,7 @@ import LiveWebsite from './pages/LiveWebsite';
 import Profile from './pages/Profile';
 import MyTodoList from './pages/MyTodoList';
 import ChatHub from './pages/ChatHub.jsx';
-import { useData } from './context/DataContext'; 
+import { useData } from './context/DataContext';
 import { DashPic } from './assets/assets';
 import { Sparkles, Loader2, Home, AlertTriangle } from 'lucide-react';
 
@@ -26,7 +26,7 @@ const NotFound404 = () => (
             The page you are trying to access doesn't exist, or you do not have permission to view it. Please return to your workspace.
         </p>
         <Link to="/" className="btn-modern-primary hover-pop" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', padding: '0.8rem 1.5rem', borderRadius: '10px', background: '#2563eb', color: 'white', fontWeight: 600 }}>
-            <Home size={18} style={{ marginRight: '0.5rem' }}/> Back to Dashboard
+            <Home size={18} style={{ marginRight: '0.5rem' }} /> Back to Dashboard
         </Link>
     </div>
 );
@@ -68,16 +68,17 @@ export default function App() {
                 try {
                     const registration = await navigator.serviceWorker.register('/sw.js');
                     console.log('Service Worker Registered');
-                    
+
                     // 1. Get existing subscription or create a new one
                     let subscription = await registration.pushManager.getSubscription();
                     if (!subscription) {
+                        // Updated to match your exact Vercel variable name!
                         const publicVapidKey = import.meta.env.VITE_VAPID_KEY;
                         if (!publicVapidKey) {
                             console.error("VITE_VAPID_KEY is missing from frontend .env");
                             return;
                         }
-                        
+
                         subscription = await registration.pushManager.subscribe({
                             userVisibleOnly: true,
                             applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
@@ -90,7 +91,7 @@ export default function App() {
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ subscription })
                     });
-                    
+
                     console.log('Push Notifications Active!');
                 } catch (err) {
                     console.error('Service Worker/Push registration failed:', err);
@@ -101,8 +102,8 @@ export default function App() {
 
     useEffect(() => {
         if (currentUser) {
-            requestNotificationPermission(); 
-            
+            requestNotificationPermission();
+
             const hasSeenSplash = sessionStorage.getItem('hasSeenSplash');
             if (!hasSeenSplash) {
                 setShowSplash(true);
@@ -114,11 +115,11 @@ export default function App() {
     useEffect(() => {
         let interval;
         let hideTimer;
-        
+
         if (showSplash) {
             setProgress(0);
             const duration = 2500;
-            const intervalTime = 50; 
+            const intervalTime = 50;
             const step = (intervalTime / duration) * 100;
 
             interval = setInterval(() => {
@@ -135,7 +136,7 @@ export default function App() {
                 setShowSplash(false);
             }, duration + 200);
         }
-        
+
         return () => {
             clearInterval(interval);
             clearTimeout(hideTimer);
@@ -154,14 +155,14 @@ export default function App() {
                 <div className="blob blob-2"></div>
                 <div className="blob blob-3"></div>
 
-                <div className="sparkle-star s1"><Sparkles size={14} color="#38bdf8"/></div>
-                <div className="sparkle-star s2"><Sparkles size={20} color="#818cf8"/></div>
-                <div className="sparkle-star s3"><Sparkles size={12} color="#60a5fa"/></div>
-                <div className="sparkle-star s4"><Sparkles size={18} color="#a78bfa"/></div>
+                <div className="sparkle-star s1"><Sparkles size={14} color="#38bdf8" /></div>
+                <div className="sparkle-star s2"><Sparkles size={20} color="#818cf8" /></div>
+                <div className="sparkle-star s3"><Sparkles size={12} color="#60a5fa" /></div>
+                <div className="sparkle-star s4"><Sparkles size={18} color="#a78bfa" /></div>
 
                 <div className="splash-content pop-in">
                     <img src={DashPic.WebLogo} alt="DevNexus Logo" className="splash-logo" />
-                    
+
                     <div className="splash-greeting-wrapper">
                         <h2>Hey, <span className="splash-name">{fallbackName}!</span> 👋</h2>
                         <h3>We are loading your dashboard</h3>
@@ -199,7 +200,7 @@ export default function App() {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/chat" element={<ChatHub />} />
                 </Route>
-                <Route path="*" element={<NotFound404 />} /> 
+                <Route path="*" element={<NotFound404 />} />
             </Routes>
         </Router>
     );
