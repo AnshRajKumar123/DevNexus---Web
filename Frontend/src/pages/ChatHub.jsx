@@ -11,6 +11,23 @@ export const getAvatarSrc = (user) => {
     return `${import.meta.env.VITE_API_URL}${user.imgUrl.startsWith('/') ? '' : '/'}${user.imgUrl}`;
 };
 
+// --- NEW: Dynamic Date Formatter for Chat Badges ---
+const formatChatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    if (date.toDateString() === today.toDateString()) {
+        return 'Today';
+    } else if (date.toDateString() === yesterday.toDateString()) {
+        return 'Yesterday';
+    } else {
+        return date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
+    }
+};
+
 export default function ChatHub() {
     const { currentUser, team = [] } = useData();
     const [chats, setChats] = useState([]);
@@ -63,8 +80,6 @@ export default function ChatHub() {
 
     const pingStatus = async () => {
         if (!currentUser) return;
-        
-        // INSTANT OFFLINE DETECTION
         if (!navigator.onLine || document.visibilityState === 'hidden') return;
 
         try {
@@ -109,7 +124,7 @@ export default function ChatHub() {
         const interval = setInterval(() => {
             fetchChats();
             pingStatus();
-        }, 5000); // 5 second polling matches the 15 second offline timeout window
+        }, 5000); 
         
         return () => clearInterval(interval);
     }, []);
@@ -635,41 +650,57 @@ export default function ChatHub() {
                                         isRead = chat.readBy && chat.readBy.includes(chat.recipientEmail);
                                     }
 
-                                    return (
-                                        <div 
-                                            id={`chat-${chat._id}`}
-                                            key={chat._id || idx} 
-                                            className={`chat-hub-bubble-wrapper ${isMe ? 'my-msg' : 'other-msg'} ${isPoll ? 'poll-msg-wrapper' : ''}`}
-                                            onMouseDown={(e) => onSwipeStart(e, chat._id)}
-                                            onTouchStart={(e) => onSwipeStart(e, chat._id)}
-                                            onContextMenu={(e) => handleRightClick(e, chat)}
-                                            style={transformStyle}
-                                        >
-                                            {!isMe && !isPoll && <span className="chat-hub-sender-label">{chat.senderName}</span>}
-                                            <div className={`chat-hub-bubble ${isPoll ? 'poll-bubble-whatsapp' : (isMe ? 'bubble-mine' : 'bubble-theirs')}`}>
-                                                
-                                                <div className="chat-hub-text">{renderMessageContent(chat)}</div>
-                                                
-                                                <div className="chat-hub-bubble-footer" style={isPoll ? { color: '#64748b', marginTop: '0.2rem' } : {}}>
-                                                    {chat.isPinned && <Pin size={10} style={{ marginRight: '4px' }} />}
-                                                    <span className="chat-hub-timestamp">{chat.timestamp}</span>
-                                                    {isMe && chat.message !== '[DELETED]' && (
-                                                        <span className={`read-receipt ${isRead ? 'read' : 'unread'}`}>
-                                                            <CheckCheck size={14} />
-                                                        </span>
-                                                    )}
-                                                </div>
+                                    // --- NEW: Check if Date Group Badge should be shown ---
+                                    const chatDate = chat.createdAt ? new Date(chat.createdAt).toDateString() : '';
+                                    const prevChatDate = idx > 0 && filteredChats[idx - 1].createdAt 
+                                        ? new Date(filteredChats[idx - 1].createdAt).toDateString() 
+                                        : '';
+                                    const showDateBadge = chatDate && chatDate !== prevChatDate;
 
-                                                {renderedReactions.length > 0 && (
-                                                    <div className="chat-reaction-badge pop-in">
-                                                        {renderedReactions.join(' ')}
-                                                        {Object.keys(chat.reactions).length > 1 && (
-                                                            <span className="reaction-count">{Object.keys(chat.reactions).length}</span>
+                                    return (
+                                        <React.Fragment key={chat._id || idx}>
+                                            
+                                            {/* Render the WhatsApp style date badge in center */}
+                                            {showDateBadge && (
+                                                <div className="chat-date-wrapper pop-in">
+                                                    <span className="chat-date-badge">{formatChatDate(chat.createdAt)}</span>
+                                                </div>
+                                            )}
+
+                                            <div 
+                                                id={`chat-${chat._id}`}
+                                                className={`chat-hub-bubble-wrapper ${isMe ? 'my-msg' : 'other-msg'} ${isPoll ? 'poll-msg-wrapper' : ''}`}
+                                                onMouseDown={(e) => onSwipeStart(e, chat._id)}
+                                                onTouchStart={(e) => onSwipeStart(e, chat._id)}
+                                                onContextMenu={(e) => handleRightClick(e, chat)}
+                                                style={transformStyle}
+                                            >
+                                                {!isMe && !isPoll && <span className="chat-hub-sender-label">{chat.senderName}</span>}
+                                                <div className={`chat-hub-bubble ${isPoll ? 'poll-bubble-whatsapp' : (isMe ? 'bubble-mine' : 'bubble-theirs')}`}>
+                                                    
+                                                    <div className="chat-hub-text">{renderMessageContent(chat)}</div>
+                                                    
+                                                    <div className="chat-hub-bubble-footer" style={isPoll ? { color: '#64748b', marginTop: '0.2rem' } : {}}>
+                                                        {chat.isPinned && <Pin size={10} style={{ marginRight: '4px' }} />}
+                                                        <span className="chat-hub-timestamp">{chat.timestamp}</span>
+                                                        {isMe && chat.message !== '[DELETED]' && (
+                                                            <span className={`read-receipt ${isRead ? 'read' : 'unread'}`}>
+                                                                <CheckCheck size={14} />
+                                                            </span>
                                                         )}
                                                     </div>
-                                                )}
+
+                                                    {renderedReactions.length > 0 && (
+                                                        <div className="chat-reaction-badge pop-in">
+                                                            {renderedReactions.join(' ')}
+                                                            {Object.keys(chat.reactions).length > 1 && (
+                                                                <span className="reaction-count">{Object.keys(chat.reactions).length}</span>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
+                                        </React.Fragment>
                                     );
                                 })
                             )}

@@ -1257,3 +1257,33 @@
 .read-receipt.read {
     color: #10b981; /* Read color (green) */
 }
+
+/* --- CENTERED DATE BADGE STYLES --- */
+.chat-date-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 1.5rem 0 0.5rem 0;
+    width: 100%;
+    z-index: 5;
+}
+
+.chat-date-badge {
+    background-color: #ffffff;
+    color: #64748b;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.35rem 0.85rem;
+    border-radius: 99px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+    border: 1px solid #e2e8f0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Dark mode support for date badge */
+body.dark-mode .chat-date-badge {
+    background-color: #1e293b;
+    color: #94a3b8;
+    border-color: #334155;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
