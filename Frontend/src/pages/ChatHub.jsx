@@ -34,13 +34,13 @@ export default function ChatHub() {
     const [messageText, setMessageText] = useState('');
     const [selectedRecipient, setSelectedRecipient] = useState('all');
     const [mobileChatOpen, setMobileChatOpen] = useState(false);
-    
+
     const [showAttachMenu, setShowAttachMenu] = useState(false);
     const [showPollModal, setShowPollModal] = useState(false);
     const [pollQuestion, setPollQuestion] = useState('');
     const [pollOptions, setPollOptions] = useState(['', '']);
     const [allowMultiple, setAllowMultiple] = useState(false);
-    
+
     const [viewVotesPoll, setViewVotesPoll] = useState(null);
     const [localVotes, setLocalVotes] = useState({});
 
@@ -56,19 +56,19 @@ export default function ChatHub() {
     const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, chat: null });
     const [pinModal, setPinModal] = useState({ visible: false, chat: null });
     const [deleteModal, setDeleteModal] = useState({ visible: false, chat: null });
-    const [hiddenChats, setHiddenChats] = useState(new Set()); 
+    const [hiddenChats, setHiddenChats] = useState(new Set());
     const [activePinIndex, setActivePinIndex] = useState(0);
     const [isFullScreen, setIsFullScreen] = useState(false);
 
     const messagesEndRef = useRef(null);
-    const chatCacheRef = useRef(''); 
+    const chatCacheRef = useRef('');
 
     useEffect(() => {
         const handleGlobalContextMenu = (e) => e.preventDefault();
         document.addEventListener('contextmenu', handleGlobalContextMenu);
         const handleClickOutside = () => setContextMenu({ visible: false, x: 0, y: 0, chat: null });
         document.addEventListener('click', handleClickOutside);
-        
+
         return () => {
             document.removeEventListener('contextmenu', handleGlobalContextMenu);
             document.removeEventListener('click', handleClickOutside);
@@ -80,7 +80,7 @@ export default function ChatHub() {
         if (!navigator.onLine || document.visibilityState === 'hidden') return;
         try {
             await fetch(`${import.meta.env.VITE_API_URL}/api/team/${currentUser.email}/ping`, { method: 'PUT' });
-        } catch (err) {}
+        } catch (err) { }
     };
 
     const fetchChats = async () => {
@@ -109,7 +109,7 @@ export default function ChatHub() {
                 body: JSON.stringify({ userEmail: currentUser.email, recipientEmail: recipient })
             });
             fetchChats();
-        } catch (err) {}
+        } catch (err) { }
     };
 
     useEffect(() => {
@@ -118,13 +118,13 @@ export default function ChatHub() {
         const interval = setInterval(() => {
             fetchChats();
             pingStatus();
-        }, 5000); 
+        }, 5000);
         return () => clearInterval(interval);
     }, []);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-        setActivePinIndex(0); 
+        setActivePinIndex(0);
         if (currentUser) markAsRead(selectedRecipient);
     }, [chats.length, selectedRecipient]);
 
@@ -176,7 +176,7 @@ export default function ChatHub() {
                     const data = await response.json();
                     uploadedUrls.push({ url: data.imageUrl, type: att.type, name: att.file.name });
                 }
-            } catch (error) {}
+            } catch (error) { }
         }
         return uploadedUrls;
     };
@@ -184,7 +184,7 @@ export default function ChatHub() {
     const handleSendMessage = async (e, customMessage = null) => {
         if (e) e.preventDefault();
         let finalMessageText = customMessage || messageText.trim();
-        
+
         if (!finalMessageText && attachments.length === 0) return;
 
         setIsUploading(true);
@@ -203,7 +203,7 @@ export default function ChatHub() {
             senderEmail: currentUser.email,
             recipientEmail: selectedRecipient,
             message: finalMessageText,
-            attachments: fileUrls, 
+            attachments: fileUrls,
             isEncrypted: true
         };
 
@@ -226,14 +226,14 @@ export default function ChatHub() {
                 setShowAttachMenu(false);
                 fetchChats();
             }
-        } catch (err) {} finally { setIsUploading(false); }
+        } catch (err) { } finally { setIsUploading(false); }
     };
 
     const handleRightClick = (e, chat) => {
-        if (chat.message === '[DELETED]') return; 
+        if (chat.message === '[DELETED]') return;
         e.preventDefault();
         e.stopPropagation();
-        
+
         let x = e.pageX;
         let y = e.pageY;
         if (window.innerWidth - x < 180) x -= 180;
@@ -265,7 +265,7 @@ export default function ChatHub() {
                 body: JSON.stringify({ userEmail: currentUser.email, emoji })
             });
             fetchChats();
-        } catch (err) {}
+        } catch (err) { }
     };
 
     const handleMenuReply = () => {
@@ -287,16 +287,16 @@ export default function ChatHub() {
                 body: JSON.stringify({ isPinned })
             });
             fetchChats();
-        } catch (err) {}
+        } catch (err) { }
     };
 
     const handleMenuPin = () => {
         const chat = contextMenu.chat;
         setContextMenu({ visible: false, x: 0, y: 0, chat: null });
         if (chat.isPinned) {
-            togglePin(chat._id, false); 
+            togglePin(chat._id, false);
         } else {
-            setPinModal({ visible: true, chat }); 
+            setPinModal({ visible: true, chat });
         }
     };
 
@@ -319,9 +319,9 @@ export default function ChatHub() {
         const chat = contextMenu.chat;
         setContextMenu({ visible: false, x: 0, y: 0, chat: null });
         if (chat.senderEmail === currentUser.email) {
-            setDeleteModal({ visible: true, chat }); 
+            setDeleteModal({ visible: true, chat });
         } else {
-            handleConfirmDelete('me', chat); 
+            handleConfirmDelete('me', chat);
         }
     };
 
@@ -330,7 +330,7 @@ export default function ChatHub() {
         setDeleteModal({ visible: false, chat: null });
 
         if (type === 'me') {
-            setChats(prev => prev.filter(c => c._id !== chat._id)); 
+            setChats(prev => prev.filter(c => c._id !== chat._id));
             try {
                 await fetch(`${API_URL}/chats/${chat._id}/deleteForMe`, {
                     method: 'PUT',
@@ -338,18 +338,18 @@ export default function ChatHub() {
                     body: JSON.stringify({ userEmail: currentUser.email })
                 });
                 fetchChats();
-            } catch (err) {}
+            } catch (err) { }
         } else if (type === 'everyone') {
             setChats(prev => prev.map(c => c._id === chat._id ? { ...c, message: '[DELETED]', isPinned: false } : c));
             try {
                 await fetch(`${API_URL}/chats/${chat._id}`, { method: 'DELETE' });
                 fetchChats();
-            } catch (err) {}
+            } catch (err) { }
         }
     };
 
     const onSwipeStart = (e, chatId) => {
-        if(e.button === 2) return; 
+        if (e.button === 2) return;
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         swipeStartX.current = clientX;
         swipeTargetId.current = chatId;
@@ -439,7 +439,7 @@ export default function ChatHub() {
                     <div className="custom-poll-bubble">
                         <div className="poll-question-header">
                             <h4>{poll.question}</h4>
-                            <span className="poll-subtitle"><CheckCircle2 size={12}/> {poll.allowMultiple ? 'Select multiple' : 'Select one'}</span>
+                            <span className="poll-subtitle"><CheckCircle2 size={12} /> {poll.allowMultiple ? 'Select multiple' : 'Select one'}</span>
                         </div>
                         <div className="poll-options-container">
                             {poll.options.map((opt, idx) => {
@@ -471,7 +471,7 @@ export default function ChatHub() {
                 );
             } catch (e) { return <span>[Invalid Poll Data]</span>; }
         }
-        
+
         const lines = text.split('\n');
         return lines.map((line, idx) => {
             if (line.startsWith('[REPLY:') && line.endsWith(']')) {
@@ -510,8 +510,8 @@ export default function ChatHub() {
     };
 
     const filteredChats = chats.filter(c => {
-        if (c.deletedFor && c.deletedFor.includes(currentUser.email)) return false; 
-        if (hiddenChats.has(c._id)) return false; 
+        if (c.deletedFor && c.deletedFor.includes(currentUser.email)) return false;
+        if (hiddenChats.has(c._id)) return false;
         if (selectedRecipient === 'all') return c.recipientEmail === 'all';
         return (
             (c.senderEmail === currentUser.email && c.recipientEmail === selectedRecipient) ||
@@ -534,7 +534,7 @@ export default function ChatHub() {
 
             <section className="stagger-2 chat-main-section">
                 <div className={`chat-hub-layout ${mobileChatOpen ? 'mobile-chat-active' : ''}`}>
-                    
+
                     {/* Left Sidebar */}
                     <div className="chat-hub-sidebar">
                         <div className="chat-hub-sidebar-header">
@@ -601,14 +601,14 @@ export default function ChatHub() {
                                     <span className="pinned-banner-title">Pinned Message</span>
                                     <span className="pinned-banner-text">
                                         {activePinnedChat.message.startsWith('[POLL') ? '📊 Poll' :
-                                         activePinnedChat.message.startsWith('[IMG') ? '🖼️ Image attached' :
-                                         activePinnedChat.message.length > 50 ? activePinnedChat.message.substring(0,50) + '...' : activePinnedChat.message}
+                                            activePinnedChat.message.startsWith('[IMG') ? '🖼️ Image attached' :
+                                                activePinnedChat.message.length > 50 ? activePinnedChat.message.substring(0, 50) + '...' : activePinnedChat.message}
                                     </span>
                                 </div>
                             </div>
                         )}
 
-                        <div 
+                        <div
                             className="chat-hub-messages-scroll"
                             onMouseMove={onSwipeMove}
                             onTouchMove={onSwipeMove}
@@ -638,27 +638,27 @@ export default function ChatHub() {
 
                                     let isRead = false;
                                     if (chat.recipientEmail === 'all') {
-                                        isRead = chat.readBy && chat.readBy.length > 1; 
+                                        isRead = chat.readBy && chat.readBy.length > 1;
                                     } else {
                                         isRead = chat.readBy && chat.readBy.includes(chat.recipientEmail);
                                     }
 
                                     const chatDate = chat.createdAt ? new Date(chat.createdAt).toDateString() : '';
-                                    const prevChatDate = idx > 0 && filteredChats[idx - 1].createdAt 
-                                        ? new Date(filteredChats[idx - 1].createdAt).toDateString() 
+                                    const prevChatDate = idx > 0 && filteredChats[idx - 1].createdAt
+                                        ? new Date(filteredChats[idx - 1].createdAt).toDateString()
                                         : '';
                                     const showDateBadge = chatDate && chatDate !== prevChatDate;
 
                                     return (
                                         <React.Fragment key={chat._id || idx}>
-                                            
+
                                             {showDateBadge && (
                                                 <div className="chat-date-wrapper pop-in">
                                                     <span className="chat-date-badge">{formatChatDate(chat.createdAt)}</span>
                                                 </div>
                                             )}
 
-                                            <div 
+                                            <div
                                                 id={`chat-${chat._id}`}
                                                 className={`chat-hub-bubble-wrapper ${isMe ? 'my-msg' : 'other-msg'} ${isPoll ? 'poll-msg-wrapper' : ''}`}
                                                 onMouseDown={(e) => onSwipeStart(e, chat._id)}
@@ -668,12 +668,24 @@ export default function ChatHub() {
                                             >
                                                 {!isMe && !isPoll && <span className="chat-hub-sender-label">{chat.senderName}</span>}
                                                 <div className={`chat-hub-bubble ${isPoll ? 'poll-bubble-whatsapp' : (isMe ? 'bubble-mine' : 'bubble-theirs')}`}>
-                                                    
+
                                                     <div className="chat-hub-text">{renderMessageContent(chat)}</div>
-                                                    
+
                                                     <div className="chat-hub-bubble-footer" style={isPoll ? { color: '#64748b', marginTop: '0.2rem' } : {}}>
                                                         {chat.isPinned && <Pin size={10} style={{ marginRight: '4px' }} />}
-                                                        <span className="chat-hub-timestamp">{chat.timestamp}</span>
+                                                        <span className="chat-hub-lock-icon" title="Encrypted"><Lock size={10} /></span>
+
+                                                        {/* --- NEW: Forced 12-hour format with AM/PM --- */}
+                                                        <span className="chat-hub-timestamp">
+                                                            {chat.createdAt
+                                                                ? new Date(chat.createdAt).toLocaleTimeString('en-US', {
+                                                                    hour: '2-digit',
+                                                                    minute: '2-digit',
+                                                                    hour12: true
+                                                                })
+                                                                : chat.timestamp}
+                                                        </span>
+
                                                         {isMe && chat.message !== '[DELETED]' && (
                                                             <span className={`read-receipt ${isRead ? 'read' : 'unread'}`}>
                                                                 <CheckCheck size={14} />
@@ -698,9 +710,8 @@ export default function ChatHub() {
                             <div ref={messagesEndRef} />
                         </div>
 
-                        {/* --- REORGANIZED FORM UI (WhatsApp Style) --- */}
                         <form onSubmit={(e) => handleSendMessage(e)} className="chat-hub-input-form">
-                            
+
                             <div className="chat-attach-container">
                                 <button type="button" className="chat-attach-trigger-btn" onClick={() => setShowAttachMenu(!showAttachMenu)}>
                                     <Plus size={22} />
@@ -725,12 +736,12 @@ export default function ChatHub() {
                                         <div className="replying-content-col">
                                             <span className="replying-name">{replyingTo.senderName === currentUser.name ? 'You' : replyingTo.senderName}</span>
                                             <span className="replying-text">
-                                                {replyingTo.message.startsWith('[POLL') ? '📊 Poll' : 
-                                                 replyingTo.message.startsWith('[IMG') ? '🖼️ Image' :
-                                                 replyingTo.message.length > 50 ? replyingTo.message.substring(0, 50) + '...' : replyingTo.message}
+                                                {replyingTo.message.startsWith('[POLL') ? '📊 Poll' :
+                                                    replyingTo.message.startsWith('[IMG') ? '🖼️ Image' :
+                                                        replyingTo.message.length > 50 ? replyingTo.message.substring(0, 50) + '...' : replyingTo.message}
                                             </span>
                                         </div>
-                                        <button type="button" className="close-reply-btn" onClick={() => setReplyingTo(null)}><X size={16}/></button>
+                                        <button type="button" className="close-reply-btn" onClick={() => setReplyingTo(null)}><X size={16} /></button>
                                     </div>
                                 )}
 
@@ -745,7 +756,7 @@ export default function ChatHub() {
                                                     <div className="file-preview-box">
                                                         <FileText size={20} color="#2563eb" />
                                                         <div className="file-preview-info">
-                                                            <span className="file-name" title={att.file.name}>{att.file.name.length > 15 ? att.file.name.substring(0,15) + '...' : att.file.name}</span>
+                                                            <span className="file-name" title={att.file.name}>{att.file.name.length > 15 ? att.file.name.substring(0, 15) + '...' : att.file.name}</span>
                                                         </div>
                                                     </div>
                                                 )}
@@ -754,9 +765,9 @@ export default function ChatHub() {
                                     </div>
                                 )}
 
-                                <input 
-                                    type="text" 
-                                    placeholder="Message" 
+                                <input
+                                    type="text"
+                                    placeholder="Message"
                                     value={messageText}
                                     onChange={(e) => setMessageText(e.target.value)}
                                     className="chat-hub-text-input"
@@ -765,8 +776,13 @@ export default function ChatHub() {
                                 />
                             </div>
 
-                            <button type="submit" className="btn-modern-primary chat-hub-send-btn" disabled={(!messageText.trim() && attachments.length === 0) || isUploading}>
-                                {isUploading ? <Sparkles size={18} className="pulse-anim" /> : <Send size={18} style={{ transform: 'translateX(-1px) translateY(1px)' }}/>} 
+                            {/* Completely isolated send button */}
+                            <button type="submit" className="chat-hub-send-btn" disabled={(!messageText.trim() && attachments.length === 0) || isUploading}>
+                                {isUploading ? (
+                                    <Sparkles size={18} className="pulse-anim" />
+                                ) : (
+                                    <Send size={18} style={{ transform: 'translateX(-1px) translateY(1px)' }} />
+                                )}
                             </button>
                         </form>
                     </div>
@@ -776,7 +792,7 @@ export default function ChatHub() {
             {contextMenu.visible && (
                 <div className="custom-context-menu pop-in" style={{ top: contextMenu.y, left: contextMenu.x }} onClick={(e) => e.stopPropagation()}>
                     <div className="context-menu-reactions">
-                        {['👍','❤️','😂','😮','😢','👏'].map(emoji => (
+                        {['👍', '❤️', '😂', '😮', '😢', '👏'].map(emoji => (
                             <button key={emoji} onClick={() => handleMenuReact(emoji)} className="reaction-btn">{emoji}</button>
                         ))}
                     </div>
@@ -830,7 +846,7 @@ export default function ChatHub() {
                             <button className="modal-close-btn" onClick={() => setViewVotesPoll(null)}><X size={20} color="#0f172a" /></button>
                             <h2>Poll votes</h2>
                         </div>
-                        
+
                         <div className="poll-votes-body">
                             <div className="poll-votes-question-bubble">
                                 {viewVotesPoll.poll.question}
@@ -872,7 +888,7 @@ export default function ChatHub() {
                 <div className="modal-overlay fade-in">
                     <div className="modal-content pop-in poll-modal-content">
                         <div className="modal-header poll-modal-header">
-                            <button className="modal-close" onClick={() => setShowPollModal(false)}><X size={20}/></button>
+                            <button className="modal-close" onClick={() => setShowPollModal(false)}><X size={20} /></button>
                             <h2>Create poll</h2>
                             <button type="button" className="btn-modern-primary poll-send-btn hover-pop" onClick={handleCreatePoll}>Send</button>
                         </div>

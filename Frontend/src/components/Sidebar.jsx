@@ -98,7 +98,6 @@ export default function Sidebar() {
         { title: 'Team', icon: <Users size={20} />, path: '/team' }
     ];
 
-    // Profile Avatar resolution path fix
     const avatarSrc = currentUser?.imgUrl 
         ? (currentUser.imgUrl.startsWith('http') ? currentUser.imgUrl : `${import.meta.env.VITE_API_URL}${currentUser.imgUrl}`)
         : `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser?.name || 'User')}&background=${currentUser?.isSupremeAdmin ? '0f172a' : 'e5e7eb'}&color=${currentUser?.isSupremeAdmin ? 'fff' : '374151'}&bold=true`;

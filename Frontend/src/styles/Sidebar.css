@@ -1,15 +1,15 @@
 .sidebar {
     width: 260px;
     background-color: #ffffff;
-    /* White main background */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     border-right: 1px solid #e5e7eb;
     color: #111827;
-    /* Black/Dark Gray main text */
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     height: 100vh;
+    height: 100dvh;
+    /* Fixes browser viewport clipping */
 }
 
 /* --- TOP BRAND SECTION --- */
@@ -31,7 +31,6 @@
     font-size: 2rem;
     font-weight: 700;
     color: #111827;
-    /* Black text */
     font-family: var(--Font3);
     letter-spacing: -0.025em;
 }
@@ -64,7 +63,6 @@
     font-size: 0.75rem;
     font-weight: 600;
     color: #9ca3af;
-    /* Light gray for section headers */
     margin-bottom: 0.5rem;
     padding-left: 0.75rem;
 }
@@ -90,7 +88,6 @@
     border-radius: 8px;
     text-decoration: none;
     color: #374151;
-    /* Dark gray for standard links */
     font-weight: 500;
     font-size: 0.875rem;
     transition: all 0.2s ease;
@@ -106,43 +103,35 @@
     display: flex;
     align-items: center;
     color: #6b7280;
-    /* Default icon color */
 }
 
-/* Hover State - Dark Blue text & light background */
+/* Hover State */
 .nav-link:hover {
     background-color: #f3f4f6;
     color: #1e3a8a;
-    /* Dark Blue */
 }
 
 .nav-link:hover .nav-icon {
     color: #1e3a8a;
 }
 
-/* Active State - Dark Blue background tint & bold Dark Blue text */
+/* Active State */
 .nav-link.active {
     background-color: #eff6ff;
     color: #1e3a8a;
     font-weight: 600;
 }
 
-/* Badges - Dark Blue background */
-.nav-badge {
-    background-color: #1e3a8a;
-    color: #ffffff;
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 0.125rem 0.4rem;
-    border-radius: 9999px;
-    min-width: 1.25rem;
-    text-align: center;
-}
-
 /* --- BOTTOM PROFILE SECTION --- */
 .sidebar-bottom {
     padding: 1rem;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+    /* iOS safe-area support */
     border-top: 1px solid #f3f4f6;
+    background-color: #ffffff;
+    flex-shrink: 0;
+    /* Prevents being crushed by scrollable links */
+    z-index: 10;
 }
 
 .profile-widget {
@@ -223,17 +212,14 @@
     transition-duration: 0.25s;
 }
 
-/* night sky background */
 #toggle:checked+svg #container {
     fill: #2b4360;
 }
 
-/* move button to right when checked */
 #toggle:checked+svg #button {
     transform: translate(28px, 2.333px);
 }
 
-/* show/hide sun and moon */
 #sun {
     opacity: 1;
 }
@@ -250,7 +236,6 @@
     opacity: 1;
 }
 
-/* show/hide background items */
 #cloud {
     opacity: 1;
 }
@@ -267,7 +252,7 @@
     opacity: 1;
 }
 
-/* Badges - Dark Blue background with clean counter pill layout */
+/* Badges */
 .nav-badge {
     background-color: #2563eb;
     color: #ffffff;
@@ -327,6 +312,8 @@
     justify-content: space-around;
     align-items: center;
     padding: 0 0.5rem;
+    padding-bottom: env(safe-area-inset-bottom);
+    /* iOS safe area */
 }
 
 .mobile-btm-item {
@@ -389,6 +376,8 @@
     right: 0;
     width: 280px;
     height: 100vh;
+    height: 100dvh;
+    /* Fixes browser viewport clipping */
     background: #ffffff;
     box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
     z-index: 1200;
@@ -408,6 +397,7 @@
     justify-content: space-between;
     padding: 1.25rem 1.5rem;
     border-bottom: 1px solid #e5e7eb;
+    flex-shrink: 0;
 }
 
 .drawer-header h3 {
@@ -450,6 +440,6 @@
         margin-left: 0 !important;
         width: 100% !important;
         padding-top: 76px !important;
-        padding-bottom: 80px !important;
+        padding-bottom: calc(64px + env(safe-area-inset-bottom)) !important;
     }
 }
