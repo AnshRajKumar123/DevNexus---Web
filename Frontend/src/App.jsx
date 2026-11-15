@@ -36,7 +36,7 @@ const DashboardLayout = () => (
     <div className="dashboard-container" style={{ display: 'flex', minHeight: '100vh', background: '#f8fafc' }}>
         <Sidebar />
         <div className="main-content-wrapper" style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-            <main className="main-content" style={{ flex: 1, padding: '0' }}>
+            <main className="main-content" style={{ flex: 1, padding: '0px' }}>
                 <Outlet />
             </main>
         </div>

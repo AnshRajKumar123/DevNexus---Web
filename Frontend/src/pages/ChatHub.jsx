@@ -11,7 +11,6 @@ export const getAvatarSrc = (user) => {
     return `${import.meta.env.VITE_API_URL}${user.imgUrl.startsWith('/') ? '' : '/'}${user.imgUrl}`;
 };
 
-// --- NEW: Dynamic Date Formatter for Chat Badges ---
 const formatChatDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -58,8 +57,6 @@ export default function ChatHub() {
     const [pinModal, setPinModal] = useState({ visible: false, chat: null });
     const [deleteModal, setDeleteModal] = useState({ visible: false, chat: null });
     const [hiddenChats, setHiddenChats] = useState(new Set()); 
-    const [localReactions, setLocalReactions] = useState({}); 
-
     const [activePinIndex, setActivePinIndex] = useState(0);
     const [isFullScreen, setIsFullScreen] = useState(false);
 
@@ -81,11 +78,8 @@ export default function ChatHub() {
     const pingStatus = async () => {
         if (!currentUser) return;
         if (!navigator.onLine || document.visibilityState === 'hidden') return;
-
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/api/team/${currentUser.email}/ping`, {
-                method: 'PUT',
-            });
+            await fetch(`${import.meta.env.VITE_API_URL}/api/team/${currentUser.email}/ping`, { method: 'PUT' });
         } catch (err) {}
     };
 
@@ -125,7 +119,6 @@ export default function ChatHub() {
             fetchChats();
             pingStatus();
         }, 5000); 
-        
         return () => clearInterval(interval);
     }, []);
 
@@ -539,7 +532,7 @@ export default function ChatHub() {
                 </div>
             </header>
 
-            <section className="stagger-2" style={{ height: isFullScreen ? '100vh' : 'calc(100vh - 240px)' }}>
+            <section className="stagger-2 chat-main-section">
                 <div className={`chat-hub-layout ${mobileChatOpen ? 'mobile-chat-active' : ''}`}>
                     
                     {/* Left Sidebar */}
@@ -650,7 +643,6 @@ export default function ChatHub() {
                                         isRead = chat.readBy && chat.readBy.includes(chat.recipientEmail);
                                     }
 
-                                    // --- NEW: Check if Date Group Badge should be shown ---
                                     const chatDate = chat.createdAt ? new Date(chat.createdAt).toDateString() : '';
                                     const prevChatDate = idx > 0 && filteredChats[idx - 1].createdAt 
                                         ? new Date(filteredChats[idx - 1].createdAt).toDateString() 
@@ -660,7 +652,6 @@ export default function ChatHub() {
                                     return (
                                         <React.Fragment key={chat._id || idx}>
                                             
-                                            {/* Render the WhatsApp style date badge in center */}
                                             {showDateBadge && (
                                                 <div className="chat-date-wrapper pop-in">
                                                     <span className="chat-date-badge">{formatChatDate(chat.createdAt)}</span>
@@ -707,10 +698,12 @@ export default function ChatHub() {
                             <div ref={messagesEndRef} />
                         </div>
 
-                        <form onSubmit={(e) => handleSendMessage(e)} className="chat-hub-input-form" style={{ position: 'relative' }}>
+                        {/* --- REORGANIZED FORM UI (WhatsApp Style) --- */}
+                        <form onSubmit={(e) => handleSendMessage(e)} className="chat-hub-input-form">
+                            
                             <div className="chat-attach-container">
-                                <button type="button" className="chat-attach-trigger-btn hover-pop" onClick={() => setShowAttachMenu(!showAttachMenu)}>
-                                    <Plus size={20} />
+                                <button type="button" className="chat-attach-trigger-btn" onClick={() => setShowAttachMenu(!showAttachMenu)}>
+                                    <Plus size={22} />
                                 </button>
                                 {showAttachMenu && (
                                     <div className="chat-upside-dropdown pop-in">
@@ -763,7 +756,7 @@ export default function ChatHub() {
 
                                 <input 
                                     type="text" 
-                                    placeholder="Send secure message..." 
+                                    placeholder="Message" 
                                     value={messageText}
                                     onChange={(e) => setMessageText(e.target.value)}
                                     className="chat-hub-text-input"
@@ -771,9 +764,9 @@ export default function ChatHub() {
                                     autoFocus={!!replyingTo}
                                 />
                             </div>
-                            <button type="submit" className="btn-modern-primary hover-pop chat-hub-send-btn" disabled={(!messageText.trim() && attachments.length === 0) || isUploading}>
-                                {isUploading ? <Sparkles size={16} className="pulse-anim" /> : <Send size={16} />} 
-                                {isUploading ? 'Sending...' : 'Send'}
+
+                            <button type="submit" className="btn-modern-primary chat-hub-send-btn" disabled={(!messageText.trim() && attachments.length === 0) || isUploading}>
+                                {isUploading ? <Sparkles size={18} className="pulse-anim" /> : <Send size={18} style={{ transform: 'translateX(-1px) translateY(1px)' }}/>} 
                             </button>
                         </form>
                     </div>

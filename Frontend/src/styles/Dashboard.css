@@ -501,6 +501,11 @@
     .dashboard-grid {
         grid-template-columns: 1fr;
     }
+
+    .dashboard-wrapper {
+        max-width: 100% !important;
+        padding: 0 1rem !important;
+    }
 }
 
 @media (max-width: 480px) {
