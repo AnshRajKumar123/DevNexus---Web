@@ -1,46 +1,21 @@
 const express = require('express');
 const multer = require('multer');
-const fs = require('fs');
-const path = require('path');
+const cloudinary = require('cloudinary').v2;
 const { Team } = require('../models');
 
 const router = express.Router();
 
-// Configure Multer Storage
-const storage = multer.diskStorage({
-    destination(req, file, cb) {
-        let subFolder = 'docChat'; // Fallback folder
-
-        // Dynamically route files to proper subfolders
-        if (req.body.isProfile === 'true') {
-            subFolder = 'profiles';
-        } else if (file.mimetype.startsWith('image/')) {
-            subFolder = 'imageChat';
-        } else if (file.mimetype.startsWith('video/')) {
-            subFolder = 'videoChat';
-        } else if (file.mimetype === 'application/pdf') {
-            subFolder = 'pdfChat';
-        }
-
-        const uploadDir = path.join(__dirname, '../../uploads', subFolder);
-        
-        // Create directory if it doesn't exist
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-        
-        req.savedSubFolder = subFolder; // Save for the response
-        cb(null, uploadDir);
-    },
-    filename(req, file, cb) {
-        const cleanName = `${Date.now()}-${file.originalname.replace(/\s+/g, '-')}`;
-        cb(null, cleanName);
-    }
+// Configure Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+// Use memory storage so we don't write to Render's temporary disk
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// POST /api/upload
 router.post('/', upload.single('image'), async (req, res) => {
     try {
         if (!req.file) {
@@ -48,21 +23,47 @@ router.post('/', upload.single('image'), async (req, res) => {
         }
 
         const userId = req.body.userId;
-        const subFolder = req.savedSubFolder || 'docChat';
+        let folderName = 'devnexus/docChat';
 
-        // Delete old profile picture ONLY if it's a profile update
-        if (userId && req.body.isProfile === 'true') {
-            const user = await Team.findById(userId);
-            if (user && user.imgUrl && user.imgUrl.startsWith('/uploads/')) {
-                const oldFilePath = path.join(__dirname, '../..', user.imgUrl);
-                if (fs.existsSync(oldFilePath)) {
-                    fs.unlinkSync(oldFilePath);
-                }
-            }
+        // Dynamically organize Cloudinary folders
+        if (req.body.isProfile === 'true') {
+            folderName = 'devnexus/profiles';
+        } else if (req.file.mimetype.startsWith('image/')) {
+            folderName = 'devnexus/imageChat';
+        } else if (req.file.mimetype.startsWith('video/')) {
+            folderName = 'devnexus/videoChat';
+        } else if (req.file.mimetype === 'application/pdf') {
+            folderName = 'devnexus/pdfChat';
         }
 
-        // Return path including subfolder
-        res.json({ imageUrl: `/uploads/${subFolder}/${req.file.filename}` });
+        // Determine correct resource type
+        let resourceType = 'auto';
+        if (req.file.mimetype.startsWith('video/')) resourceType = 'video';
+        else if (!req.file.mimetype.startsWith('image/')) resourceType = 'raw';
+
+        // Upload stream to Cloudinary
+        const uploadStream = cloudinary.uploader.upload_stream(
+            { folder: folderName, resource_type: resourceType },
+            async (error, result) => {
+                if (error) {
+                    console.error('Cloudinary error:', error);
+                    return res.status(500).json({ message: 'Cloudinary upload failed' });
+                }
+
+                // Delete old profile picture from Cloudinary (optional cleanup)
+                if (userId && req.body.isProfile === 'true') {
+                    const user = await Team.findById(userId);
+                    if (user && user.imgUrl && user.imgUrl.includes('cloudinary.com')) {
+                        // Advanced: You can extract the public_id here and delete the old image
+                    }
+                }
+
+                // Return the secure, permanent Cloudinary URL
+                res.json({ imageUrl: result.secure_url });
+            }
+        );
+
+        uploadStream.end(req.file.buffer);
     } catch (error) {
         console.error('Error handling upload:', error);
         res.status(500).json({ message: 'Server error during upload' });

@@ -43,13 +43,16 @@ export default function Profile() {
 
         try {
             setIsUploading(true);
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/upload`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/upload`, {
                 method: 'POST',
                 body: formData,
             });
             if (!response.ok) throw new Error('Image upload failed');
             const data = await response.json();
-            await updateProfile(currentUserId, { imgUrl: data.imageUrl });
+            
+            const finalUrl = data.imageUrl.startsWith('http') ? data.imageUrl : `${import.meta.env.VITE_API_URL || ''}${data.imageUrl}`;
+            await updateProfile(currentUserId, { imgUrl: finalUrl });
+            
         } catch (error) {
             console.error('Upload Error:', error);
             alert('Failed to upload image. Ensure the backend server is running.');
@@ -77,9 +80,15 @@ export default function Profile() {
         setTimeout(() => setPassFlow('idle'), 3000);
     };
 
-    const avatarSrc = currentUser.imgUrl 
-        ? (currentUser.imgUrl.startsWith('http') ? currentUser.imgUrl : `${import.meta.env.VITE_API_URL}${currentUser.imgUrl}`)
-        : `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name)}&background=${currentUser.isSupremeAdmin ? '0f172a' : 'e5e7eb'}&color=${currentUser.isSupremeAdmin ? 'fff' : '374151'}&size=150`;
+    const getAvatarUrl = () => {
+        if (!currentUser.imgUrl) {
+            return `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name)}&background=${currentUser.isSupremeAdmin ? '0f172a' : 'e5e7eb'}&color=${currentUser.isSupremeAdmin ? 'fff' : '374151'}&size=150`;
+        }
+        if (currentUser.imgUrl.startsWith('http')) return currentUser.imgUrl;
+        
+        const cleanPath = currentUser.imgUrl.startsWith('/') ? currentUser.imgUrl : `/${currentUser.imgUrl}`;
+        return cleanPath;
+    };
 
     return (
         <div className="dashboard-wrapper page-animate">
@@ -95,9 +104,13 @@ export default function Profile() {
                             </div>
                         ) : (
                             <img
-                                src={avatarSrc}
+                                src={getAvatarUrl()}
                                 alt={currentUser.name}
                                 className="profile-main-avatar"
+                                onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name)}&background=${currentUser.isSupremeAdmin ? '0f172a' : 'e5e7eb'}&color=${currentUser.isSupremeAdmin ? 'fff' : '374151'}&size=150`;
+                                }}
                             />
                         )}
                         {!isLoading && (

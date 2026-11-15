@@ -3,12 +3,21 @@ import { Send, Lock, Users, Sparkles, MessageSquareCode, ArrowLeft, Plus, Video,
 import { useData } from '../context/DataContext';
 import '../styles/ChatHub.css';
 
-const API_URL = `${import.meta.env.VITE_API_URL}/api`;
+const API_URL = `${import.meta.env.VITE_API_URL || ''}/api`;
 
 export const getAvatarSrc = (user) => {
-    if (!user || !user.imgUrl) return `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=e5e7eb&color=374151&bold=true`;
-    if (user.imgUrl.startsWith('http')) return user.imgUrl;
-    return `${import.meta.env.VITE_API_URL}${user.imgUrl.startsWith('/') ? '' : '/'}${user.imgUrl}`;
+    if (!user || !user.imgUrl) {
+        return `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=${user?.isSupremeAdmin ? '0f172a' : 'e5e7eb'}&color=${user?.isSupremeAdmin ? 'fff' : '374151'}&bold=true`;
+    }
+    
+    // Cloudinary URLs and generic HTTP URLs
+    if (user.imgUrl.startsWith('http')) {
+        return user.imgUrl;
+    }
+
+    // Masked Vercel local proxies
+    const cleanPath = user.imgUrl.startsWith('/') ? user.imgUrl : `/${user.imgUrl}`;
+    return cleanPath;
 };
 
 const formatChatDate = (dateString) => {
@@ -79,7 +88,7 @@ export default function ChatHub() {
         if (!currentUser) return;
         if (!navigator.onLine || document.visibilityState === 'hidden') return;
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/api/team/${currentUser.email}/ping`, { method: 'PUT' });
+            await fetch(`${API_URL}/team/${currentUser.email}/ping`, { method: 'PUT' });
         } catch (err) { }
     };
 
@@ -209,7 +218,9 @@ export default function ChatHub() {
 
         if (fileUrls.length > 0) {
             const attachmentStrings = fileUrls.map(f => {
-                const fullUrl = `${import.meta.env.VITE_API_URL}${f.url}`;
+                const baseUrl = import.meta.env.VITE_API_URL || '';
+                const fullUrl = f.url.startsWith('http') ? f.url : `${baseUrl}${f.url}`;
+                
                 if (f.type === 'image') return `[IMG:${fullUrl}]`;
                 if (f.type === 'video') return `[VID:${fullUrl}]`;
                 return `[FILE:${f.name}|${fullUrl}]`;
@@ -561,7 +572,15 @@ export default function ChatHub() {
                                 </div>
                             )) : team.filter(t => t.email !== currentUser?.email).map(member => (
                                 <div key={member._id} className={`chat-hub-channel-item ${selectedRecipient === member.email ? 'active-channel' : ''}`} onClick={() => handleSelectRecipient(member.email)}>
-                                    <img src={getAvatarSrc(member)} alt={member.name} className="chat-hub-member-avatar" />
+                                    <img 
+                                        src={getAvatarSrc(member)} 
+                                        alt={member.name} 
+                                        className="chat-hub-member-avatar"
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(member?.name || 'User')}&background=${member?.isSupremeAdmin ? '0f172a' : 'e5e7eb'}&color=${member?.isSupremeAdmin ? 'fff' : '374151'}&bold=true`;
+                                        }}
+                                    />
                                     <div className="chat-hub-channel-info">
                                         <h4>{member.name}</h4>
                                         <p>{member.role}</p>
@@ -675,7 +694,6 @@ export default function ChatHub() {
                                                         {chat.isPinned && <Pin size={10} style={{ marginRight: '4px' }} />}
                                                         <span className="chat-hub-lock-icon" title="Encrypted"><Lock size={10} /></span>
 
-                                                        {/* --- NEW: Forced 12-hour format with AM/PM --- */}
                                                         <span className="chat-hub-timestamp">
                                                             {chat.createdAt
                                                                 ? new Date(chat.createdAt).toLocaleTimeString('en-US', {
@@ -776,7 +794,6 @@ export default function ChatHub() {
                                 />
                             </div>
 
-                            {/* Completely isolated send button */}
                             <button type="submit" className="chat-hub-send-btn" disabled={(!messageText.trim() && attachments.length === 0) || isUploading}>
                                 {isUploading ? (
                                     <Sparkles size={18} className="pulse-anim" />

@@ -5,11 +5,11 @@ import '../styles/LiveWebsite.css';
 
 export default function LiveWebsite() {
     const { websites, addWebsite, updateWebsite, removeWebsite, currentUser } = useData();
-    const isMainAdmin = currentUser?.isSupremeAdmin; 
-    
+    const isMainAdmin = currentUser?.isSupremeAdmin;
+
     const [isLoading, setIsLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
-    const [editingId, setEditingId] = useState(null); 
+    const [editingId, setEditingId] = useState(null);
     const [title, setTitle] = useState('');
     const [url, setUrl] = useState('');
     const [desc, setDesc] = useState('');
@@ -28,15 +28,19 @@ export default function LiveWebsite() {
         formData.append('image', file);
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/upload`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/upload`, {
                 method: 'POST',
                 body: formData
             });
 
             if (!response.ok) throw new Error('Image upload failed');
+
             const data = await response.json();
-            setImgUrl(`${import.meta.env.VITE_API_URL}${data.imageUrl}`);
             
+            // Cloudinary returns a secure HTTP URL. Masked fallback ensures backward compatibility.
+            const finalUrl = data.imageUrl.startsWith('http') ? data.imageUrl : `${import.meta.env.VITE_API_URL || ''}${data.imageUrl}`;
+            setImgUrl(finalUrl);
+
         } catch (error) { alert("Failed to upload image. Make sure the backend is running."); }
     };
 
@@ -91,7 +95,7 @@ export default function LiveWebsite() {
 
                         {isLoading ? (
                             <div className="websites-grid-modern">
-                                {Array.from({length: 3}).map((_, i) => <div key={i} className="skeleton skeleton-card" style={{ height: '300px' }}></div>)}
+                                {Array.from({ length: 3 }).map((_, i) => <div key={i} className="skeleton skeleton-card" style={{ height: '300px' }}></div>)}
                             </div>
                         ) : websites.length === 0 ? (
                             <div className="empty-state">
@@ -110,7 +114,15 @@ export default function LiveWebsite() {
                                     <div key={website._id || website.id} className="website-card-modern fade-in-row">
                                         <div className="website-card-image">
                                             {website.img || website.imgUrl ? (
-                                                <img src={website.img || website.imgUrl} alt={website.title} />
+                                                <img 
+                                                    src={website.img || website.imgUrl} 
+                                                    alt={website.title} 
+                                                    onError={(e) => {
+                                                        e.target.onerror = null;
+                                                        e.target.style.display = 'none'; // Fallback if image breaks
+                                                        e.target.parentElement.innerHTML = '<div class="image-placeholder"><Globe size="36" color="#94a3b8" /></div>';
+                                                    }}
+                                                />
                                             ) : (
                                                 <div className="image-placeholder"><Globe size={36} /></div>
                                             )}
@@ -142,9 +154,9 @@ export default function LiveWebsite() {
                     <div className="modal-content pop-in">
                         <div className="modal-header">
                             <h2>{editingId ? 'Edit Website' : 'Add Website'}</h2>
-                            <button className="modal-close" onClick={() => setShowModal(false)}><X size={24}/></button>
+                            <button className="modal-close" onClick={() => setShowModal(false)}><X size={24} /></button>
                         </div>
-                        
+
                         <form onSubmit={handleSave} className="modern-form">
                             <div className="form-group">
                                 <label>Website Name</label>
@@ -156,15 +168,15 @@ export default function LiveWebsite() {
                             </div>
                             <div className="form-group">
                                 <label>Preview Image</label>
-                                <div style={{display:'flex', gap:'1rem', alignItems:'center'}}>
-                                    <label className="btn-modern-secondary" style={{cursor:'pointer', margin:0}}>
+                                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                    <label className="btn-modern-secondary" style={{ cursor: 'pointer', margin: 0 }}>
                                         <ImagePlus size={16} /> Choose Image
                                         <input type="file" accept="image/*" onChange={handleImageUpload} hidden />
                                     </label>
                                     {imgUrl ? (
-                                        <img src={imgUrl} alt="Preview" style={{ width: '50px', height: '35px', objectFit: 'cover', borderRadius: '6px' }} />
+                                        <img src={imgUrl.startsWith('http') ? imgUrl : `${import.meta.env.VITE_API_URL || ''}${imgUrl}`} alt="Preview" style={{ width: '50px', height: '35px', objectFit: 'cover', borderRadius: '6px' }} />
                                     ) : (
-                                        <span style={{fontSize:'0.8rem', color:'#94a3b8'}}>No image selected</span>
+                                        <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>No image selected</span>
                                     )}
                                 </div>
                             </div>
