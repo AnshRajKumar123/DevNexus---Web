@@ -3,14 +3,23 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const path = require('path');
-require('dotenv').config();
-
-// --- CORRECTED FIREBASE ADMIN INITIALIZATION ---
 const adminModule = require('firebase-admin');
 const admin = adminModule.default || adminModule;
-const serviceAccount = require('./firebase-service-account.json');
+require('dotenv').config();
 
-if (!admin.apps.length) {
+// Load Firebase credentials safely (JSON file locally, Env vars on Render)
+let serviceAccount;
+try {
+    serviceAccount = require('./firebase-service-account.json');
+} catch (err) {
+    serviceAccount = {
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') : undefined
+    };
+}
+
+if (!admin.apps.length && serviceAccount.projectId) {
     admin.initializeApp({
         credential: admin.credential.cert(serviceAccount)
     });
