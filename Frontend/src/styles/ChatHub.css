@@ -132,6 +132,7 @@
     justify-content: space-between;
     align-items: center;
     background: #ffffff;
+    z-index: 10;
 }
 
 .chat-hub-active-title {
@@ -140,22 +141,44 @@
     gap: 0.75rem;
 }
 
-.chat-hub-active-title h3 {
+.chat-hub-header-avatar,
+.header-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.chat-hub-header-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.chat-hub-header-info h3 {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     color: #0f172a;
+    line-height: 1.2;
+}
+
+.chat-status {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-top: 0.15rem;
+}
+
+.chat-status.online {
+    color: #10b981;
+    font-weight: 600;
 }
 
 .chat-hub-security-tag {
-    font-size: 0.78rem;
-    color: #059669;
     background: #ecfdf5;
-    padding: 0.3rem 0.75rem;
-    border-radius: 99px;
+    padding: 0.75rem;
+    border-radius: 9px;
     display: flex;
     align-items: center;
-    gap: 0.35rem;
-    font-weight: 600;
 }
 
 /* --- MESSAGES & BUBBLES --- */
@@ -168,6 +191,7 @@
     gap: 1.5rem;
     background: #eff6ff;
     user-select: none;
+    position: relative;
 }
 
 .chat-hub-bubble-wrapper {
@@ -194,10 +218,10 @@
 }
 
 .chat-hub-bubble {
-    padding: 0.85rem 1.15rem;
-    border-radius: 16px;
+    padding: 0.5rem 0.6rem 0.5rem 0.75rem;
+    border-radius: 12px;
     position: relative;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .bubble-mine {
@@ -216,22 +240,29 @@
 
 .chat-hub-text {
     font-size: 0.95rem;
-    line-height: 1.5;
+    line-height: 1.4;
     word-break: break-word;
     white-space: pre-wrap;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
 }
 
+/* Floating the footer next to the content like WhatsApp */
 .chat-hub-bubble-footer {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 0.35rem;
+    gap: 0.2rem;
+    float: right;
+    margin-left: 0.75rem;
     margin-top: 0.35rem;
-    font-size: 0.68rem;
-    opacity: 0.8;
+    font-size: 0.65rem;
+    font-weight: 500;
+}
+
+/* Fix flex floating layout issues */
+.chat-hub-bubble::after {
+    content: "";
+    display: table;
+    clear: both;
 }
 
 .bubble-mine .chat-hub-bubble-footer {
@@ -240,6 +271,14 @@
 
 .bubble-theirs .chat-hub-bubble-footer {
     color: #94a3b8;
+}
+
+.read-receipt.unread {
+    color: #94a3b8 !important;
+}
+
+.read-receipt.read {
+    color: #3b82f6 !important;
 }
 
 .chat-hub-empty-state {
@@ -253,22 +292,13 @@
     padding: 2rem;
 }
 
-/* --- CHAT ATTACHMENTS --- */
-.chat-bubble-image-container {
-    position: relative;
-    display: inline-block;
-    max-width: 100%;
-    margin-top: 0.5rem;
-    overflow: hidden;
-    border-radius: 8px;
-}
-
-.chat-bubble-image-container .chat-bubble-image,
+/* --- CHAT ATTACHMENTS (NON-IMAGE) --- */
 .chat-bubble-video {
     display: block;
     width: 100%;
     max-width: 100%;
     border-radius: 8px;
+    margin-bottom: 0.5rem;
 }
 
 .chat-bubble-file {
@@ -282,7 +312,7 @@
     text-decoration: none;
     font-weight: 600;
     font-size: 0.85rem;
-    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
 }
 
 .bubble-theirs .chat-bubble-file {
@@ -296,6 +326,160 @@
     border: 1px solid #93c5fd;
     color: #2563eb;
 }
+
+/* ========================================================
+   NEW: WHATSAPP-STYLE IMAGE COLLAGE & LIGHTBOX
+   ======================================================== */
+.chat-message-blocks {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.chat-text-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.chat-image-collage {
+    display: grid;
+    gap: 4px;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 0.2rem;
+    width: 100%;
+    max-width: 320px;
+}
+
+.collage-count-1 {
+    grid-template-columns: 1fr;
+}
+
+.collage-count-1 .collage-item {
+    aspect-ratio: auto;
+    max-height: 350px;
+}
+
+.collage-count-2 {
+    grid-template-columns: 1fr 1fr;
+}
+
+.collage-count-3 {
+    grid-template-columns: 1fr 1fr;
+}
+
+.collage-count-3 .collage-item:first-child {
+    grid-column: 1 / 3;
+    aspect-ratio: 16 / 9;
+}
+
+.collage-count-4 {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+
+.collage-item {
+    position: relative;
+    cursor: pointer;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+}
+
+.collage-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.2s;
+}
+
+.collage-item:hover img {
+    transform: scale(1.03);
+}
+
+.collage-overlay-count {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+.lightbox-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+}
+
+.lightbox-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+}
+
+.lightbox-counter {
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 1px;
+}
+
+.lightbox-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.lightbox-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem 2rem 2rem;
+}
+
+.lightbox-main-img {
+    max-width: 80%;
+    max-height: 85vh;
+    object-fit: contain;
+    margin: 0 auto;
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-nav {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.lightbox-nav:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
 
 /* ========================================================
    CUSTOM POLL UI
@@ -435,6 +619,7 @@
     gap: 0.6rem;
     width: 100%;
     box-sizing: border-box;
+    z-index: 10;
 }
 
 .chat-attach-container {
@@ -530,7 +715,6 @@
     box-sizing: border-box;
 }
 
-/* --- ISOLATED CIRCULAR SEND BUTTON --- */
 .chat-hub-send-btn {
     padding: 0;
     width: 44px;
@@ -548,7 +732,6 @@
     box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3);
 }
 
-/* Force Lucide SVG to render stroke and never block fill */
 .chat-hub-send-btn svg {
     stroke: #ffffff;
     fill: none !important;
@@ -861,8 +1044,7 @@
     margin-top: 0.25rem;
 }
 
-
-/* --- EXISTING MODALS (Poll / View Votes) --- */
+/* EXISTING MODALS (Poll / View Votes) */
 .poll-votes-modal {
     background: #f8fafc;
     width: 100%;
@@ -1091,14 +1273,12 @@
 
     .chat-main-section {
         height: calc(100vh - 240px);
-        /* Leaves exact space for bottom toolbars without stretching */
     }
 
     .chat-hub-layout {
         border-radius: 12px;
     }
 
-    /* Fixed Sidebar overlap using pure display toggle */
     .chat-hub-sidebar {
         display: flex;
         width: 100% !important;
@@ -1127,7 +1307,6 @@
         padding: 0.75rem 1rem;
     }
 
-    /* Fixed Chat Form Input Area Padding on Mobile */
     .chat-hub-input-form {
         padding: 0.75rem 0.5rem;
         gap: 0.4rem;
@@ -1140,6 +1319,29 @@
     .chat-hub-bubble-wrapper,
     .poll-msg-wrapper {
         max-width: 85% !important;
+    }
+
+    .lightbox-main-img {
+        max-width: 100%;
+    }
+
+    .lightbox-content {
+        padding: 0 0.5rem 2rem 0.5rem;
+    }
+
+    .lightbox-nav {
+        width: 40px;
+        height: 40px;
+        background: rgba(0, 0, 0, 0.5);
+        position: absolute;
+    }
+
+    .lightbox-nav.prev {
+        left: 10px;
+    }
+
+    .lightbox-nav.next {
+        right: 10px;
     }
 }
 
@@ -1269,8 +1471,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0.2rem;
-    margin-left: 0.25rem;
     transition: color 0.2s;
 }
 
@@ -1279,27 +1479,14 @@
     transform: scale(1.1);
 }
 
-/* --- DOUBLE TICK READ RECEIPT STYLES --- */
-.read-receipt {
-    display: flex;
-    align-items: center;
-    transition: color 0.2s;
-}
-
-.read-receipt.unread {
-    color: #60a5fa;
-}
-
-.read-receipt.read {
-    color: #10b981;
-}
-
-/* --- CENTERED DATE BADGE STYLES --- */
+/* --- WHATSAPP-STYLE STICKY DATE BADGE --- */
 .chat-date-wrapper {
     display: flex;
     justify-content: center;
-    margin: 1.5rem 0 0.5rem 0;
     width: 100%;
+    margin: 1.5rem 0 0.5rem 0;
+    position: sticky;
+    top: 0;
     z-index: 5;
 }
 
@@ -1321,4 +1508,44 @@ body.dark-mode .chat-date-badge {
     color: #94a3b8;
     border-color: #334155;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* --- Sidebar Meta Layout (WhatsApp Style) --- */
+.sidebar-meta-layout {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.15rem;
+}
+
+.sidebar-meta-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-meta-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-time {
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.sidebar-unread-badge {
+    background-color: #10b981;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    height: 18px;
+    min-width: 18px;
+    padding: 0 5px;
+    border-radius: 99px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(16, 185, 129, 0.4);
 }

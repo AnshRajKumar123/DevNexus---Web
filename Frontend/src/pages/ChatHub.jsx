@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Lock, Users, Sparkles, MessageSquareCode, ArrowLeft, Plus, Video, Image, FileText, File, BarChart2, X, Check, CheckCircle2, Circle, Ban, Pin, Maximize, Minimize, CheckCheck } from 'lucide-react';
+import { Send, Lock, Users, Sparkles, MessageSquareCode, ArrowLeft, Plus, Video, Image, FileText, File, BarChart2, X, Check, CheckCircle2, Circle, Ban, Pin, Maximize, Minimize, CheckCheck, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import '../styles/ChatHub.css';
 
@@ -9,15 +9,8 @@ export const getAvatarSrc = (user) => {
     if (!user || !user.imgUrl) {
         return `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=${user?.isSupremeAdmin ? '0f172a' : 'e5e7eb'}&color=${user?.isSupremeAdmin ? 'fff' : '374151'}&bold=true`;
     }
-    
-    // Cloudinary URLs and generic HTTP URLs
-    if (user.imgUrl.startsWith('http')) {
-        return user.imgUrl;
-    }
-
-    // Masked Vercel local proxies
-    const cleanPath = user.imgUrl.startsWith('/') ? user.imgUrl : `/${user.imgUrl}`;
-    return cleanPath;
+    if (user.imgUrl.startsWith('http')) return user.imgUrl;
+    return user.imgUrl.startsWith('/') ? user.imgUrl : `/${user.imgUrl}`;
 };
 
 const formatChatDate = (dateString) => {
@@ -27,12 +20,47 @@ const formatChatDate = (dateString) => {
     const yesterday = new Date();
     yesterday.setDate(today.getDate() - 1);
 
+    if (date.toDateString() === today.toDateString()) return 'Today';
+    if (date.toDateString() === yesterday.toDateString()) return 'Yesterday';
+    return date.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+};
+
+const formatLastSeen = (lastSeenDate) => {
+    if (!lastSeenDate) return 'offline';
+    
+    const date = new Date(lastSeenDate);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = diffMs / (1000 * 60);
+
+    if (diffMins < 5) return 'Online';
+
+    const isToday = date.toDateString() === now.toDateString();
+    
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const isYesterday = date.toDateString() === yesterday.toDateString();
+
+    const timeString = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+    if (isToday) return `last seen today at ${timeString}`;
+    if (isYesterday) return `last seen yesterday at ${timeString}`;
+    return `last seen ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at ${timeString}`;
+};
+
+const formatSidebarTime = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
     if (date.toDateString() === today.toDateString()) {
-        return 'Today';
+        return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
     } else if (date.toDateString() === yesterday.toDateString()) {
         return 'Yesterday';
     } else {
-        return date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
+        return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear().toString().slice(-2)}`;
     }
 };
 
@@ -52,6 +80,9 @@ export default function ChatHub() {
 
     const [viewVotesPoll, setViewVotesPoll] = useState(null);
     const [localVotes, setLocalVotes] = useState({});
+
+    // Lightbox Preview State
+    const [previewModal, setPreviewModal] = useState({ visible: false, images: [], currentIndex: 0 });
 
     const fileInputRef = useRef(null);
     const [attachments, setAttachments] = useState([]);
@@ -77,7 +108,6 @@ export default function ChatHub() {
         document.addEventListener('contextmenu', handleGlobalContextMenu);
         const handleClickOutside = () => setContextMenu({ visible: false, x: 0, y: 0, chat: null });
         document.addEventListener('click', handleClickOutside);
-
         return () => {
             document.removeEventListener('contextmenu', handleGlobalContextMenu);
             document.removeEventListener('click', handleClickOutside);
@@ -85,11 +115,8 @@ export default function ChatHub() {
     }, []);
 
     const pingStatus = async () => {
-        if (!currentUser) return;
-        if (!navigator.onLine || document.visibilityState === 'hidden') return;
-        try {
-            await fetch(`${API_URL}/team/${currentUser.email}/ping`, { method: 'PUT' });
-        } catch (err) { }
+        if (!currentUser || !navigator.onLine || document.visibilityState === 'hidden') return;
+        try { await fetch(`${API_URL}/team/${currentUser.email}/ping`, { method: 'PUT' }); } catch (err) { }
     };
 
     const fetchChats = async () => {
@@ -104,9 +131,7 @@ export default function ChatHub() {
                 }
                 setIsLoading(false);
             }
-        } catch (err) {
-            setIsLoading(false);
-        }
+        } catch (err) { setIsLoading(false); }
     };
 
     const markAsRead = async (recipient) => {
@@ -220,7 +245,6 @@ export default function ChatHub() {
             const attachmentStrings = fileUrls.map(f => {
                 const baseUrl = import.meta.env.VITE_API_URL || '';
                 const fullUrl = f.url.startsWith('http') ? f.url : `${baseUrl}${f.url}`;
-                
                 if (f.type === 'image') return `[IMG:${fullUrl}]`;
                 if (f.type === 'video') return `[VID:${fullUrl}]`;
                 return `[FILE:${f.name}|${fullUrl}]`;
@@ -244,9 +268,7 @@ export default function ChatHub() {
         if (chat.message === '[DELETED]') return;
         e.preventDefault();
         e.stopPropagation();
-
-        let x = e.pageX;
-        let y = e.pageY;
+        let x = e.pageX; let y = e.pageY;
         if (window.innerWidth - x < 180) x -= 180;
         if (window.innerHeight - y < 350) y -= 350;
         setContextMenu({ visible: true, x, y, chat });
@@ -255,35 +277,20 @@ export default function ChatHub() {
     const handleMenuReact = async (emoji) => {
         const chat = contextMenu.chat;
         setContextMenu({ visible: false, x: 0, y: 0, chat: null });
-
         setChats(prev => prev.map(c => {
             if (c._id === chat._id) {
                 const newReactions = { ...(c.reactions || {}) };
-                if (newReactions[currentUser.email] === emoji) {
-                    delete newReactions[currentUser.email];
-                } else {
-                    newReactions[currentUser.email] = emoji;
-                }
+                if (newReactions[currentUser.email] === emoji) delete newReactions[currentUser.email];
+                else newReactions[currentUser.email] = emoji;
                 return { ...c, reactions: newReactions };
             }
             return c;
         }));
-
-        try {
-            await fetch(`${API_URL}/chats/${chat._id}/react`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userEmail: currentUser.email, emoji })
-            });
-            fetchChats();
-        } catch (err) { }
+        try { await fetch(`${API_URL}/chats/${chat._id}/react`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userEmail: currentUser.email, emoji }) }); fetchChats(); } catch (err) { }
     };
 
-    const handleMenuReply = () => {
-        setReplyingTo(contextMenu.chat);
-        setContextMenu({ visible: false, x: 0, y: 0, chat: null });
-    };
-
+    const handleMenuReply = () => { setReplyingTo(contextMenu.chat); setContextMenu({ visible: false, x: 0, y: 0, chat: null }); };
+    
     const handleMenuCopy = () => {
         navigator.clipboard.writeText(contextMenu.chat.message.replace(/\[(?:REPLY|IMG|VID|FILE):.*?\]/g, '').trim());
         setContextMenu({ visible: false, x: 0, y: 0, chat: null });
@@ -291,24 +298,14 @@ export default function ChatHub() {
 
     const togglePin = async (chatId, isPinned) => {
         setChats(prev => prev.map(c => c._id === chatId ? { ...c, isPinned } : c));
-        try {
-            await fetch(`${API_URL}/chats/${chatId}/pin`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ isPinned })
-            });
-            fetchChats();
-        } catch (err) { }
+        try { await fetch(`${API_URL}/chats/${chatId}/pin`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ isPinned }) }); fetchChats(); } catch (err) { }
     };
 
     const handleMenuPin = () => {
         const chat = contextMenu.chat;
         setContextMenu({ visible: false, x: 0, y: 0, chat: null });
-        if (chat.isPinned) {
-            togglePin(chat._id, false);
-        } else {
-            setPinModal({ visible: true, chat });
-        }
+        if (chat.isPinned) togglePin(chat._id, false);
+        else setPinModal({ visible: true, chat });
     };
 
     const handleMenuDownload = () => {
@@ -316,12 +313,8 @@ export default function ChatHub() {
         const match = text.match(/\[(?:IMG|VID|FILE):(?:.*?\|)?(.*?)\]/);
         if (match && match[1]) {
             const link = document.createElement('a');
-            link.href = match[1];
-            link.download = 'download';
-            link.target = '_blank';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            link.href = match[1]; link.download = 'download'; link.target = '_blank';
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
         setContextMenu({ visible: false, x: 0, y: 0, chat: null });
     };
@@ -329,11 +322,8 @@ export default function ChatHub() {
     const handleMenuDelete = () => {
         const chat = contextMenu.chat;
         setContextMenu({ visible: false, x: 0, y: 0, chat: null });
-        if (chat.senderEmail === currentUser.email) {
-            setDeleteModal({ visible: true, chat });
-        } else {
-            handleConfirmDelete('me', chat);
-        }
+        if (chat.senderEmail === currentUser.email) setDeleteModal({ visible: true, chat });
+        else handleConfirmDelete('me', chat);
     };
 
     const handleConfirmDelete = async (type, chatTarget = null) => {
@@ -342,27 +332,16 @@ export default function ChatHub() {
 
         if (type === 'me') {
             setChats(prev => prev.filter(c => c._id !== chat._id));
-            try {
-                await fetch(`${API_URL}/chats/${chat._id}/deleteForMe`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userEmail: currentUser.email })
-                });
-                fetchChats();
-            } catch (err) { }
+            try { await fetch(`${API_URL}/chats/${chat._id}/deleteForMe`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userEmail: currentUser.email }) }); fetchChats(); } catch (err) { }
         } else if (type === 'everyone') {
             setChats(prev => prev.map(c => c._id === chat._id ? { ...c, message: '[DELETED]', isPinned: false } : c));
-            try {
-                await fetch(`${API_URL}/chats/${chat._id}`, { method: 'DELETE' });
-                fetchChats();
-            } catch (err) { }
+            try { await fetch(`${API_URL}/chats/${chat._id}`, { method: 'DELETE' }); fetchChats(); } catch (err) { }
         }
     };
 
     const onSwipeStart = (e, chatId) => {
         if (e.button === 2) return;
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        swipeStartX.current = clientX;
+        swipeStartX.current = e.touches ? e.touches[0].clientX : e.clientX;
         swipeTargetId.current = chatId;
     };
 
@@ -370,10 +349,7 @@ export default function ChatHub() {
         if (!swipeStartX.current || !swipeTargetId.current) return;
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         let deltaX = clientX - swipeStartX.current;
-        if (deltaX > 0) {
-            if (deltaX > 70) deltaX = 70;
-            setSwipeOffsets({ ...swipeOffsets, [swipeTargetId.current]: deltaX });
-        }
+        if (deltaX > 0) setSwipeOffsets({ ...swipeOffsets, [swipeTargetId.current]: Math.min(deltaX, 70) });
     };
 
     const onSwipeEnd = () => {
@@ -389,47 +365,24 @@ export default function ChatHub() {
         swipeTargetId.current = null;
     };
 
-    const handleAddPollOption = () => setPollOptions([...pollOptions, '']);
-    const handlePollOptionChange = (index, value) => {
-        const updated = [...pollOptions];
-        updated[index] = value;
-        setPollOptions(updated);
-    };
-
     const handleCreatePoll = (e) => {
         e.preventDefault();
         if (!pollQuestion.trim() || pollOptions.filter(o => o.trim()).length < 2) return alert('Please enter a question and at least 2 options.');
         const validOptions = pollOptions.filter(o => o.trim()).map(opt => ({ text: opt, votes: [] }));
         const pollData = { question: pollQuestion, allowMultiple, options: validOptions, creatorEmail: currentUser.email };
         handleSendMessage(null, `[POLL_JSON]:${JSON.stringify(pollData)}`);
-        setPollQuestion('');
-        setPollOptions(['', '']);
-        setAllowMultiple(false);
-        setShowPollModal(false);
+        setPollQuestion(''); setPollOptions(['', '']); setAllowMultiple(false); setShowPollModal(false);
     };
 
     const handleVoteToggle = (chatId, optionIndex, allowMultiple) => {
         setLocalVotes(prev => {
             const currentVotes = prev[chatId] || [];
             if (allowMultiple) {
-                if (currentVotes.includes(optionIndex)) return { ...prev, [chatId]: currentVotes.filter(idx => idx !== optionIndex) };
-                else return { ...prev, [chatId]: [...currentVotes, optionIndex] };
+                return currentVotes.includes(optionIndex) ? { ...prev, [chatId]: currentVotes.filter(idx => idx !== optionIndex) } : { ...prev, [chatId]: [...currentVotes, optionIndex] };
             } else {
                 return { ...prev, [chatId]: [optionIndex] };
             }
         });
-    };
-
-    const handleBannerClick = () => {
-        if (pinnedChats.length === 0) return;
-        const chatTarget = pinnedChats[activePinIndex];
-        const element = document.getElementById(`chat-${chatTarget._id}`);
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            element.classList.add('highlight-flash');
-            setTimeout(() => element.classList.remove('highlight-flash'), 2000);
-        }
-        setActivePinIndex((prevIndex) => (prevIndex + 1) % pinnedChats.length);
     };
 
     const renderMessageContent = (chat) => {
@@ -484,40 +437,66 @@ export default function ChatHub() {
         }
 
         const lines = text.split('\n');
-        return lines.map((line, idx) => {
-            if (line.startsWith('[REPLY:') && line.endsWith(']')) {
+        const images = [];
+        const videos = [];
+        const files = [];
+        const textElements = [];
+
+        lines.forEach((line, idx) => {
+            if (line.startsWith('[IMG:') && line.endsWith(']')) {
+                images.push(line.substring(5, line.length - 1));
+            } else if (line.startsWith('[VID:') && line.endsWith(']')) {
+                videos.push(line.substring(5, line.length - 1));
+            } else if (line.startsWith('[FILE:') && line.endsWith(']')) {
+                const content = line.substring(6, line.length - 1);
+                const [name, url] = content.split('|');
+                files.push({ name, url });
+            } else if (line.startsWith('[REPLY:') && line.endsWith(']')) {
                 const replyContent = line.substring(7, line.length - 1);
                 const [repliedName, repliedText] = replyContent.split('|');
-                return (
-                    <div key={idx} className="rendered-reply-box">
+                textElements.push(
+                    <div key={`reply-${idx}`} className="rendered-reply-box">
                         <div className="reply-name">{repliedName}</div>
                         <div className="reply-preview-text">{repliedText}</div>
                     </div>
                 );
+            } else if (line.trim() !== '') {
+                textElements.push(<span key={`text-${idx}`}>{line}</span>);
             }
-            if (line.startsWith('[IMG:') && line.endsWith(']')) {
-                const url = line.substring(5, line.length - 1);
-                return (
-                    <div key={idx} className="chat-bubble-image-container">
-                        <img src={url} alt="attachment" className="chat-bubble-image" />
-                    </div>
-                );
-            }
-            if (line.startsWith('[VID:') && line.endsWith(']')) {
-                const url = line.substring(5, line.length - 1);
-                return <video key={idx} src={url} controls className="chat-bubble-video" />;
-            }
-            if (line.startsWith('[FILE:') && line.endsWith(']')) {
-                const content = line.substring(6, line.length - 1);
-                const [name, url] = content.split('|');
-                return (
-                    <a key={idx} href={url} target="_blank" rel="noreferrer" className="chat-bubble-file">
-                        <FileText size={18} /> {name}
-                    </a>
-                );
-            }
-            return <span key={idx}>{line}</span>;
         });
+
+        return (
+            <div className="chat-message-blocks">
+                {textElements.length > 0 && (
+                    <div className="chat-text-content">
+                        {textElements}
+                    </div>
+                )}
+
+                {images.length > 0 && (
+                    <div className={`chat-image-collage collage-count-${Math.min(images.length, 4)}`}>
+                        {images.slice(0, 4).map((url, i) => (
+                            <div key={i} className="collage-item" onClick={() => setPreviewModal({ visible: true, images, currentIndex: i })}>
+                                <img src={url} alt="attachment" />
+                                {i === 3 && images.length > 4 && (
+                                    <div className="collage-overlay-count">+{images.length - 4}</div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {videos.map((url, i) => (
+                    <video key={`vid-${i}`} src={url} controls className="chat-bubble-video" style={{ marginTop: '0.5rem' }} />
+                ))}
+
+                {files.map((file, i) => (
+                    <a key={`file-${i}`} href={file.url} target="_blank" rel="noreferrer" className="chat-bubble-file">
+                        <FileText size={18} /> {file.name}
+                    </a>
+                ))}
+            </div>
+        );
     };
 
     const filteredChats = chats.filter(c => {
@@ -530,9 +509,36 @@ export default function ChatHub() {
         );
     });
 
-    const activeRecipientName = selectedRecipient === 'all' ? 'Team Chat' : team.find(t => t.email === selectedRecipient)?.name;
+    const activeUser = selectedRecipient === 'all' ? null : team.find(t => t.email === selectedRecipient);
+    const activeRecipientName = selectedRecipient === 'all' ? 'Team Chat' : activeUser?.name;
     const pinnedChats = filteredChats.filter(c => c.isPinned);
     const activePinnedChat = pinnedChats.length > 0 ? pinnedChats[activePinIndex % pinnedChats.length] : null;
+
+    const getConversationMeta = (recipientEmail) => {
+        const conversationMsgs = chats.filter(c => {
+            if (c.deletedFor && c.deletedFor.includes(currentUser.email)) return false;
+            if (recipientEmail === 'all') return c.recipientEmail === 'all';
+            return (
+                (c.senderEmail === currentUser.email && c.recipientEmail === recipientEmail) ||
+                (c.senderEmail === recipientEmail && c.recipientEmail === currentUser.email)
+            );
+        });
+        const unreadCount = conversationMsgs.filter(c => c.senderEmail !== currentUser.email && !(c.readBy && c.readBy.includes(currentUser.email))).length;
+        const lastMsg = conversationMsgs[conversationMsgs.length - 1];
+        
+        let previewText = '';
+        if (lastMsg) {
+            if (lastMsg.message === '[DELETED]') previewText = '🚫 Deleted message';
+            else if (lastMsg.message.startsWith('[IMG')) previewText = '📷 Photo';
+            else if (lastMsg.message.startsWith('[VID')) previewText = '🎥 Video';
+            else if (lastMsg.message.startsWith('[FILE')) previewText = '📎 File';
+            else if (lastMsg.message.startsWith('[POLL_JSON]')) previewText = '📊 Poll';
+            else previewText = lastMsg.message.replace(/\[REPLY:.*?\]\n/g, '').substring(0, 30);
+        }
+        return { unreadCount, lastMsgTime: lastMsg ? formatSidebarTime(lastMsg.createdAt) : '', previewText };
+    };
+
+    const teamChatMeta = getConversationMeta('all');
 
     return (
         <div className={`chatbox-wrapper page-animate ${isFullScreen ? 'fullscreen-mode' : ''}`}>
@@ -546,7 +552,6 @@ export default function ChatHub() {
             <section className="stagger-2 chat-main-section">
                 <div className={`chat-hub-layout ${mobileChatOpen ? 'mobile-chat-active' : ''}`}>
 
-                    {/* Left Sidebar */}
                     <div className="chat-hub-sidebar">
                         <div className="chat-hub-sidebar-header">
                             <h3>Conversations</h3>
@@ -556,11 +561,18 @@ export default function ChatHub() {
                                 <div className="chat-hub-icon-circle" style={{ background: '#eff6ff', color: '#2563eb' }}>
                                     <Users size={18} />
                                 </div>
-                                <div className="chat-hub-channel-info">
-                                    <h4>Team Chat</h4>
-                                    <p>Public encrypted room</p>
+                                <div className="chat-hub-channel-info sidebar-meta-layout">
+                                    <div className="sidebar-meta-top">
+                                        <h4>Team Chat</h4>
+                                        <span className="sidebar-time">{teamChatMeta.lastMsgTime}</span>
+                                    </div>
+                                    <div className="sidebar-meta-bottom">
+                                        <p>{teamChatMeta.previewText || 'Public encrypted room'}</p>
+                                        {teamChatMeta.unreadCount > 0 && <span className="sidebar-unread-badge">{teamChatMeta.unreadCount}</span>}
+                                    </div>
                                 </div>
                             </div>
+                            
                             <div className="chat-hub-section-title">Team Members</div>
                             {isLoading ? Array.from({ length: 4 }).map((_, i) => (
                                 <div key={i} className="chat-hub-channel-item">
@@ -570,76 +582,66 @@ export default function ChatHub() {
                                         <div className="skeleton skeleton-text short"></div>
                                     </div>
                                 </div>
-                            )) : team.filter(t => t.email !== currentUser?.email).map(member => (
+                            )) : team.filter(t => t.email !== currentUser?.email).map(member => {
+                                const meta = getConversationMeta(member.email);
+                                return (
                                 <div key={member._id} className={`chat-hub-channel-item ${selectedRecipient === member.email ? 'active-channel' : ''}`} onClick={() => handleSelectRecipient(member.email)}>
-                                    <img 
-                                        src={getAvatarSrc(member)} 
-                                        alt={member.name} 
-                                        className="chat-hub-member-avatar"
-                                        onError={(e) => {
-                                            e.target.onerror = null;
-                                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(member?.name || 'User')}&background=${member?.isSupremeAdmin ? '0f172a' : 'e5e7eb'}&color=${member?.isSupremeAdmin ? 'fff' : '374151'}&bold=true`;
-                                        }}
-                                    />
-                                    <div className="chat-hub-channel-info">
-                                        <h4>{member.name}</h4>
-                                        <p>{member.role}</p>
+                                    <img src={getAvatarSrc(member)} alt={member.name} className="chat-hub-member-avatar" />
+                                    <div className="chat-hub-channel-info sidebar-meta-layout">
+                                        <div className="sidebar-meta-top">
+                                            <h4>{member.name}</h4>
+                                            <span className="sidebar-time" style={{ color: meta.unreadCount > 0 ? '#10b981' : '#94a3b8' }}>{meta.lastMsgTime}</span>
+                                        </div>
+                                        <div className="sidebar-meta-bottom">
+                                            <p>{meta.previewText || member.role}</p>
+                                            {meta.unreadCount > 0 && <span className="sidebar-unread-badge">{meta.unreadCount}</span>}
+                                        </div>
                                     </div>
                                 </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
 
-                    {/* Right Main Pane */}
                     <div className="chat-hub-main-pane">
                         <div className="chat-hub-main-header">
                             <div className="chat-hub-active-title">
                                 <button className="mobile-back-btn" onClick={() => setMobileChatOpen(false)}>
                                     <ArrowLeft size={20} />
                                 </button>
-                                <MessageSquareCode size={20} color="#6366f1" />
-                                <h3>{activeRecipientName}</h3>
+                                
+                                {selectedRecipient === 'all' ? (
+                                    <>
+                                        <div className="chat-hub-icon-circle header-avatar" style={{ background: '#eff6ff', color: '#2563eb' }}><Users size={20} /></div>
+                                        <div className="chat-hub-header-info">
+                                            <h3>Team Chat</h3>
+                                            <span className="chat-status">Public encrypted room</span>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <img src={getAvatarSrc(activeUser)} alt={activeRecipientName} className="chat-hub-header-avatar" />
+                                        <div className="chat-hub-header-info">
+                                            <h3>{activeRecipientName}</h3>
+                                            <span className={`chat-status ${formatLastSeen(activeUser?.lastSeen) === 'Online' ? 'online' : ''}`}>
+                                                {formatLastSeen(activeUser?.lastSeen)}
+                                            </span>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                             <div className="chat-hub-security-tag">
-                                <Lock size={13} color="#10b981" /> Encrypted
-                                <button onClick={() => setIsFullScreen(!isFullScreen)} className="fullscreen-btn" title="Toggle Fullscreen">
+                                <button onClick={() => setIsFullScreen(!isFullScreen)} className="fullscreen-btn">
                                     {isFullScreen ? <Minimize size={14} /> : <Maximize size={14} />}
                                 </button>
                             </div>
                         </div>
 
-                        {activePinnedChat && (
-                            <div className="pinned-message-banner pop-in" onClick={handleBannerClick}>
-                                <div className="pinned-banner-indicator">
-                                    <Pin size={16} color="#059669" />
-                                    {pinnedChats.length > 1 && (
-                                        <span className="pinned-counter">{activePinIndex + 1}/{pinnedChats.length}</span>
-                                    )}
-                                </div>
-                                <div className="pinned-banner-content">
-                                    <span className="pinned-banner-title">Pinned Message</span>
-                                    <span className="pinned-banner-text">
-                                        {activePinnedChat.message.startsWith('[POLL') ? '📊 Poll' :
-                                            activePinnedChat.message.startsWith('[IMG') ? '🖼️ Image attached' :
-                                                activePinnedChat.message.length > 50 ? activePinnedChat.message.substring(0, 50) + '...' : activePinnedChat.message}
-                                    </span>
-                                </div>
-                            </div>
-                        )}
-
-                        <div
-                            className="chat-hub-messages-scroll"
-                            onMouseMove={onSwipeMove}
-                            onTouchMove={onSwipeMove}
-                            onMouseUp={onSwipeEnd}
-                            onTouchEnd={onSwipeEnd}
-                            onMouseLeave={onSwipeEnd}
-                        >
+                        <div className="chat-hub-messages-scroll" onMouseMove={onSwipeMove} onTouchMove={onSwipeMove} onMouseUp={onSwipeEnd} onTouchEnd={onSwipeEnd} onMouseLeave={onSwipeEnd}>
                             {isLoading ? (
                                 <>
                                     <div className="chat-hub-bubble-wrapper other-msg"><div className="skeleton skeleton-bubble" style={{ width: '220px', height: '60px' }}></div></div>
                                     <div className="chat-hub-bubble-wrapper my-msg"><div className="skeleton skeleton-bubble" style={{ width: '300px', height: '80px' }}></div></div>
-                                    <div className="chat-hub-bubble-wrapper other-msg"><div className="skeleton skeleton-bubble" style={{ width: '250px', height: '50px' }}></div></div>
                                 </>
                             ) : filteredChats.length === 0 ? (
                                 <div className="chat-hub-empty-state">
@@ -651,71 +653,42 @@ export default function ChatHub() {
                                 filteredChats.map((chat, idx) => {
                                     const isMe = chat.senderEmail === currentUser?.email;
                                     const isPoll = chat.message && chat.message.startsWith('[POLL_JSON]:');
-                                    const offset = swipeOffsets[chat._id] || 0;
-                                    const transformStyle = { transform: `translateX(${offset}px)` };
+                                    const transformStyle = { transform: `translateX(${swipeOffsets[chat._id] || 0}px)` };
                                     const renderedReactions = chat.reactions ? Array.from(new Set(Object.values(chat.reactions))) : [];
-
-                                    let isRead = false;
-                                    if (chat.recipientEmail === 'all') {
-                                        isRead = chat.readBy && chat.readBy.length > 1;
-                                    } else {
-                                        isRead = chat.readBy && chat.readBy.includes(chat.recipientEmail);
-                                    }
-
+                                    const isRead = chat.recipientEmail === 'all' ? (chat.readBy && chat.readBy.length > 1) : (chat.readBy && chat.readBy.includes(chat.recipientEmail));
+                                    
                                     const chatDate = chat.createdAt ? new Date(chat.createdAt).toDateString() : '';
-                                    const prevChatDate = idx > 0 && filteredChats[idx - 1].createdAt
-                                        ? new Date(filteredChats[idx - 1].createdAt).toDateString()
-                                        : '';
+                                    const prevChatDate = idx > 0 && filteredChats[idx - 1].createdAt ? new Date(filteredChats[idx - 1].createdAt).toDateString() : '';
                                     const showDateBadge = chatDate && chatDate !== prevChatDate;
 
                                     return (
                                         <React.Fragment key={chat._id || idx}>
-
                                             {showDateBadge && (
                                                 <div className="chat-date-wrapper pop-in">
                                                     <span className="chat-date-badge">{formatChatDate(chat.createdAt)}</span>
                                                 </div>
                                             )}
 
-                                            <div
-                                                id={`chat-${chat._id}`}
-                                                className={`chat-hub-bubble-wrapper ${isMe ? 'my-msg' : 'other-msg'} ${isPoll ? 'poll-msg-wrapper' : ''}`}
-                                                onMouseDown={(e) => onSwipeStart(e, chat._id)}
-                                                onTouchStart={(e) => onSwipeStart(e, chat._id)}
-                                                onContextMenu={(e) => handleRightClick(e, chat)}
-                                                style={transformStyle}
-                                            >
-                                                {!isMe && !isPoll && <span className="chat-hub-sender-label">{chat.senderName}</span>}
+                                            <div id={`chat-${chat._id}`} className={`chat-hub-bubble-wrapper ${isMe ? 'my-msg' : 'other-msg'} ${isPoll ? 'poll-msg-wrapper' : ''}`} onMouseDown={(e) => onSwipeStart(e, chat._id)} onTouchStart={(e) => onSwipeStart(e, chat._id)} onContextMenu={(e) => handleRightClick(e, chat)} style={transformStyle}>
+                                                {!isMe && !isPoll && selectedRecipient === 'all' && <span className="chat-hub-sender-label">{chat.senderName}</span>}
                                                 <div className={`chat-hub-bubble ${isPoll ? 'poll-bubble-whatsapp' : (isMe ? 'bubble-mine' : 'bubble-theirs')}`}>
 
                                                     <div className="chat-hub-text">{renderMessageContent(chat)}</div>
 
-                                                    <div className="chat-hub-bubble-footer" style={isPoll ? { color: '#64748b', marginTop: '0.2rem' } : {}}>
+                                                    <div className="chat-hub-bubble-footer">
                                                         {chat.isPinned && <Pin size={10} style={{ marginRight: '4px' }} />}
-
                                                         <span className="chat-hub-timestamp">
-                                                            {chat.createdAt
-                                                                ? new Date(chat.createdAt).toLocaleTimeString('en-US', {
-                                                                    hour: '2-digit',
-                                                                    minute: '2-digit',
-                                                                    hour12: true
-                                                                })
-                                                                : chat.timestamp}
+                                                            {chat.createdAt ? new Date(chat.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }) : chat.timestamp}
                                                         </span>
-
                                                         {isMe && chat.message !== '[DELETED]' && (
-                                                            <span className={`read-receipt ${isRead ? 'read' : 'unread'}`}>
-                                                                <CheckCheck size={14} />
-                                                            </span>
+                                                            <span className={`read-receipt ${isRead ? 'read' : 'unread'}`}><CheckCheck size={14} /></span>
                                                         )}
                                                     </div>
 
                                                     {renderedReactions.length > 0 && (
                                                         <div className="chat-reaction-badge pop-in">
                                                             {renderedReactions.join(' ')}
-                                                            {Object.keys(chat.reactions).length > 1 && (
-                                                                <span className="reaction-count">{Object.keys(chat.reactions).length}</span>
-                                                            )}
+                                                            {Object.keys(chat.reactions).length > 1 && <span className="reaction-count">{Object.keys(chat.reactions).length}</span>}
                                                         </div>
                                                     )}
                                                 </div>
@@ -728,22 +701,17 @@ export default function ChatHub() {
                         </div>
 
                         <form onSubmit={(e) => handleSendMessage(e)} className="chat-hub-input-form">
-
                             <div className="chat-attach-container">
-                                <button type="button" className="chat-attach-trigger-btn" onClick={() => setShowAttachMenu(!showAttachMenu)}>
-                                    <Plus size={22} />
-                                </button>
+                                <button type="button" className="chat-attach-trigger-btn" onClick={() => setShowAttachMenu(!showAttachMenu)}><Plus size={22} /></button>
                                 {showAttachMenu && (
                                     <div className="chat-upside-dropdown pop-in">
                                         <button type="button" onClick={() => triggerFileInput('video')}><Video size={16} color="#ef4444" /> Videos</button>
                                         <button type="button" onClick={() => triggerFileInput('image')}><Image size={16} color="#3b82f6" /> Photos</button>
                                         <button type="button" onClick={() => triggerFileInput('file')}><FileText size={16} color="#f59e0b" /> Files</button>
-                                        <button type="button" onClick={() => triggerFileInput('document')}><File size={16} color="#10b981" /> Document</button>
                                         <button type="button" onClick={() => { setShowAttachMenu(false); setShowPollModal(true); }}><BarChart2 size={16} color="#8b5cf6" /> Poll</button>
                                     </div>
                                 )}
                             </div>
-
                             <input type="file" ref={fileInputRef} multiple style={{ display: 'none' }} onChange={handleFileChange} />
 
                             <div className="chat-input-wrapper">
@@ -752,11 +720,7 @@ export default function ChatHub() {
                                         <div className="replying-accent-bar"></div>
                                         <div className="replying-content-col">
                                             <span className="replying-name">{replyingTo.senderName === currentUser.name ? 'You' : replyingTo.senderName}</span>
-                                            <span className="replying-text">
-                                                {replyingTo.message.startsWith('[POLL') ? '📊 Poll' :
-                                                    replyingTo.message.startsWith('[IMG') ? '🖼️ Image' :
-                                                        replyingTo.message.length > 50 ? replyingTo.message.substring(0, 50) + '...' : replyingTo.message}
-                                            </span>
+                                            <span className="replying-text">{replyingTo.message.startsWith('[POLL') ? '📊 Poll' : replyingTo.message.startsWith('[IMG') ? '🖼️ Image' : replyingTo.message.substring(0, 50)}</span>
                                         </div>
                                         <button type="button" className="close-reply-btn" onClick={() => setReplyingTo(null)}><X size={16} /></button>
                                     </div>
@@ -769,41 +733,53 @@ export default function ChatHub() {
                                                 <button type="button" className="remove-attachment-btn hover-pop" onClick={() => removeAttachment(index)}><X size={14} /></button>
                                                 {att.type === 'image' && <img src={att.previewUrl} alt="preview" />}
                                                 {att.type === 'video' && <video src={att.previewUrl} />}
-                                                {(att.type === 'document' || att.type === 'file') && (
-                                                    <div className="file-preview-box">
-                                                        <FileText size={20} color="#2563eb" />
-                                                        <div className="file-preview-info">
-                                                            <span className="file-name" title={att.file.name}>{att.file.name.length > 15 ? att.file.name.substring(0, 15) + '...' : att.file.name}</span>
-                                                        </div>
-                                                    </div>
-                                                )}
                                             </div>
                                         ))}
                                     </div>
                                 )}
 
-                                <input
-                                    type="text"
-                                    placeholder="Message"
-                                    value={messageText}
-                                    onChange={(e) => setMessageText(e.target.value)}
-                                    className="chat-hub-text-input"
-                                    disabled={isUploading}
-                                    autoFocus={!!replyingTo}
-                                />
+                                <input type="text" placeholder="Message" value={messageText} onChange={(e) => setMessageText(e.target.value)} className="chat-hub-text-input" disabled={isUploading} autoFocus={!!replyingTo} />
                             </div>
 
                             <button type="submit" className="chat-hub-send-btn" disabled={(!messageText.trim() && attachments.length === 0) || isUploading}>
-                                {isUploading ? (
-                                    <Sparkles size={18} className="pulse-anim" />
-                                ) : (
-                                    <Send size={18} style={{ transform: 'translateX(-1px) translateY(1px)' }} />
-                                )}
+                                {isUploading ? <Sparkles size={18} className="pulse-anim" /> : <Send size={18} style={{ transform: 'translateX(-1px) translateY(1px)' }} />}
                             </button>
                         </form>
                     </div>
                 </div>
             </section>
+
+            {/* --- IMAGE PREVIEW MODAL (LIGHTBOX) --- */}
+            {previewModal.visible && (
+                <div className="lightbox-overlay fade-in" onClick={() => setPreviewModal({ visible: false, images: [], currentIndex: 0 })}>
+                    <div className="lightbox-header">
+                        <span className="lightbox-counter">{previewModal.currentIndex + 1} / {previewModal.images.length}</span>
+                        <button className="lightbox-close hover-pop" onClick={() => setPreviewModal({ visible: false, images: [], currentIndex: 0 })}><X size={28} color="white" /></button>
+                    </div>
+                    
+                    <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+                        {previewModal.images.length > 1 && (
+                            <button 
+                                className="lightbox-nav prev hover-pop" 
+                                onClick={(e) => { e.stopPropagation(); setPreviewModal(p => ({ ...p, currentIndex: p.currentIndex === 0 ? p.images.length - 1 : p.currentIndex - 1 })); }}
+                            >
+                                <ChevronLeft size={36} color="white" />
+                            </button>
+                        )}
+                        
+                        <img src={previewModal.images[previewModal.currentIndex]} alt="fullscreen preview" className="lightbox-main-img" />
+                        
+                        {previewModal.images.length > 1 && (
+                            <button 
+                                className="lightbox-nav next hover-pop" 
+                                onClick={(e) => { e.stopPropagation(); setPreviewModal(p => ({ ...p, currentIndex: (p.currentIndex + 1) % p.images.length })); }}
+                            >
+                                <ChevronRight size={36} color="white" />
+                            </button>
+                        )}
+                    </div>
+                </div>
+            )}
 
             {contextMenu.visible && (
                 <div className="custom-context-menu pop-in" style={{ top: contextMenu.y, left: contextMenu.x }} onClick={(e) => e.stopPropagation()}>
@@ -814,120 +790,9 @@ export default function ChatHub() {
                     </div>
                     <div className="context-menu-actions">
                         <button onClick={handleMenuReply}>Reply</button>
-                        <button onClick={handleMenuPin}>
-                            {contextMenu.chat?.isPinned ? 'Unpin' : 'Pin'}
-                        </button>
+                        <button onClick={handleMenuPin}>{contextMenu.chat?.isPinned ? 'Unpin' : 'Pin'}</button>
                         <button onClick={handleMenuCopy}>Copy</button>
-                        {contextMenu.chat?.message?.match(/\[(?:IMG|VID|FILE):/) && (
-                            <button onClick={handleMenuDownload}>Download</button>
-                        )}
                         <button onClick={handleMenuDelete} className="context-menu-danger">Delete</button>
-                    </div>
-                </div>
-            )}
-
-            {pinModal.visible && (
-                <div className="modal-overlay fade-in">
-                    <div className="pin-duration-modal pop-in">
-                        <h3>Choose how long your new pin lasts</h3>
-                        <p>You can unpin at any time.</p>
-                        <div className="pin-duration-options">
-                            <button onClick={() => { togglePin(pinModal.chat._id, true); setPinModal({ visible: false, chat: null }); }}>24 hours</button>
-                            <button onClick={() => { togglePin(pinModal.chat._id, true); setPinModal({ visible: false, chat: null }); }}>7 days</button>
-                            <button onClick={() => { togglePin(pinModal.chat._id, true); setPinModal({ visible: false, chat: null }); }}>30 days</button>
-                            <button onClick={() => setPinModal({ visible: false, chat: null })}>Cancel</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {deleteModal.visible && (
-                <div className="modal-overlay fade-in">
-                    <div className="delete-action-modal pop-in">
-                        <h3>Delete Message?</h3>
-                        <p>Are you sure you want to delete this message?</p>
-                        <div className="delete-action-options">
-                            <button className="btn-modern-danger" onClick={() => handleConfirmDelete('everyone')}>Delete for everyone</button>
-                            <button className="btn-modern-secondary" onClick={() => handleConfirmDelete('me')}>Delete for me</button>
-                            <button className="text-btn" onClick={() => setDeleteModal({ visible: false, chat: null })}>Cancel</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {viewVotesPoll && (
-                <div className="modal-overlay fade-in">
-                    <div className="poll-votes-modal pop-in">
-                        <div className="poll-votes-modal-header">
-                            <button className="modal-close-btn" onClick={() => setViewVotesPoll(null)}><X size={20} color="#0f172a" /></button>
-                            <h2>Poll votes</h2>
-                        </div>
-
-                        <div className="poll-votes-body">
-                            <div className="poll-votes-question-bubble">
-                                {viewVotesPoll.poll.question}
-                            </div>
-                            {viewVotesPoll.poll.options.map((opt, i) => {
-                                const optionVotes = [...opt.votes];
-                                const userSelectedOptions = localVotes[viewVotesPoll.chatId] || [];
-                                if (userSelectedOptions.includes(i)) {
-                                    optionVotes.push({ user: currentUser.name, avatar: getAvatarSrc(currentUser), time: 'Just now' });
-                                }
-                                return (
-                                    <div key={i} className="poll-votes-option-group">
-                                        <div className="poll-votes-option-header">
-                                            <h4>{opt.text}</h4>
-                                            <span className="vote-count-text">{optionVotes.length} {optionVotes.length === 1 ? 'vote' : 'votes'}</span>
-                                        </div>
-                                        {optionVotes.length === 0 ? (
-                                            <div className="no-votes-text">No votes yet</div>
-                                        ) : (
-                                            optionVotes.map((v, vIdx) => (
-                                                <div key={vIdx} className="poll-voter-item">
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                                        <img src={v.avatar} alt={v.user} className="voter-avatar" />
-                                                        <span className="voter-name">{v.user === currentUser.name ? 'You' : v.user}</span>
-                                                    </div>
-                                                    <span className="voter-time">{v.time}</span>
-                                                </div>
-                                            ))
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {showPollModal && (
-                <div className="modal-overlay fade-in">
-                    <div className="modal-content pop-in poll-modal-content">
-                        <div className="modal-header poll-modal-header">
-                            <button className="modal-close" onClick={() => setShowPollModal(false)}><X size={20} /></button>
-                            <h2>Create poll</h2>
-                            <button type="button" className="btn-modern-primary poll-send-btn hover-pop" onClick={handleCreatePoll}>Send</button>
-                        </div>
-                        <form onSubmit={handleCreatePoll} className="modern-form poll-form">
-                            <div className="form-group">
-                                <label className="poll-section-label">QUESTION</label>
-                                <input type="text" value={pollQuestion} onChange={(e) => setPollQuestion(e.target.value)} className="modern-input poll-input" placeholder="Ask question" required autoFocus />
-                            </div>
-                            <div className="form-group">
-                                <label className="poll-section-label">OPTIONS</label>
-                                {pollOptions.map((opt, idx) => (
-                                    <input key={idx} type="text" value={opt} onChange={(e) => handlePollOptionChange(idx, e.target.value)} className="modern-input poll-input" placeholder="Add" style={{ marginBottom: '0.75rem' }} />
-                                ))}
-                                <button type="button" className="text-btn" onClick={handleAddPollOption} style={{ fontSize: '0.85rem', fontWeight: 600, color: '#2563eb' }}>+ Add another option</button>
-                            </div>
-                            <div className="poll-checkbox-row">
-                                <span>Allow multiple answers</span>
-                                <label className="custom-checkbox">
-                                    <input type="checkbox" checked={allowMultiple} onChange={(e) => setAllowMultiple(e.target.checked)} />
-                                    <span className="checkmark"><Check size={14} color="white" /></span>
-                                </label>
-                            </div>
-                        </form>
                     </div>
                 </div>
             )}
