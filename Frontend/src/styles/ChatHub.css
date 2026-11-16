@@ -414,6 +414,7 @@
     font-weight: 800;
 }
 
+/* Lightbox Modal (Fullscreen Image Preview) */
 .lightbox-overlay {
     position: fixed;
     top: 0;
@@ -421,7 +422,7 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.95);
-    z-index: 10000;
+    z-index: 2147483647; 
     display: flex;
     flex-direction: column;
 }
@@ -431,6 +432,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 1.5rem;
+    padding-top: calc(1.5rem + env(safe-area-inset-top)); 
 }
 
 .lightbox-counter {
@@ -444,6 +446,7 @@
     background: none;
     border: none;
     cursor: pointer;
+    z-index: 2147483647; 
 }
 
 .lightbox-content {
@@ -452,6 +455,8 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 2rem 2rem 2rem;
+    /* NEW: Added safe area inset for phones with a bottom nav bar */
+    padding-bottom: calc(2rem + env(safe-area-inset-bottom)); 
 }
 
 .lightbox-main-img {
@@ -474,12 +479,12 @@
     justify-content: center;
     cursor: pointer;
     transition: background 0.2s;
+    z-index: 2147483647; 
 }
 
 .lightbox-nav:hover {
     background: rgba(255, 255, 255, 0.25);
 }
-
 
 /* ========================================================
    CUSTOM POLL UI
@@ -1321,6 +1326,7 @@
         max-width: 85% !important;
     }
 
+    /* Fixed mobile Lightbox z-index overlap issues */
     .lightbox-main-img {
         max-width: 100%;
     }
