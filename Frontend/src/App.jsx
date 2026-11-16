@@ -48,62 +48,8 @@ export default function App() {
     const [showSplash, setShowSplash] = useState(false);
     const [progress, setProgress] = useState(0);
 
-    // --- HELPER: Converts VAPID key string to Uint8Array for browser Push API ---
-    const urlBase64ToUint8Array = (base64String) => {
-        const padding = '='.repeat((4 - base64String.length % 4) % 4);
-        const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
-        const rawData = window.atob(base64);
-        const outputArray = new Uint8Array(rawData.length);
-        for (let i = 0; i < rawData.length; ++i) {
-            outputArray[i] = rawData.charCodeAt(i);
-        }
-        return outputArray;
-    };
-
-    // --- UPDATED: Notification & Service Worker Registration ---
-    const requestNotificationPermission = async () => {
-        if ('Notification' in window && 'serviceWorker' in navigator) {
-            const permission = await Notification.requestPermission();
-            if (permission === 'granted') {
-                try {
-                    const registration = await navigator.serviceWorker.register('/sw.js');
-                    console.log('Service Worker Registered');
-
-                    // 1. Get existing subscription or create a new one
-                    let subscription = await registration.pushManager.getSubscription();
-                    if (!subscription) {
-                        // Updated to match your exact Vercel variable name!
-                        const publicVapidKey = import.meta.env.VITE_VAPID_KEY;
-                        if (!publicVapidKey) {
-                            console.error("VITE_VAPID_KEY is missing from frontend .env");
-                            return;
-                        }
-
-                        subscription = await registration.pushManager.subscribe({
-                            userVisibleOnly: true,
-                            applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
-                        });
-                    }
-
-                    // 2. Send the subscription securely to the backend
-                    await fetch(`${import.meta.env.VITE_API_URL || ''}/api/team/${currentUser.email}/subscribe`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ subscription })
-                    });
-
-                    console.log('Push Notifications Active!');
-                } catch (err) {
-                    console.error('Service Worker/Push registration failed:', err);
-                }
-            }
-        }
-    };
-
     useEffect(() => {
         if (currentUser) {
-            requestNotificationPermission();
-
             const hasSeenSplash = sessionStorage.getItem('hasSeenSplash');
             if (!hasSeenSplash) {
                 setShowSplash(true);

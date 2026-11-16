@@ -1,6 +1,16 @@
 self.addEventListener('push', function(event) {
-    // Parse the incoming push payload from the backend
-    const data = event.data ? event.data.json() : {};
+    let data = {};
+    
+    // Safely parse incoming push payload
+    if (event.data) {
+        try {
+            // Try parsing as JSON first (what our backend sends)
+            data = event.data.json();
+        } catch (e) {
+            // Fallback for plain text (like Chrome DevTools default push)
+            data = { message: event.data.text() };
+        }
+    }
 
     const options = {
         body: data.message || "You have a new message.",

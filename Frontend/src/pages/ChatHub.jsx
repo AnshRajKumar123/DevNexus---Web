@@ -692,7 +692,6 @@ export default function ChatHub() {
 
                                                     <div className="chat-hub-bubble-footer" style={isPoll ? { color: '#64748b', marginTop: '0.2rem' } : {}}>
                                                         {chat.isPinned && <Pin size={10} style={{ marginRight: '4px' }} />}
-                                                        <span className="chat-hub-lock-icon" title="Encrypted"><Lock size={10} /></span>
 
                                                         <span className="chat-hub-timestamp">
                                                             {chat.createdAt

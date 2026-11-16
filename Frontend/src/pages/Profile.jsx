@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Phone, ShieldAlert, Key, Save, Edit3, X, CheckCircle2, Lock, Camera, Loader2, LogOut, Trash2, FileQuestion, CalendarDays, LinkIcon } from 'lucide-react';
+import { Mail, Phone, ShieldAlert, Key, Save, Edit3, X, CheckCircle2, Lock, Camera, Loader2, LogOut, Trash2, FileQuestion, CalendarDays, LinkIcon, Bell } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import '../styles/Profile.css';
 
@@ -32,14 +32,69 @@ export default function Profile() {
     const myEvents = events.filter(e => e.createdBy === currentUser.name);
     const myLinks = links.filter(l => l.createdBy === currentUser.name);
 
+    // --- HELPER: Converts VAPID key string to Uint8Array for browser Push API ---
+    const urlBase64ToUint8Array = (base64String) => {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+    };
+
+    // --- NEW: Notification Registration Function ---
+    const requestNotificationPermission = async () => {
+        if ('Notification' in window && 'serviceWorker' in navigator) {
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                try {
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    console.log('Service Worker Registered');
+
+                    let subscription = await registration.pushManager.getSubscription();
+                    if (!subscription) {
+                        const publicVapidKey = import.meta.env.VITE_VAPID_KEY;
+                        if (!publicVapidKey) {
+                            alert("Configuration Error: VITE_VAPID_KEY is missing.");
+                            return;
+                        }
+
+                        subscription = await registration.pushManager.subscribe({
+                            userVisibleOnly: true,
+                            applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
+                        });
+                    }
+
+                    // Send the subscription securely to the backend
+                    await fetch(`${import.meta.env.VITE_API_URL || ''}/api/team/${currentUser.email}/subscribe`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ subscription })
+                    });
+
+                    alert('Success! Push Notifications are now enabled for this device.');
+                } catch (err) {
+                    console.error('Service Worker/Push registration failed:', err);
+                    alert('Failed to enable notifications. Please check console.');
+                }
+            } else {
+                alert('Notification permission was denied. You can change this in your browser settings.');
+            }
+        } else {
+            alert('Push notifications are not supported on this browser/device.');
+        }
+    };
+
     const handleImageUpload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
         const formData = new FormData();
         formData.append('image', file);
-        formData.append('userId', currentUserId); 
-        formData.append('isProfile', 'true'); 
+        formData.append('userId', currentUserId);
+        formData.append('isProfile', 'true');
 
         try {
             setIsUploading(true);
@@ -49,10 +104,10 @@ export default function Profile() {
             });
             if (!response.ok) throw new Error('Image upload failed');
             const data = await response.json();
-            
+
             const finalUrl = data.imageUrl.startsWith('http') ? data.imageUrl : `${import.meta.env.VITE_API_URL || ''}${data.imageUrl}`;
             await updateProfile(currentUserId, { imgUrl: finalUrl });
-            
+
         } catch (error) {
             console.error('Upload Error:', error);
             alert('Failed to upload image. Ensure the backend server is running.');
@@ -85,7 +140,7 @@ export default function Profile() {
             return `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name)}&background=${currentUser.isSupremeAdmin ? '0f172a' : 'e5e7eb'}&color=${currentUser.isSupremeAdmin ? 'fff' : '374151'}&size=150`;
         }
         if (currentUser.imgUrl.startsWith('http')) return currentUser.imgUrl;
-        
+
         const cleanPath = currentUser.imgUrl.startsWith('/') ? currentUser.imgUrl : `/${currentUser.imgUrl}`;
         return cleanPath;
     };
@@ -218,7 +273,7 @@ export default function Profile() {
                 <div className="grid-col">
                     <div className="premium-widget">
                         <div className="widget-header">
-                            <h3>Security & Password</h3>
+                            <h3>Security & Notifications</h3>
                         </div>
                         <div className="widget-body">
                             {isLoading ? (
@@ -228,9 +283,14 @@ export default function Profile() {
                                 </div>
                             ) : passFlow === 'idle' ? (
                                 <div className="security-state-idle">
-                                    <p>Ensure your account is using a long, random password to stay secure.</p>
-                                    <button className="btn-modern-secondary hover-pop" onClick={handleSendOTP}>
+                                    <p style={{ marginBottom: '0.75rem' }}>Ensure your account is using a strong password.</p>
+                                    <button className="btn-modern-secondary hover-pop" onClick={handleSendOTP} style={{ marginBottom: '1.5rem', width: '100%' }}>
                                         <Key size={16} /> Change Password
+                                    </button>
+                                    
+                                    <p style={{ marginBottom: '0.75rem', borderTop: '1px solid #e2e8f0', paddingTop: '1rem' }}>Enable background notifications for Safari or Chrome.</p>
+                                    <button className="btn-modern-primary hover-pop" onClick={requestNotificationPermission} style={{ width: '100%' }}>
+                                        <Bell size={16} /> Enable Desktop Notifications
                                     </button>
                                 </div>
                             ) : passFlow === 'otp' ? (
@@ -311,7 +371,7 @@ export default function Profile() {
                         <h3><FileQuestion size={16} className="icon-orange" /> My Inquiries</h3>
                     </div>
                     <div className="widget-feed">
-                        {isLoading ? Array.from({length: 2}).map((_, i) => (
+                        {isLoading ? Array.from({ length: 2 }).map((_, i) => (
                             <div key={i} className="feed-item">
                                 <div style={{ flex: 1 }}>
                                     <div className="skeleton skeleton-text medium"></div>
@@ -336,7 +396,7 @@ export default function Profile() {
                         <h3><CalendarDays size={16} className="icon-blue" /> My Meetings</h3>
                     </div>
                     <div className="widget-feed">
-                        {isLoading ? Array.from({length: 2}).map((_, i) => (
+                        {isLoading ? Array.from({ length: 2 }).map((_, i) => (
                             <div key={i} className="feed-item">
                                 <div style={{ flex: 1 }}>
                                     <div className="skeleton skeleton-text medium"></div>
@@ -361,7 +421,7 @@ export default function Profile() {
                         <h3><LinkIcon size={16} style={{ color: '#10b981' }} /> My Quick Links</h3>
                     </div>
                     <div className="widget-feed">
-                        {isLoading ? Array.from({length: 2}).map((_, i) => (
+                        {isLoading ? Array.from({ length: 2 }).map((_, i) => (
                             <div key={i} className="feed-item">
                                 <div style={{ flex: 1 }}>
                                     <div className="skeleton skeleton-text medium"></div>
