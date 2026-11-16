@@ -70,7 +70,7 @@ router.post('/', async (req, res) => {
                     const pushPayload = JSON.stringify({
                         senderName: senderName,
                         message: notificationBody,
-                        senderAvatar: '/vite.svg',
+                        senderAvatar: '/logo.png',
                         url: '/chat'
                     });
                     await webpush.sendNotification(recipientUser.pushSubscription, pushPayload);
@@ -85,7 +85,7 @@ router.post('/', async (req, res) => {
                         const pushPayload = JSON.stringify({
                             senderName: `${senderName} (Team Chat)`,
                             message: notificationBody,
-                            senderAvatar: '/vite.svg',
+                            senderAvatar: '/logo.png',
                             url: '/chat'
                         });
                         return webpush.sendNotification(user.pushSubscription, pushPayload);

@@ -14,8 +14,8 @@ self.addEventListener('push', function(event) {
 
     const options = {
         body: data.message || "You have a new message.",
-        icon: data.senderAvatar || '/vite.svg', // Fallback to your default app icon
-        badge: '/vite.svg', // Small monochrome icon for Android status bar
+        icon: data.senderAvatar || '/logo.png', // Fallback to your default app icon
+        badge: '/logo.png', // Small monochrome icon for Android status bar
         vibrate: [200, 100, 200],
         data: { url: '/chat' } // Where to navigate when clicked
     };
