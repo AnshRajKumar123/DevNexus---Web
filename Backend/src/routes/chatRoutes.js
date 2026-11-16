@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { Team } = require('../models');
 const router = express.Router();
-const admin = require('firebase-admin'); // Clean access to pre-initialized admin
+const admin = require('firebase-admin');
 
 const ChatSchema = new mongoose.Schema({
     senderName: { type: String, required: true },
@@ -50,6 +50,17 @@ router.post('/', async (req, res) => {
         else if (message.startsWith('[FILE')) notificationBody = '📎 Sent a file';
         else if (message.length > 40) notificationBody = message.substring(0, 40) + '...';
 
+        // Fetch sender's profile picture for the notification icon
+        const senderUser = await Team.findOne({ email: senderEmail });
+        let senderIcon = '/logo.png';
+        if (senderUser && senderUser.imgUrl) {
+            senderIcon = senderUser.imgUrl.startsWith('http') 
+                ? senderUser.imgUrl 
+                : `https://teamdashboard-bice.vercel.app${senderUser.imgUrl}`;
+        }
+
+        const appUrl = 'https://teamdashboard-bice.vercel.app';
+
         if (recipientEmail !== 'all') {
             const recipientUser = await Team.findOne({ email: recipientEmail });
             
@@ -58,12 +69,13 @@ router.post('/', async (req, res) => {
                     token: recipientUser.fcmToken,
                     notification: {
                         title: senderName,
-                        body: notificationBody
+                        body: notificationBody,
+                        image: senderIcon // Shows avatar as notification thumbnail/image
                     },
                     webpush: {
                         notification: {
-                            icon: '/logo.png',
-                            click_action: '/chat'
+                            icon: senderIcon, // Shows sender avatar as notification icon
+                            click_action: `${appUrl}/chat`
                         }
                     }
                 };
@@ -82,12 +94,13 @@ router.post('/', async (req, res) => {
                     tokens: tokens,
                     notification: {
                         title: `${senderName} (Team Chat)`,
-                        body: notificationBody
+                        body: notificationBody,
+                        image: senderIcon
                     },
                     webpush: {
                         notification: {
-                            icon: '/logo.png',
-                            click_action: '/chat'
+                            icon: senderIcon,
+                            click_action: `${appUrl}/chat`
                         }
                     }
                 };
