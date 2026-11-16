@@ -5,6 +5,18 @@ const helmet = require('helmet');
 const path = require('path');
 require('dotenv').config();
 
+// --- CORRECTED FIREBASE ADMIN INITIALIZATION ---
+const adminModule = require('firebase-admin');
+const admin = adminModule.default || adminModule;
+const serviceAccount = require('./firebase-service-account.json');
+
+if (!admin.apps.length) {
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+    });
+    console.log('Firebase Admin initialized successfully');
+}
+
 const app = express();
 
 app.set('trust proxy', 1);

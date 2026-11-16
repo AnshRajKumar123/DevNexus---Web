@@ -53,16 +53,15 @@ router.put('/:email/ping', async (req, res) => {
     }
 });
 
-// --- NEW: Save Push Notification Subscription ---
+// --- NEW: Save Firebase Push Notification Token ---
 router.post('/:email/subscribe', async (req, res) => {
     try {
-        // This dynamically adds the subscription object to the user's database document
+        // Find the user by email and update their fcmToken string
         await Team.findOneAndUpdate(
             { email: req.params.email },
-            { pushSubscription: req.body.subscription },
-            { strict: false } // Ensures it saves even if you didn't define it in your Mongoose schema yet
+            { fcmToken: req.body.fcmToken }
         );
-        res.status(200).json({ success: true, message: 'Push subscription saved securely.' });
+        res.status(200).json({ success: true, message: 'Firebase Push Token saved securely.' });
     } catch (error) {
         console.error('Subscription error:', error);
         res.status(500).json({ message: 'Failed to save push subscription' });

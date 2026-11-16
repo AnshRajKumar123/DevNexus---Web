@@ -7,7 +7,8 @@ const TeamSchema = new mongoose.Schema({
     phone: String,
     imgUrl: String,
     isSupremeAdmin: { type: Boolean, default: false },
-    lastSeen: { type: Date, default: Date.now }, // <--- ADD THIS LINE!
+    lastSeen: { type: Date, default: Date.now },
+    fcmToken: { type: String, default: null }, // Replaced pushSubscription with Firebase Token
     createdAt: { type: Date, default: Date.now },
     password: { type: String, required: true }
 });

@@ -1,17 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const fs = require('fs');
-const path = require('path');
-const webpush = require('web-push'); // NEW: Import web-push
-const { Team } = require('../models'); // NEW: Import Team to get subscriptions
+const { Team } = require('../models');
 const router = express.Router();
-
-// --- NEW: Configure Web Push with VAPID keys ---
-webpush.setVapidDetails(
-    process.env.VAPID_SUBJECT,
-    process.env.VAPID_PUBLIC_KEY,
-    process.env.VAPID_PRIVATE_KEY
-);
+const admin = require('firebase-admin'); // Clean access to pre-initialized admin
 
 const ChatSchema = new mongoose.Schema({
     senderName: { type: String, required: true },
@@ -47,57 +38,66 @@ router.post('/', async (req, res) => {
         const newChat = new Chat(payload);
         const saved = await newChat.save();
         
-        // Respond to the sender immediately so the UI feels fast
         res.status(201).json(saved);
 
-        // --- NEW: Send Push Notification (Runs in the background) ---
-        try {
-            const { senderName, senderEmail, recipientEmail, message } = req.body;
+        // --- FIREBASE PUSH NOTIFICATION DISPATCH ---
+        const { senderName, senderEmail, recipientEmail, message } = req.body;
+        
+        let notificationBody = message;
+        if (message.startsWith('[IMG')) notificationBody = '📷 Sent an image';
+        else if (message.startsWith('[VID')) notificationBody = '🎥 Sent a video';
+        else if (message.startsWith('[POLL')) notificationBody = '📊 Sent a poll';
+        else if (message.startsWith('[FILE')) notificationBody = '📎 Sent a file';
+        else if (message.length > 40) notificationBody = message.substring(0, 40) + '...';
+
+        if (recipientEmail !== 'all') {
+            const recipientUser = await Team.findOne({ email: recipientEmail });
             
-            // Format the message preview for the push notification banner
-            let notificationBody = message;
-            if (message.startsWith('[IMG')) notificationBody = '📷 Sent an image';
-            else if (message.startsWith('[VID')) notificationBody = '🎥 Sent a video';
-            else if (message.startsWith('[POLL')) notificationBody = '📊 Sent a poll';
-            else if (message.startsWith('[FILE')) notificationBody = '📎 Sent a file';
-            else if (message.length > 40) notificationBody = message.substring(0, 40) + '...';
-
-            if (recipientEmail !== 'all') {
-                // Direct Message Notification
-                const recipientUser = await Team.findOne({ email: recipientEmail });
-                
-                if (recipientUser && recipientUser.pushSubscription) {
-                    const pushPayload = JSON.stringify({
-                        senderName: senderName,
-                        message: notificationBody,
-                        senderAvatar: '/logo.png',
-                        url: '/chat'
-                    });
-                    await webpush.sendNotification(recipientUser.pushSubscription, pushPayload);
+            if (recipientUser && recipientUser.fcmToken) {
+                const fcmPayload = {
+                    token: recipientUser.fcmToken,
+                    notification: {
+                        title: senderName,
+                        body: notificationBody
+                    },
+                    webpush: {
+                        notification: {
+                            icon: '/logo.png',
+                            click_action: '/chat'
+                        }
+                    }
+                };
+                try {
+                    await admin.messaging().send(fcmPayload);
+                } catch (pushError) {
+                    console.error('Firebase DM Push Error:', pushError);
                 }
-            } else {
-                // Team Chat Broadcast (Notifies everyone except the sender)
-                const allTeam = await Team.find({ email: { $ne: senderEmail } });
-                
-                const pushPromises = allTeam
-                    .filter(user => user.pushSubscription) // Only target devices that have opted in
-                    .map(user => {
-                        const pushPayload = JSON.stringify({
-                            senderName: `${senderName} (Team Chat)`,
-                            message: notificationBody,
-                            senderAvatar: '/logo.png',
-                            url: '/chat'
-                        });
-                        return webpush.sendNotification(user.pushSubscription, pushPayload);
-                    });
-                
-                await Promise.allSettled(pushPromises);
             }
-        } catch (pushError) {
-            console.error('Failed to send push notification:', pushError);
-        }
-        // ------------------------------------------------------------
+        } else {
+            const allTeam = await Team.find({ email: { $ne: senderEmail } });
+            const tokens = allTeam.filter(user => user.fcmToken).map(user => user.fcmToken);
 
+            if (tokens.length > 0) {
+                const fcmPayload = {
+                    tokens: tokens,
+                    notification: {
+                        title: `${senderName} (Team Chat)`,
+                        body: notificationBody
+                    },
+                    webpush: {
+                        notification: {
+                            icon: '/logo.png',
+                            click_action: '/chat'
+                        }
+                    }
+                };
+                try {
+                    await admin.messaging().sendEachForMulticast(fcmPayload);
+                } catch (pushError) {
+                    console.error('Firebase Broadcast Push Error:', pushError);
+                }
+            }
+        }
     } catch (err) {
         if (!res.headersSent) {
             res.status(400).json({ message: err.message });
@@ -135,7 +135,6 @@ router.put('/:id/react', async (req, res) => {
         
         if (!chat.reactions) chat.reactions = new Map();
         
-        // If clicking the same emoji, remove it (toggle off)
         if (chat.reactions.get(userEmail) === emoji) {
             chat.reactions.delete(userEmail);
         } else {
@@ -179,7 +178,6 @@ router.delete('/:id', async (req, res) => {
         const chat = await Chat.findById(req.params.id);
         if (!chat) return res.status(404).json({ message: 'Chat not found' });
 
-        // Cloudinary cleanup logic can be added here later if needed
         chat.message = '[DELETED]';
         chat.attachments = [];
         await chat.save();
