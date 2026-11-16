@@ -1,8 +1,8 @@
 import { initializeApp } from "firebase/app";
-import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import { getMessaging, getToken } from "firebase/messaging";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDDgRoIkUPYpCFiCLgExj6UhF96lGgqqs8", // Fixed uppercase 'AIza'
+  apiKey: "AIzaSyDDgRoIkUPYpCFiCLgExj6UHf96lGgqqs8",
   authDomain: "devnexus-ec954.firebaseapp.com",
   projectId: "devnexus-ec954",
   storageBucket: "devnexus-ec954.firebasestorage.app",
