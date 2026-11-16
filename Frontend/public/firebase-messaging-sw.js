@@ -12,13 +12,14 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// Handle background notifications cleanly
 messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification.title || "DevNexus";
   const notificationOptions = {
     body: payload.notification.body || "You have a new message.",
     icon: payload.notification.icon || '/logo.png',
     image: payload.notification.image || undefined,
+    tag: 'devnexus-chat-notification', // Overwrites any existing notification with the same tag
+    renotify: true,
     data: { url: payload.webpush?.notification?.click_action || '/chat' }
   };
 
