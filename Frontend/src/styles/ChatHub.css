@@ -218,10 +218,11 @@
 }
 
 .chat-hub-bubble {
-    padding: 0.5rem 0.6rem 0.5rem 0.75rem;
+    padding: 0.5rem 0.6rem 1.25rem 0.75rem;
     border-radius: 12px;
     position: relative;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    min-width: 80px;
 }
 
 .bubble-mine {
@@ -243,26 +244,41 @@
     line-height: 1.4;
     word-break: break-word;
     white-space: pre-wrap;
+    display: inline-block;
 }
 
-/* Floating the footer next to the content like WhatsApp */
+/* Toggles the dropdown arrow on mobile/hover */
+.bubble-action-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 10;
+    padding: 2px;
+    border-radius: 4px;
+}
+
+.chat-hub-bubble:hover .bubble-action-btn {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* Fixed absolute positioning for timestamp */
 .chat-hub-bubble-footer {
+    position: absolute;
+    bottom: 4px;
+    right: 8px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: 0.2rem;
-    float: right;
-    margin-left: 0.75rem;
-    margin-top: 0.35rem;
     font-size: 0.65rem;
     font-weight: 500;
-}
-
-/* Fix flex floating layout issues */
-.chat-hub-bubble::after {
-    content: "";
-    display: table;
-    clear: both;
 }
 
 .bubble-mine .chat-hub-bubble-footer {
@@ -328,7 +344,7 @@
 }
 
 /* ========================================================
-   NEW: WHATSAPP-STYLE IMAGE COLLAGE & LIGHTBOX
+   WHATSAPP-STYLE IMAGE COLLAGE & LIGHTBOX
    ======================================================== */
 .chat-message-blocks {
     display: flex;
@@ -340,6 +356,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
+    margin-bottom: 0.5rem;
 }
 
 .chat-image-collage {
@@ -414,7 +431,7 @@
     font-weight: 800;
 }
 
-/* Lightbox Modal (Fullscreen Image Preview) */
+/* Lightbox Modal */
 .lightbox-overlay {
     position: fixed;
     top: 0;
@@ -422,7 +439,7 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.95);
-    z-index: 2147483647; 
+    z-index: 2147483647;
     display: flex;
     flex-direction: column;
 }
@@ -432,7 +449,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 1.5rem;
-    padding-top: calc(1.5rem + env(safe-area-inset-top)); 
+    padding-top: calc(1.5rem + env(safe-area-inset-top));
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), transparent);
 }
 
 .lightbox-counter {
@@ -442,11 +460,25 @@
     letter-spacing: 1px;
 }
 
-.lightbox-close {
+.lightbox-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.lightbox-btn {
     background: none;
     border: none;
     cursor: pointer;
-    z-index: 2147483647; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: transform 0.2s;
+}
+
+.lightbox-btn:hover {
+    transform: scale(1.1);
 }
 
 .lightbox-content {
@@ -455,8 +487,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 2rem 2rem 2rem;
-    /* NEW: Added safe area inset for phones with a bottom nav bar */
-    padding-bottom: calc(2rem + env(safe-area-inset-bottom)); 
+    padding-bottom: calc(2rem + env(safe-area-inset-bottom));
 }
 
 .lightbox-main-img {
@@ -479,12 +510,13 @@
     justify-content: center;
     cursor: pointer;
     transition: background 0.2s;
-    z-index: 2147483647; 
+    z-index: 2147483647;
 }
 
 .lightbox-nav:hover {
     background: rgba(255, 255, 255, 0.25);
 }
+
 
 /* ========================================================
    CUSTOM POLL UI
@@ -497,7 +529,7 @@
     background: #eff6ff !important;
     color: #0f172a !important;
     border-radius: 12px;
-    padding: 1rem 1.25rem 0.5rem 1.25rem;
+    padding: 1rem 1.25rem 2rem 1.25rem;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     border: 1px solid #bfdbfe;
     min-width: 370px;
@@ -699,7 +731,6 @@
     background: #ffffff;
     border: 1px solid #ffffff;
     transition: all 0.2s;
-    overflow: hidden;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     min-width: 0;
 }
@@ -1269,87 +1300,6 @@
     justify-content: center;
 }
 
-/* --- MOBILE SPECIFIC FIXES --- */
-@media (max-width: 768px) {
-    .chatbox-wrapper {
-        max-width: 100% !important;
-        padding: 0 0.5rem;
-    }
-
-    .chat-main-section {
-        height: calc(100vh - 240px);
-    }
-
-    .chat-hub-layout {
-        border-radius: 12px;
-    }
-
-    .chat-hub-sidebar {
-        display: flex;
-        width: 100% !important;
-        height: 100%;
-    }
-
-    .chat-hub-main-pane {
-        display: none;
-        width: 100% !important;
-        height: 100%;
-    }
-
-    .chat-hub-layout.mobile-chat-active .chat-hub-sidebar {
-        display: none;
-    }
-
-    .chat-hub-layout.mobile-chat-active .chat-hub-main-pane {
-        display: flex;
-    }
-
-    .mobile-back-btn {
-        display: flex !important;
-    }
-
-    .chat-hub-main-header {
-        padding: 0.75rem 1rem;
-    }
-
-    .chat-hub-input-form {
-        padding: 0.75rem 0.5rem;
-        gap: 0.4rem;
-    }
-
-    .chat-hub-messages-scroll {
-        padding: 1rem;
-    }
-
-    .chat-hub-bubble-wrapper,
-    .poll-msg-wrapper {
-        max-width: 85% !important;
-    }
-
-    /* Fixed mobile Lightbox z-index overlap issues */
-    .lightbox-main-img {
-        max-width: 100%;
-    }
-
-    .lightbox-content {
-        padding: 0 0.5rem 2rem 0.5rem;
-    }
-
-    .lightbox-nav {
-        width: 40px;
-        height: 40px;
-        background: rgba(0, 0, 0, 0.5);
-        position: absolute;
-    }
-
-    .lightbox-nav.prev {
-        left: 10px;
-    }
-
-    .lightbox-nav.next {
-        right: 10px;
-    }
-}
 
 /* --- DELETED MESSAGE BUBBLE --- */
 .deleted-message-bubble {
@@ -1402,7 +1352,6 @@
     max-width: 300px;
 }
 
-/* --- SCROLL HIGHLIGHT ANIMATION --- */
 .highlight-flash .chat-hub-bubble {
     animation: flashHighlight 2s ease-out;
 }
@@ -1419,7 +1368,6 @@
     }
 }
 
-/* --- EMOJI REACTION BADGE --- */
 .reaction-count {
     font-size: 0.75rem;
     font-weight: 700;
@@ -1492,18 +1440,22 @@
     width: 100%;
     margin: 1.5rem 0 0.5rem 0;
     position: sticky;
-    top: 0;
-    z-index: 5;
+    top: 10px;
+    /* Gives it breathing room from the top edge */
+    z-index: 50;
+    /* Sits above everything while scrolling */
+    pointer-events: none;
+    /* Allows you to click messages underneath it */
 }
 
 .chat-date-badge {
-    background-color: #ffffff;
-    color: #64748b;
+    background-color: #f1f5f9;
+    color: #475569;
     font-size: 0.72rem;
     font-weight: 700;
-    padding: 0.35rem 0.85rem;
-    border-radius: 99px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+    padding: 0.4rem 0.9rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
     border: 1px solid #e2e8f0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1554,4 +1506,178 @@ body.dark-mode .chat-date-badge {
     align-items: center;
     justify-content: center;
     box-shadow: 0 1px 3px rgba(16, 185, 129, 0.4);
+}
+
+/* ========================================================
+   NEW: DRAG & DROP OVERLAY
+   ======================================================== */
+.drag-drop-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.85);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.drag-drop-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    color: white;
+    border: 3px dashed rgba(255, 255, 255, 0.4);
+    padding: 3rem 4rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.drag-drop-content h2 {
+    margin: 1.5rem 0 0.5rem 0;
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+.drag-drop-content p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #cbd5e1;
+}
+
+/* ========================================================
+   NEW: @MENTION DROPDOWN (WhatsApp Dark Theme)
+   ======================================================== */
+.mention-dropdown {
+    position: absolute;
+    bottom: 100%;
+    left: 1rem;
+    margin-bottom: 0.5rem;
+    width: 280px;
+    background: #2a2f32;
+    border: 1px solid #3b4045;
+    border-radius: 12px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 105;
+    padding: 0.5rem 0;
+}
+
+.mention-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.7rem 1.2rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.mention-item:hover {
+    background: #3b4045;
+}
+
+.mention-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.mention-name {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #ffffff;
+}
+
+
+/* --- MOBILE SPECIFIC FIXES --- */
+@media (max-width: 768px) {
+    .chatbox-wrapper {
+        max-width: 100% !important;
+        padding: 0 0.5rem;
+    }
+
+    .chat-main-section {
+        height: calc(100vh - 240px);
+    }
+
+    .chat-hub-layout {
+        border-radius: 12px;
+    }
+
+    .chat-hub-sidebar {
+        display: flex;
+        width: 100% !important;
+        height: 100%;
+    }
+
+    .chat-hub-main-pane {
+        display: none;
+        width: 100% !important;
+        height: 100%;
+    }
+
+    .chat-hub-layout.mobile-chat-active .chat-hub-sidebar {
+        display: none;
+    }
+
+    .chat-hub-layout.mobile-chat-active .chat-hub-main-pane {
+        display: flex;
+    }
+
+    .mobile-back-btn {
+        display: flex !important;
+    }
+
+    .chat-hub-main-header {
+        padding: 0.75rem 1rem;
+    }
+
+    .chat-hub-input-form {
+        padding: 0.75rem 0.5rem;
+        gap: 0.4rem;
+    }
+
+    .chat-hub-messages-scroll {
+        padding: 1rem;
+    }
+
+    .chat-hub-bubble-wrapper,
+    .poll-msg-wrapper {
+        max-width: 85% !important;
+    }
+
+    .lightbox-main-img {
+        max-width: 100%;
+    }
+
+    .lightbox-content {
+        padding: 0 0.5rem 2rem 0.5rem;
+    }
+
+    .lightbox-nav {
+        width: 40px;
+        height: 40px;
+        background: rgba(0, 0, 0, 0.5);
+        position: absolute;
+    }
+
+    .lightbox-nav.prev {
+        left: 10px;
+    }
+
+    .lightbox-nav.next {
+        right: 10px;
+    }
+
+    /* Ensure the touch menu button is always visible on mobile */
+    .bubble-action-btn {
+        opacity: 1;
+    }
 }

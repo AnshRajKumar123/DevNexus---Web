@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Lock, Users, Sparkles, MessageSquareCode, ArrowLeft, Plus, Video, Image, FileText, File, BarChart2, X, Check, CheckCircle2, Circle, Ban, Pin, Maximize, Minimize, CheckCheck, ChevronLeft, ChevronRight } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { Send, Lock, Users, Sparkles, MessageSquareCode, ArrowLeft, Plus, Video, Image, FileText, File, BarChart2, X, Check, CheckCircle2, Circle, Ban, Pin, Maximize, Minimize, CheckCheck, ChevronLeft, ChevronRight, CornerUpLeft, Download, UploadCloud, ChevronDown } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import '../styles/ChatHub.css';
 
@@ -27,7 +28,7 @@ const formatChatDate = (dateString) => {
 
 const formatLastSeen = (lastSeenDate) => {
     if (!lastSeenDate) return 'offline';
-    
+
     const date = new Date(lastSeenDate);
     const now = new Date();
     const diffMs = now - date;
@@ -36,7 +37,6 @@ const formatLastSeen = (lastSeenDate) => {
     if (diffMins < 5) return 'Online';
 
     const isToday = date.toDateString() === now.toDateString();
-    
     const yesterday = new Date(now);
     yesterday.setDate(yesterday.getDate() - 1);
     const isYesterday = date.toDateString() === yesterday.toDateString();
@@ -72,46 +72,51 @@ export default function ChatHub() {
     const [selectedRecipient, setSelectedRecipient] = useState('all');
     const [mobileChatOpen, setMobileChatOpen] = useState(false);
 
+    // --- Menus and Modals ---
     const [showAttachMenu, setShowAttachMenu] = useState(false);
     const [showPollModal, setShowPollModal] = useState(false);
     const [pollQuestion, setPollQuestion] = useState('');
     const [pollOptions, setPollOptions] = useState(['', '']);
     const [allowMultiple, setAllowMultiple] = useState(false);
-
     const [viewVotesPoll, setViewVotesPoll] = useState(null);
     const [localVotes, setLocalVotes] = useState({});
-
-    // Lightbox Preview State
-    const [previewModal, setPreviewModal] = useState({ visible: false, images: [], currentIndex: 0 });
-
-    const fileInputRef = useRef(null);
-    const [attachments, setAttachments] = useState([]);
-    const [isUploading, setIsUploading] = useState(false);
-
-    const [replyingTo, setReplyingTo] = useState(null);
-    const [swipeOffsets, setSwipeOffsets] = useState({});
-    const swipeStartX = useRef(null);
-    const swipeTargetId = useRef(null);
-
+    const [previewModal, setPreviewModal] = useState({ visible: false, images: [], currentIndex: 0, chat: null });
     const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, chat: null });
     const [pinModal, setPinModal] = useState({ visible: false, chat: null });
     const [deleteModal, setDeleteModal] = useState({ visible: false, chat: null });
+
+    // --- Mentions & Drag Drop ---
+    const [showMentionList, setShowMentionList] = useState(false);
+    const [mentionQuery, setMentionQuery] = useState('');
+    const [isDragging, setIsDragging] = useState(false);
+    const dragCounter = useRef(0);
+
+    const inputRef = useRef(null);
+    const fileInputRef = useRef(null);
+    const messagesEndRef = useRef(null);
+    const chatCacheRef = useRef('');
+
+    const [attachments, setAttachments] = useState([]);
+    const [isUploading, setIsUploading] = useState(false);
+    const [replyingTo, setReplyingTo] = useState(null);
+
+    const [swipeOffsets, setSwipeOffsets] = useState({});
+    const swipeStartX = useRef(null);
+    const swipeTargetId = useRef(null);
     const [hiddenChats, setHiddenChats] = useState(new Set());
     const [activePinIndex, setActivePinIndex] = useState(0);
     const [isFullScreen, setIsFullScreen] = useState(false);
 
-    const messagesEndRef = useRef(null);
-    const chatCacheRef = useRef('');
+    // Prevent background scrolling when Lightbox is open
+    useEffect(() => {
+        document.body.style.overflow = previewModal.visible ? 'hidden' : 'auto';
+        return () => { document.body.style.overflow = 'auto'; };
+    }, [previewModal.visible]);
 
     useEffect(() => {
-        const handleGlobalContextMenu = (e) => e.preventDefault();
-        document.addEventListener('contextmenu', handleGlobalContextMenu);
         const handleClickOutside = () => setContextMenu({ visible: false, x: 0, y: 0, chat: null });
         document.addEventListener('click', handleClickOutside);
-        return () => {
-            document.removeEventListener('contextmenu', handleGlobalContextMenu);
-            document.removeEventListener('click', handleClickOutside);
-        };
+        return () => document.removeEventListener('click', handleClickOutside);
     }, []);
 
     const pingStatus = async () => {
@@ -149,10 +154,7 @@ export default function ChatHub() {
     useEffect(() => {
         fetchChats();
         pingStatus();
-        const interval = setInterval(() => {
-            fetchChats();
-            pingStatus();
-        }, 5000);
+        const interval = setInterval(() => { fetchChats(); pingStatus(); }, 5000);
         return () => clearInterval(interval);
     }, []);
 
@@ -167,6 +169,66 @@ export default function ChatHub() {
         setMobileChatOpen(true);
     };
 
+    // --- Universal Attachment Processing (Drag, Paste, Click) ---
+    const addFilesToAttachments = (newFiles) => {
+        if (!newFiles || newFiles.length === 0) return;
+        const currentCount = attachments.length;
+        if (currentCount >= 10) return alert('Max 10 files allowed.');
+
+        const validFiles = newFiles.slice(0, 10 - currentCount);
+        const newAtts = validFiles.map(file => ({
+            file,
+            previewUrl: URL.createObjectURL(file),
+            type: file.type.startsWith('image/') ? 'image' : file.type.startsWith('video/') ? 'video' : 'document'
+        }));
+        setAttachments(prev => [...prev, ...newAtts]);
+    };
+
+    const handleFileChange = (e) => {
+        addFilesToAttachments(Array.from(e.target.files));
+        if (fileInputRef.current) fileInputRef.current.value = '';
+        setShowAttachMenu(false);
+    };
+
+    const handlePaste = (e) => {
+        const items = e.clipboardData?.items;
+        if (!items) return;
+        const pastedFiles = [];
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].kind === 'file') {
+                const file = items[i].getAsFile();
+                if (file) pastedFiles.push(file);
+            }
+        }
+        if (pastedFiles.length > 0) {
+            e.preventDefault();
+            addFilesToAttachments(pastedFiles);
+        }
+    };
+
+    const handleDragEnter = (e) => {
+        e.preventDefault();
+        dragCounter.current += 1;
+        if (e.dataTransfer.items && e.dataTransfer.items.length > 0) setIsDragging(true);
+    };
+
+    const handleDragLeave = (e) => {
+        e.preventDefault();
+        dragCounter.current -= 1;
+        if (dragCounter.current === 0) setIsDragging(false);
+    };
+
+    const handleDragOver = (e) => e.preventDefault();
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        dragCounter.current = 0;
+        setIsDragging(false);
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            addFilesToAttachments(Array.from(e.dataTransfer.files));
+        }
+    };
+
     const triggerFileInput = (type) => {
         setShowAttachMenu(false);
         if (fileInputRef.current) {
@@ -175,17 +237,6 @@ export default function ChatHub() {
             else fileInputRef.current.accept = '*/*';
             fileInputRef.current.click();
         }
-    };
-
-    const handleFileChange = (e) => {
-        const newFiles = Array.from(e.target.files);
-        if (attachments.length + newFiles.length > 10) return alert('Max 10 files allowed.');
-        const newAttachments = newFiles.map(file => ({
-            file, previewUrl: URL.createObjectURL(file),
-            type: file.type.startsWith('image/') ? 'image' : file.type.startsWith('video/') ? 'video' : 'document'
-        }));
-        setAttachments([...attachments, ...newAttachments]);
-        if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
     const removeAttachment = (index) => {
@@ -213,6 +264,43 @@ export default function ChatHub() {
             } catch (error) { }
         }
         return uploadedUrls;
+    };
+
+    // --- @Mention Logic ---
+    const handleTextChange = (e) => {
+        const text = e.target.value;
+        setMessageText(text);
+
+        if (selectedRecipient !== 'all') {
+            setShowMentionList(false);
+            return;
+        }
+
+        const cursorPosition = e.target.selectionStart;
+        const textBeforeCursor = text.slice(0, cursorPosition);
+        const match = textBeforeCursor.match(/(?:\s|^)@([a-zA-Z0-9_]*)$/);
+
+        if (match) {
+            setShowMentionList(true);
+            setMentionQuery(match[1].toLowerCase());
+        } else {
+            setShowMentionList(false);
+        }
+    };
+
+    const handleMentionSelect = (memberName) => {
+        const cursorPosition = inputRef.current.selectionStart;
+        const textBeforeCursor = messageText.slice(0, cursorPosition);
+        const textAfterCursor = messageText.slice(cursorPosition);
+
+        const match = textBeforeCursor.match(/(?:\s|^)@([a-zA-Z0-9_]*)$/);
+        if (match) {
+            const startIdx = match.index + (match[0].startsWith(' ') ? 1 : 0);
+            const newText = messageText.substring(0, startIdx) + '@' + memberName + ' ' + textAfterCursor;
+            setMessageText(newText);
+            setShowMentionList(false);
+            if (inputRef.current) inputRef.current.focus();
+        }
     };
 
     const handleSendMessage = async (e, customMessage = null) => {
@@ -259,11 +347,41 @@ export default function ChatHub() {
                 clearAttachments();
                 setReplyingTo(null);
                 setShowAttachMenu(false);
+                setShowMentionList(false);
                 fetchChats();
             }
         } catch (err) { } finally { setIsUploading(false); }
     };
 
+    // --- Poll Functions ---
+    const handleAddPollOption = () => setPollOptions([...pollOptions, '']);
+    const handlePollOptionChange = (index, value) => {
+        const updated = [...pollOptions];
+        updated[index] = value;
+        setPollOptions(updated);
+    };
+
+    const handleCreatePoll = (e) => {
+        e.preventDefault();
+        if (!pollQuestion.trim() || pollOptions.filter(o => o.trim()).length < 2) return alert('Please enter a question and at least 2 options.');
+        const validOptions = pollOptions.filter(o => o.trim()).map(opt => ({ text: opt, votes: [] }));
+        const pollData = { question: pollQuestion, allowMultiple, options: validOptions, creatorEmail: currentUser.email };
+        handleSendMessage(null, `[POLL_JSON]:${JSON.stringify(pollData)}`);
+        setPollQuestion(''); setPollOptions(['', '']); setAllowMultiple(false); setShowPollModal(false);
+    };
+
+    const handleVoteToggle = (chatId, optionIndex, allowMultiple) => {
+        setLocalVotes(prev => {
+            const currentVotes = prev[chatId] || [];
+            if (allowMultiple) {
+                return currentVotes.includes(optionIndex) ? { ...prev, [chatId]: currentVotes.filter(idx => idx !== optionIndex) } : { ...prev, [chatId]: [...currentVotes, optionIndex] };
+            } else {
+                return { ...prev, [chatId]: [optionIndex] };
+            }
+        });
+    };
+
+    // --- Context Menus ---
     const handleRightClick = (e, chat) => {
         if (chat.message === '[DELETED]') return;
         e.preventDefault();
@@ -290,7 +408,7 @@ export default function ChatHub() {
     };
 
     const handleMenuReply = () => { setReplyingTo(contextMenu.chat); setContextMenu({ visible: false, x: 0, y: 0, chat: null }); };
-    
+
     const handleMenuCopy = () => {
         navigator.clipboard.writeText(contextMenu.chat.message.replace(/\[(?:REPLY|IMG|VID|FILE):.*?\]/g, '').trim());
         setContextMenu({ visible: false, x: 0, y: 0, chat: null });
@@ -365,26 +483,7 @@ export default function ChatHub() {
         swipeTargetId.current = null;
     };
 
-    const handleCreatePoll = (e) => {
-        e.preventDefault();
-        if (!pollQuestion.trim() || pollOptions.filter(o => o.trim()).length < 2) return alert('Please enter a question and at least 2 options.');
-        const validOptions = pollOptions.filter(o => o.trim()).map(opt => ({ text: opt, votes: [] }));
-        const pollData = { question: pollQuestion, allowMultiple, options: validOptions, creatorEmail: currentUser.email };
-        handleSendMessage(null, `[POLL_JSON]:${JSON.stringify(pollData)}`);
-        setPollQuestion(''); setPollOptions(['', '']); setAllowMultiple(false); setShowPollModal(false);
-    };
-
-    const handleVoteToggle = (chatId, optionIndex, allowMultiple) => {
-        setLocalVotes(prev => {
-            const currentVotes = prev[chatId] || [];
-            if (allowMultiple) {
-                return currentVotes.includes(optionIndex) ? { ...prev, [chatId]: currentVotes.filter(idx => idx !== optionIndex) } : { ...prev, [chatId]: [...currentVotes, optionIndex] };
-            } else {
-                return { ...prev, [chatId]: [optionIndex] };
-            }
-        });
-    };
-
+    // --- Message Bubble Rendering ---
     const renderMessageContent = (chat) => {
         if (!chat.message) return null;
         let text = chat.message;
@@ -400,7 +499,7 @@ export default function ChatHub() {
                 const totalVotes = poll.options.reduce((acc, opt) => acc + opt.votes.length, 0) + (userSelectedOptions.length > 0 ? 1 : 0);
 
                 return (
-                    <div className="custom-poll-bubble">
+                    <div className="custom-poll-bubble" style={{ width: "100%" }}>
                         <div className="poll-question-header">
                             <h4>{poll.question}</h4>
                             <span className="poll-subtitle"><CheckCircle2 size={12} /> {poll.allowMultiple ? 'Select multiple' : 'Select one'}</span>
@@ -461,7 +560,11 @@ export default function ChatHub() {
                     </div>
                 );
             } else if (line.trim() !== '') {
-                textElements.push(<span key={`text-${idx}`}>{line}</span>);
+                const styledLine = line.split(/(@[a-zA-Z0-9_]+)/g).map((part, i) => {
+                    if (part.startsWith('@')) return <strong key={i} style={{ color: '#2563eb' }}>{part}</strong>;
+                    return part;
+                });
+                textElements.push(<span key={`text-${idx}`}>{styledLine}</span>);
             }
         });
 
@@ -476,7 +579,7 @@ export default function ChatHub() {
                 {images.length > 0 && (
                     <div className={`chat-image-collage collage-count-${Math.min(images.length, 4)}`}>
                         {images.slice(0, 4).map((url, i) => (
-                            <div key={i} className="collage-item" onClick={() => setPreviewModal({ visible: true, images, currentIndex: i })}>
+                            <div key={i} className="collage-item" onClick={() => setPreviewModal({ visible: true, images, currentIndex: i, chat })}>
                                 <img src={url} alt="attachment" />
                                 {i === 3 && images.length > 4 && (
                                     <div className="collage-overlay-count">+{images.length - 4}</div>
@@ -525,7 +628,7 @@ export default function ChatHub() {
         });
         const unreadCount = conversationMsgs.filter(c => c.senderEmail !== currentUser.email && !(c.readBy && c.readBy.includes(currentUser.email))).length;
         const lastMsg = conversationMsgs[conversationMsgs.length - 1];
-        
+
         let previewText = '';
         if (lastMsg) {
             if (lastMsg.message === '[DELETED]') previewText = '🚫 Deleted message';
@@ -539,6 +642,7 @@ export default function ChatHub() {
     };
 
     const teamChatMeta = getConversationMeta('all');
+    const filteredMentions = team.filter(t => t.email !== currentUser?.email && t.name.toLowerCase().includes(mentionQuery));
 
     return (
         <div className={`chatbox-wrapper page-animate ${isFullScreen ? 'fullscreen-mode' : ''}`}>
@@ -552,6 +656,7 @@ export default function ChatHub() {
             <section className="stagger-2 chat-main-section">
                 <div className={`chat-hub-layout ${mobileChatOpen ? 'mobile-chat-active' : ''}`}>
 
+                    {/* --- Sidebar --- */}
                     <div className="chat-hub-sidebar">
                         <div className="chat-hub-sidebar-header">
                             <h3>Conversations</h3>
@@ -572,7 +677,7 @@ export default function ChatHub() {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div className="chat-hub-section-title">Team Members</div>
                             {isLoading ? Array.from({ length: 4 }).map((_, i) => (
                                 <div key={i} className="chat-hub-channel-item">
@@ -585,31 +690,49 @@ export default function ChatHub() {
                             )) : team.filter(t => t.email !== currentUser?.email).map(member => {
                                 const meta = getConversationMeta(member.email);
                                 return (
-                                <div key={member._id} className={`chat-hub-channel-item ${selectedRecipient === member.email ? 'active-channel' : ''}`} onClick={() => handleSelectRecipient(member.email)}>
-                                    <img src={getAvatarSrc(member)} alt={member.name} className="chat-hub-member-avatar" />
-                                    <div className="chat-hub-channel-info sidebar-meta-layout">
-                                        <div className="sidebar-meta-top">
-                                            <h4>{member.name}</h4>
-                                            <span className="sidebar-time" style={{ color: meta.unreadCount > 0 ? '#10b981' : '#94a3b8' }}>{meta.lastMsgTime}</span>
-                                        </div>
-                                        <div className="sidebar-meta-bottom">
-                                            <p>{meta.previewText || member.role}</p>
-                                            {meta.unreadCount > 0 && <span className="sidebar-unread-badge">{meta.unreadCount}</span>}
+                                    <div key={member._id} className={`chat-hub-channel-item ${selectedRecipient === member.email ? 'active-channel' : ''}`} onClick={() => handleSelectRecipient(member.email)}>
+                                        <img src={getAvatarSrc(member)} alt={member.name} className="chat-hub-member-avatar" />
+                                        <div className="chat-hub-channel-info sidebar-meta-layout">
+                                            <div className="sidebar-meta-top">
+                                                <h4>{member.name}</h4>
+                                                <span className="sidebar-time" style={{ color: meta.unreadCount > 0 ? '#10b981' : '#94a3b8' }}>{meta.lastMsgTime}</span>
+                                            </div>
+                                            <div className="sidebar-meta-bottom">
+                                                <p>{meta.previewText || member.role}</p>
+                                                {meta.unreadCount > 0 && <span className="sidebar-unread-badge">{meta.unreadCount}</span>}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
                                 );
                             })}
                         </div>
                     </div>
 
-                    <div className="chat-hub-main-pane">
+                    {/* --- Main Chat Pane (Handles Drag & Drop) --- */}
+                    <div
+                        className="chat-hub-main-pane"
+                        style={{ position: 'relative' }}
+                        onDragEnter={handleDragEnter}
+                        onDragLeave={handleDragLeave}
+                        onDragOver={handleDragOver}
+                        onDrop={handleDrop}
+                    >
+                        {isDragging && (
+                            <div className="drag-drop-overlay">
+                                <div className="drag-drop-content">
+                                    <UploadCloud size={64} color="white" />
+                                    <h2>Drop files to attach</h2>
+                                    <p>Images, videos, and documents are supported.</p>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="chat-hub-main-header">
                             <div className="chat-hub-active-title">
                                 <button className="mobile-back-btn" onClick={() => setMobileChatOpen(false)}>
                                     <ArrowLeft size={20} />
                                 </button>
-                                
+
                                 {selectedRecipient === 'all' ? (
                                     <>
                                         <div className="chat-hub-icon-circle header-avatar" style={{ background: '#eff6ff', color: '#2563eb' }}><Users size={20} /></div>
@@ -637,6 +760,27 @@ export default function ChatHub() {
                             </div>
                         </div>
 
+                        {activePinnedChat && (
+                            <div className="pinned-message-banner pop-in" onClick={() => {
+                                const el = document.getElementById(`chat-${activePinnedChat._id}`);
+                                if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('highlight-flash'); setTimeout(() => el.classList.remove('highlight-flash'), 2000); }
+                                setActivePinIndex((prev) => (prev + 1) % pinnedChats.length);
+                            }}>
+                                <div className="pinned-banner-indicator">
+                                    <Pin size={16} color="#059669" />
+                                    {pinnedChats.length > 1 && <span className="pinned-counter">{activePinIndex + 1}/{pinnedChats.length}</span>}
+                                </div>
+                                <div className="pinned-banner-content">
+                                    <span className="pinned-banner-title">Pinned Message</span>
+                                    <span className="pinned-banner-text">
+                                        {activePinnedChat.message.startsWith('[POLL') ? '📊 Poll' :
+                                            activePinnedChat.message.startsWith('[IMG') ? '🖼️ Image attached' :
+                                                activePinnedChat.message.length > 50 ? activePinnedChat.message.substring(0, 50) + '...' : activePinnedChat.message}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="chat-hub-messages-scroll" onMouseMove={onSwipeMove} onTouchMove={onSwipeMove} onMouseUp={onSwipeEnd} onTouchEnd={onSwipeEnd} onMouseLeave={onSwipeEnd}>
                             {isLoading ? (
                                 <>
@@ -656,7 +800,7 @@ export default function ChatHub() {
                                     const transformStyle = { transform: `translateX(${swipeOffsets[chat._id] || 0}px)` };
                                     const renderedReactions = chat.reactions ? Array.from(new Set(Object.values(chat.reactions))) : [];
                                     const isRead = chat.recipientEmail === 'all' ? (chat.readBy && chat.readBy.length > 1) : (chat.readBy && chat.readBy.includes(chat.recipientEmail));
-                                    
+
                                     const chatDate = chat.createdAt ? new Date(chat.createdAt).toDateString() : '';
                                     const prevChatDate = idx > 0 && filteredChats[idx - 1].createdAt ? new Date(filteredChats[idx - 1].createdAt).toDateString() : '';
                                     const showDateBadge = chatDate && chatDate !== prevChatDate;
@@ -673,7 +817,18 @@ export default function ChatHub() {
                                                 {!isMe && !isPoll && selectedRecipient === 'all' && <span className="chat-hub-sender-label">{chat.senderName}</span>}
                                                 <div className={`chat-hub-bubble ${isPoll ? 'poll-bubble-whatsapp' : (isMe ? 'bubble-mine' : 'bubble-theirs')}`}>
 
-                                                    <div className="chat-hub-text">{renderMessageContent(chat)}</div>
+                                                    {/* NEW: Dropdown for Mobile Users x(Tap to open context menu) */}
+                                                    <button className="bubble-action-btn" onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        let x = e.pageX; let y = e.pageY;
+                                                        if (window.innerWidth - x < 180) x -= 180;
+                                                        if (window.innerHeight - y < 350) y -= 350;
+                                                        setContextMenu({ visible: true, x, y, chat });
+                                                    }}>
+                                                        <ChevronDown size={16} />
+                                                    </button>
+
+                                                    <div>{renderMessageContent(chat)}</div>
 
                                                     <div className="chat-hub-bubble-footer">
                                                         {chat.isPinned && <Pin size={10} style={{ marginRight: '4px' }} />}
@@ -700,7 +855,21 @@ export default function ChatHub() {
                             <div ref={messagesEndRef} />
                         </div>
 
-                        <form onSubmit={(e) => handleSendMessage(e)} className="chat-hub-input-form">
+                        {/* --- Input Form (Includes Paste Logic & Mentions) --- */}
+                        <form onSubmit={(e) => handleSendMessage(e)} className="chat-hub-input-form" style={{ position: 'relative' }}>
+
+                            {/* @ Mention Dropdown Overlay */}
+                            {showMentionList && filteredMentions.length > 0 && (
+                                <div className="mention-dropdown pop-in">
+                                    {filteredMentions.map(member => (
+                                        <div key={member._id} className="mention-item" onClick={() => handleMentionSelect(member.name)}>
+                                            <img src={getAvatarSrc(member)} alt={member.name} className="mention-avatar" />
+                                            <span className="mention-name">{member.name}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
                             <div className="chat-attach-container">
                                 <button type="button" className="chat-attach-trigger-btn" onClick={() => setShowAttachMenu(!showAttachMenu)}><Plus size={22} /></button>
                                 {showAttachMenu && (
@@ -733,12 +902,30 @@ export default function ChatHub() {
                                                 <button type="button" className="remove-attachment-btn hover-pop" onClick={() => removeAttachment(index)}><X size={14} /></button>
                                                 {att.type === 'image' && <img src={att.previewUrl} alt="preview" />}
                                                 {att.type === 'video' && <video src={att.previewUrl} />}
+                                                {(att.type === 'document' || att.type === 'file') && (
+                                                    <div className="file-preview-box">
+                                                        <FileText size={20} color="#2563eb" />
+                                                        <div className="file-preview-info">
+                                                            <span className="file-name" title={att.file.name}>{att.file.name.length > 15 ? att.file.name.substring(0, 15) + '...' : att.file.name}</span>
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
                                 )}
 
-                                <input type="text" placeholder="Message" value={messageText} onChange={(e) => setMessageText(e.target.value)} className="chat-hub-text-input" disabled={isUploading} autoFocus={!!replyingTo} />
+                                <input
+                                    ref={inputRef}
+                                    type="text"
+                                    placeholder="Type your message here"
+                                    value={messageText}
+                                    onChange={handleTextChange}
+                                    onPaste={handlePaste}
+                                    className="chat-hub-text-input"
+                                    disabled={isUploading}
+                                    autoFocus={!!replyingTo}
+                                />
                             </div>
 
                             <button type="submit" className="chat-hub-send-btn" disabled={(!messageText.trim() && attachments.length === 0) || isUploading}>
@@ -750,37 +937,64 @@ export default function ChatHub() {
             </section>
 
             {/* --- IMAGE PREVIEW MODAL (LIGHTBOX) --- */}
-            {previewModal.visible && (
-                <div className="lightbox-overlay fade-in" onClick={() => setPreviewModal({ visible: false, images: [], currentIndex: 0 })}>
-                    <div className="lightbox-header">
+            {previewModal.visible && createPortal(
+                <div className="lightbox-overlay fade-in" onClick={() => setPreviewModal({ visible: false, images: [], currentIndex: 0, chat: null })}>
+
+                    <div className="lightbox-header" onClick={e => e.stopPropagation()}>
                         <span className="lightbox-counter">{previewModal.currentIndex + 1} / {previewModal.images.length}</span>
-                        <button className="lightbox-close hover-pop" onClick={() => setPreviewModal({ visible: false, images: [], currentIndex: 0 })}><X size={28} color="white" /></button>
+
+                        <div className="lightbox-actions">
+                            <button className="lightbox-btn hover-pop" title="Reply to image" onClick={() => {
+                                setReplyingTo(previewModal.chat);
+                                setPreviewModal({ visible: false, images: [], currentIndex: 0, chat: null });
+                            }}>
+                                <CornerUpLeft size={24} color="white" />
+                            </button>
+
+                            <button className="lightbox-btn hover-pop" title="Download image" onClick={() => {
+                                const link = document.createElement('a');
+                                link.href = previewModal.images[previewModal.currentIndex];
+                                link.download = 'download';
+                                link.target = '_blank';
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                            }}>
+                                <Download size={24} color="white" />
+                            </button>
+
+                            <button className="lightbox-btn hover-pop" title="Close" onClick={() => setPreviewModal({ visible: false, images: [], currentIndex: 0, chat: null })}>
+                                <X size={28} color="white" />
+                            </button>
+                        </div>
                     </div>
-                    
+
                     <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
                         {previewModal.images.length > 1 && (
-                            <button 
-                                className="lightbox-nav prev hover-pop" 
+                            <button
+                                className="lightbox-nav prev hover-pop"
                                 onClick={(e) => { e.stopPropagation(); setPreviewModal(p => ({ ...p, currentIndex: p.currentIndex === 0 ? p.images.length - 1 : p.currentIndex - 1 })); }}
                             >
                                 <ChevronLeft size={36} color="white" />
                             </button>
                         )}
-                        
+
                         <img src={previewModal.images[previewModal.currentIndex]} alt="fullscreen preview" className="lightbox-main-img" />
-                        
+
                         {previewModal.images.length > 1 && (
-                            <button 
-                                className="lightbox-nav next hover-pop" 
+                            <button
+                                className="lightbox-nav next hover-pop"
                                 onClick={(e) => { e.stopPropagation(); setPreviewModal(p => ({ ...p, currentIndex: (p.currentIndex + 1) % p.images.length })); }}
                             >
                                 <ChevronRight size={36} color="white" />
                             </button>
                         )}
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
 
+            {/* --- RESTORED MODALS AND MENUS --- */}
             {contextMenu.visible && (
                 <div className="custom-context-menu pop-in" style={{ top: contextMenu.y, left: contextMenu.x }} onClick={(e) => e.stopPropagation()}>
                     <div className="context-menu-reactions">
@@ -792,7 +1006,113 @@ export default function ChatHub() {
                         <button onClick={handleMenuReply}>Reply</button>
                         <button onClick={handleMenuPin}>{contextMenu.chat?.isPinned ? 'Unpin' : 'Pin'}</button>
                         <button onClick={handleMenuCopy}>Copy</button>
+                        {contextMenu.chat?.message?.match(/\[(?:IMG|VID|FILE):/) && (
+                            <button onClick={handleMenuDownload}>Download</button>
+                        )}
                         <button onClick={handleMenuDelete} className="context-menu-danger">Delete</button>
+                    </div>
+                </div>
+            )}
+
+            {pinModal.visible && (
+                <div className="modal-overlay fade-in">
+                    <div className="pin-duration-modal pop-in">
+                        <h3>Choose how long your new pin lasts</h3>
+                        <p>You can unpin at any time.</p>
+                        <div className="pin-duration-options">
+                            <button onClick={() => { togglePin(pinModal.chat._id, true); setPinModal({ visible: false, chat: null }); }}>24 hours</button>
+                            <button onClick={() => { togglePin(pinModal.chat._id, true); setPinModal({ visible: false, chat: null }); }}>7 days</button>
+                            <button onClick={() => { togglePin(pinModal.chat._id, true); setPinModal({ visible: false, chat: null }); }}>30 days</button>
+                            <button onClick={() => setPinModal({ visible: false, chat: null })}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {deleteModal.visible && (
+                <div className="modal-overlay fade-in">
+                    <div className="delete-action-modal pop-in">
+                        <h3>Delete Message?</h3>
+                        <p>Are you sure you want to delete this message?</p>
+                        <div className="delete-action-options">
+                            <button className="btn-modern-danger" onClick={() => handleConfirmDelete('everyone')}>Delete for everyone</button>
+                            <button className="btn-modern-secondary" onClick={() => handleConfirmDelete('me')}>Delete for me</button>
+                            <button className="text-btn" onClick={() => setDeleteModal({ visible: false, chat: null })}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showPollModal && (
+                <div className="modal-overlay fade-in">
+                    <div className="modal-content pop-in poll-modal-content">
+                        <div className="modal-header poll-modal-header">
+                            <button className="modal-close" onClick={() => setShowPollModal(false)}><X size={20} /></button>
+                            <h2>Create poll</h2>
+                            <button type="button" className="btn-modern-primary poll-send-btn hover-pop" onClick={handleCreatePoll}>Send</button>
+                        </div>
+                        <form onSubmit={handleCreatePoll} className="modern-form poll-form">
+                            <div className="form-group">
+                                <label className="poll-section-label">QUESTION</label>
+                                <input type="text" value={pollQuestion} onChange={(e) => setPollQuestion(e.target.value)} className="modern-input poll-input" placeholder="Ask question" required autoFocus />
+                            </div>
+                            <div className="form-group">
+                                <label className="poll-section-label">OPTIONS</label>
+                                {pollOptions.map((opt, idx) => (
+                                    <input key={idx} type="text" value={opt} onChange={(e) => handlePollOptionChange(idx, e.target.value)} className="modern-input poll-input" placeholder="Add" style={{ marginBottom: '0.75rem' }} />
+                                ))}
+                                <button type="button" className="text-btn" onClick={handleAddPollOption} style={{ fontSize: '0.85rem', fontWeight: 600, color: '#2563eb' }}>+ Add another option</button>
+                            </div>
+                            <div className="poll-checkbox-row">
+                                <span>Allow multiple answers</span>
+                                <label className="custom-checkbox">
+                                    <input type="checkbox" checked={allowMultiple} onChange={(e) => setAllowMultiple(e.target.checked)} />
+                                    <span className="checkmark"><Check size={14} color="white" /></span>
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {viewVotesPoll && (
+                <div className="modal-overlay fade-in">
+                    <div className="poll-votes-modal pop-in">
+                        <div className="poll-votes-modal-header">
+                            <button className="modal-close-btn" onClick={() => setViewVotesPoll(null)}><X size={20} color="#0f172a" /></button>
+                            <h2>Poll votes</h2>
+                        </div>
+                        <div className="poll-votes-body">
+                            <div className="poll-votes-question-bubble">{viewVotesPoll.poll.question}</div>
+                            {viewVotesPoll.poll.options.map((opt, i) => {
+                                const optionVotes = [...opt.votes];
+                                const userSelectedOptions = localVotes[viewVotesPoll.chatId] || [];
+                                if (userSelectedOptions.includes(i)) {
+                                    optionVotes.push({ user: currentUser.name, avatar: getAvatarSrc(currentUser), time: 'Just now' });
+                                }
+                                return (
+                                    <div key={i} className="poll-votes-option-group">
+                                        <div className="poll-votes-option-header">
+                                            <h4>{opt.text}</h4>
+                                            <span className="vote-count-text">{optionVotes.length} {optionVotes.length === 1 ? 'vote' : 'votes'}</span>
+                                        </div>
+                                        {optionVotes.length === 0 ? (
+                                            <div className="no-votes-text">No votes yet</div>
+                                        ) : (
+                                            optionVotes.map((v, vIdx) => (
+                                                <div key={vIdx} className="poll-voter-item">
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                        <img src={v.avatar} alt={v.user} className="voter-avatar" />
+                                                        <span className="voter-name">{v.user === currentUser.name ? 'You' : v.user}</span>
+                                                    </div>
+                                                    <span className="voter-time">{v.time}</span>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
             )}
