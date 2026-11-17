@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { 
-    Inbox, CalendarX2, BarChart2, Users, AlertCircle, Video, TrendingUp, CheckCircle2, Clock, Activity, ListTodo, PlayCircle, Trash2, Plus, Briefcase
+    Inbox, CalendarX2, BarChart2, Users, AlertCircle, Video, TrendingUp, CheckCircle2, Clock, Activity, ListTodo, PlayCircle, Trash2, Plus, Briefcase, Lightbulb
 } from 'lucide-react';
 import { useData } from '../context/DataContext'; 
 import { Link } from 'react-router-dom';
 import '../styles/Dashboard.css';
 
 export default function Dashboard() {
-    // Added projects = [] to pull from Context safely
     const { inquiries, events, currentUser, team, todos = [], projects = [], updateTodoStatus } = useData(); 
     const [greeting, setGreeting] = useState('');
     const [motivation, setMotivation] = useState('');
@@ -49,6 +48,7 @@ export default function Dashboard() {
     // Calculate Project KPIs
     const totalProjects = projects.length;
     const ongoingProjects = projects.filter(p => p.status === 'In Progress').length;
+    const pendingIdeas = projects.filter(p => p.status === 'Pending Approval');
 
     return (
         <div className="dashboard-wrapper page-animate">
@@ -216,6 +216,34 @@ export default function Dashboard() {
                 </div>
 
                 <div className="grid-col">
+                    <div className="premium-widget stagger-4">
+                        <div className="widget-header">
+                            <h3><Lightbulb size={18} className="icon-orange" /> Idea Board</h3>
+                            <Link to="/projects" className="text-btn">Pitch Idea</Link>
+                        </div>
+                        {isLoading ? (
+                            <div className="schedule-feed">
+                                {Array.from({length: 2}).map((_,i) => <div key={i} className="skeleton skeleton-card" style={{ height: '70px' }}></div>)}
+                            </div>
+                        ) : pendingIdeas.length > 0 ? (
+                            <div className="widget-feed">
+                                {pendingIdeas.slice(0, 4).map((idea) => (
+                                    <div key={idea._id || idea.id} className="feed-item fade-in-row" style={{ alignItems: 'flex-start' }}>
+                                        <div className="feed-content">
+                                            <h4 className="feed-title">{idea.name}</h4>
+                                            <div className="feed-meta">
+                                                <span className="meta-creator">By: <strong>{idea.createdBy}</strong></span>
+                                            </div>
+                                        </div>
+                                        <span className="badge badge-pending">Review</span>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="empty-state"><Lightbulb size={32} color="#94a3b8" /><p>No pending ideas.</p></div>
+                        )}
+                    </div>
+
                     <div className="premium-widget stagger-4">
                         <div className="widget-header">
                             <h3><Clock size={18} className="icon-blue" /> Upcoming Schedule</h3>

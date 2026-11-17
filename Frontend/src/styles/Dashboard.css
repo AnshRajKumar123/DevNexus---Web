@@ -525,3 +525,62 @@
         font-size: 1.6rem;
     }
 }
+
+/* --- RESPONSIVE MOBILE ADJUSTMENTS --- */
+@media (max-width: 1024px) {
+    .dashboard-wrapper {
+        max-width: 100% !important;
+        /* Critical fix: 6rem bottom padding ensures the mobile nav bar doesn't cut off content */
+        padding: 1rem 0.5rem 6.5rem 0.5rem !important; 
+    }
+
+    .dashboard-hero-modern {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+        padding: 1.5rem;
+    }
+
+    .hero-visual-stats {
+        width: 100%;
+        gap: 0.75rem;
+        flex-direction: column;
+    }
+
+    .modern-stat-box {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .kpi-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-grid {
+        display: flex; /* Fixes grid crushing on tablets */
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-hero-modern {
+        padding: 1.25rem;
+    }
+
+    .hero-greeting {
+        font-size: 2rem;
+    }
+
+    .kpi-card-modern {
+        padding: 1.25rem;
+    }
+
+    .kpi-bottom h2 {
+        font-size: 1.6rem;
+    }
+    
+    .widget-feed {
+        padding: 0.5rem 1rem 1rem 1rem;
+    }
+}
