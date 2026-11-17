@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    Inbox, CalendarX2, BarChart2, Users, AlertCircle, Video, TrendingUp, CheckCircle2, Clock, Activity, ListTodo, PlayCircle, Trash2, Plus, Briefcase, Lightbulb
+import {
+    CalendarX2, Users, AlertCircle, Video, CheckCircle2, Clock, Activity, ListTodo, Trash2, Plus, Briefcase, Lightbulb, RefreshCw
 } from 'lucide-react';
-import { useData } from '../context/DataContext'; 
+import { useData } from '../context/DataContext';
 import { Link } from 'react-router-dom';
 import '../styles/Dashboard.css';
 
 export default function Dashboard() {
-    const { inquiries, events, currentUser, team, todos = [], projects = [], updateTodoStatus } = useData(); 
+    const { inquiries, events, currentUser, team, todos = [], projects = [], updateTodoStatus, updateProject, removeProject } = useData();
     const [greeting, setGreeting] = useState('');
     const [motivation, setMotivation] = useState('');
-    const [isLoading, setIsLoading] = useState(true); 
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const timer = setTimeout(() => setIsLoading(false), 800);
-        
+
         const hour = new Date().getHours();
         if (hour >= 0 && hour < 5) {
             setGreeting('Midnight Grind');
@@ -45,10 +45,26 @@ export default function Dashboard() {
     const priorityWeight = { 'High': 3, 'Medium': 2, 'Low': 1 };
     const sortedTodos = [...userTodos].sort((a, b) => (priorityWeight[b.priority] || 2) - (priorityWeight[a.priority] || 2));
 
-    // Calculate Project KPIs
     const totalProjects = projects.length;
     const ongoingProjects = projects.filter(p => p.status === 'In Progress').length;
-    const pendingIdeas = projects.filter(p => p.status === 'Pending Approval');
+
+    const pendingIdeas = projects.filter(p => {
+        if (p.status === 'Pending Approval') return true;
+        if (p.status === 'Rejected' && (p.createdBy === currentUser?.name || currentUser?.isSupremeAdmin)) return true;
+        return false;
+    });
+
+    const handleRepitch = (id) => {
+        updateProject(id, { status: 'Pending Approval' });
+        window.island.success('Idea re-pitched successfully! 💡');
+    };
+
+    const handleDeleteIdea = (id) => {
+        if (window.confirm('Are you sure you want to permanently delete this rejected idea?')) {
+            removeProject(id);
+            window.island.success('Idea deleted completely.');
+        }
+    };
 
     return (
         <div className="dashboard-wrapper page-animate">
@@ -56,8 +72,8 @@ export default function Dashboard() {
                 <div className="hero-text-content">
                     {isLoading ? (
                         <>
-                            <div className="skeleton skeleton-text short" style={{ marginBottom: '1rem' }}></div>
-                            <div className="skeleton skeleton-title" style={{ width: '350px', height: '2.5rem' }}></div>
+                            <div className="skeleton skeleton-text short skel-short-mb"></div>
+                            <div className="skeleton skeleton-title skel-title-hero"></div>
                             <div className="skeleton skeleton-text medium"></div>
                         </>
                     ) : (
@@ -71,8 +87,8 @@ export default function Dashboard() {
                 <div className="hero-visual-stats">
                     {isLoading ? (
                         <>
-                            <div className="modern-stat-box skeleton" style={{ width: '180px', height: '80px' }}></div>
-                            <div className="modern-stat-box skeleton" style={{ width: '180px', height: '80px' }}></div>
+                            <div className="modern-stat-box skeleton skel-stat-box"></div>
+                            <div className="modern-stat-box skeleton skel-stat-box"></div>
                         </>
                     ) : (
                         <>
@@ -96,7 +112,7 @@ export default function Dashboard() {
             </header>
 
             <section className="kpi-grid stagger-2">
-                {isLoading ? Array.from({length: 3}).map((_,i) => <div key={i} className="kpi-card-modern skeleton skeleton-card" style={{ height: '160px' }}></div>) : (
+                {isLoading ? Array.from({ length: 3 }).map((_, i) => <div key={i} className="kpi-card-modern skeleton skeleton-card skel-kpi-card"></div>) : (
                     <>
                         <div className="kpi-card-modern">
                             <div className="kpi-top">
@@ -104,7 +120,7 @@ export default function Dashboard() {
                                 <span className="trend positive">Active</span>
                             </div>
                             <div className="kpi-bottom">
-                                <h2>{ongoingProjects} <span style={{fontSize: '1rem', color: '#94a3b8', fontWeight: 600}}>/ {totalProjects}</span></h2>
+                                <h2>{ongoingProjects} <span className="kpi-total">/ {totalProjects}</span></h2>
                                 <p>Ongoing / Total Projects</p>
                             </div>
                         </div>
@@ -141,10 +157,10 @@ export default function Dashboard() {
                         </div>
                         {isLoading ? (
                             <div className="widget-feed">
-                                {Array.from({length: 3}).map((_,i) => (
-                                    <div key={i} className="feed-item" style={{ gap: '1rem' }}>
-                                        <div className="skeleton skeleton-avatar" style={{ width:'20px', height:'20px' }}></div>
-                                        <div style={{ flex: 1 }}><div className="skeleton skeleton-text medium"></div><div className="skeleton skeleton-text short"></div></div>
+                                {Array.from({ length: 3 }).map((_, i) => (
+                                    <div key={i} className="feed-item feed-item-gap">
+                                        <div className="skeleton skeleton-avatar skel-avatar-sm"></div>
+                                        <div className="skel-flex-1"><div className="skeleton skeleton-text medium"></div><div className="skeleton skeleton-text short"></div></div>
                                     </div>
                                 ))}
                             </div>
@@ -152,7 +168,7 @@ export default function Dashboard() {
                             <div className="empty-state">
                                 <ListTodo size={32} color="#94a3b8" />
                                 <p>No personal tasks added yet.</p>
-                                <Link to="/todo" className="btn-modern-primary hover-pop" style={{ marginTop: '0.75rem', padding: '0.5rem 1rem', fontSize: '0.8rem', textDecoration: 'none' }}>
+                                <Link to="/todo" className="btn-modern-primary hover-pop btn-add-task-small">
                                     <Plus size={14} /> Add Task
                                 </Link>
                             </div>
@@ -163,21 +179,21 @@ export default function Dashboard() {
                                     const statusClass = todo.status ? todo.status.replace(/\s+/g, '-').toLowerCase() : 'pending';
 
                                     return (
-                                        <div key={id} className="feed-item fade-in-row" style={{ justifyContent: 'space-between' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: 0 }}>
+                                        <div key={id} className="feed-item fade-in-row feed-item-between">
+                                            <div className="feed-item-left">
                                                 <div className={`status-dot ${statusClass}`}></div>
-                                                <div className="feed-content" style={{ minWidth: 0 }}>
-                                                    <h4 className="feed-title" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{todo.title}</h4>
+                                                <div className="feed-content">
+                                                    <h4 className="feed-title text-truncate">{todo.title}</h4>
                                                     <div className="feed-meta">
                                                         <span className={`priority-badge priority-${todo.priority ? todo.priority.toLowerCase() : 'medium'}`}>{todo.priority || 'Medium'}</span>
                                                         <span className="meta-creator">• {todo.status}</span>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
-                                                {todo.status === 'Pending' && <button className="btn-action-start hover-pop" onClick={() => updateTodoStatus(id, 'In Progress')} style={{ padding: '0.25rem 0.5rem', fontSize: '0.7rem' }}>Start</button>}
-                                                {todo.status === 'In Progress' && <button className="btn-action-finish hover-pop" onClick={() => updateTodoStatus(id, 'Completed')} style={{ padding: '0.25rem 0.5rem', fontSize: '0.7rem' }}>Finish</button>}
-                                                {todo.status === 'Completed' && <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 700 }}>Done</span>}
+                                            <div className="feed-item-right">
+                                                {todo.status === 'Pending' && <button className="btn-action-start hover-pop btn-action-small" onClick={() => updateTodoStatus(id, 'In Progress')}>Start</button>}
+                                                {todo.status === 'In Progress' && <button className="btn-action-finish hover-pop btn-action-small" onClick={() => updateTodoStatus(id, 'Completed')}>Finish</button>}
+                                                {todo.status === 'Completed' && <span className="text-success-small">Done</span>}
                                             </div>
                                         </div>
                                     );
@@ -192,8 +208,8 @@ export default function Dashboard() {
                         </div>
                         {isLoading ? (
                             <div className="widget-feed">
-                                {Array.from({length: 2}).map((_,i) => (
-                                    <div key={i} className="feed-item"><div style={{ flex: 1 }}><div className="skeleton skeleton-text medium"></div><div className="skeleton skeleton-text short"></div></div></div>
+                                {Array.from({ length: 2 }).map((_, i) => (
+                                    <div key={i} className="feed-item"><div className="skel-flex-1"><div className="skeleton skeleton-text medium"></div><div className="skeleton skeleton-text short"></div></div></div>
                                 ))}
                             </div>
                         ) : inquiries.length === 0 ? (
@@ -223,21 +239,49 @@ export default function Dashboard() {
                         </div>
                         {isLoading ? (
                             <div className="schedule-feed">
-                                {Array.from({length: 2}).map((_,i) => <div key={i} className="skeleton skeleton-card" style={{ height: '70px' }}></div>)}
+                                {Array.from({ length: 2 }).map((_, i) => <div key={i} className="skeleton skeleton-card skel-schedule"></div>)}
                             </div>
                         ) : pendingIdeas.length > 0 ? (
                             <div className="widget-feed">
-                                {pendingIdeas.slice(0, 4).map((idea) => (
-                                    <div key={idea._id || idea.id} className="feed-item fade-in-row" style={{ alignItems: 'flex-start' }}>
-                                        <div className="feed-content">
-                                            <h4 className="feed-title">{idea.name}</h4>
-                                            <div className="feed-meta">
-                                                <span className="meta-creator">By: <strong>{idea.createdBy}</strong></span>
+                                {pendingIdeas.slice(0, 4).map((idea) => {
+                                    const isRejected = idea.status === 'Rejected';
+                                    const idToUse = idea._id || idea.id;
+                                    const isCreator = idea.createdBy === currentUser?.name;
+
+                                    return (
+                                        <div key={idToUse} className="feed-item feed-idea-item fade-in-row">
+                                            <div className="feed-content idea-content">
+                                                <h4 className="feed-title">{idea.name}</h4>
+                                                <div className="feed-meta">
+                                                    <span className="meta-creator">By: <strong>{idea.createdBy}</strong></span>
+                                                </div>
+                                            </div>
+
+                                            <div className="idea-actions-col">
+                                                <span className={`badge badge-${isRejected ? 'rejected' : 'pending'}`}>
+                                                    {isRejected ? 'Rejected' : 'Review'}
+                                                </span>
+
+                                                {isRejected && isCreator && (
+                                                    <div className="idea-repitch-row">
+                                                        <button
+                                                            className="btn-modern-primary hover-pop btn-action-small"
+                                                            onClick={() => handleRepitch(idToUse)}
+                                                        >
+                                                            <RefreshCw size={12} className="mr-1" /> Repitch
+                                                        </button>
+                                                        <button
+                                                            className="btn-modern-danger hover-pop btn-action-small"
+                                                            onClick={() => handleDeleteIdea(idToUse)}
+                                                        >
+                                                            <Trash2 size={12} />
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
-                                        <span className="badge badge-pending">Review</span>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         ) : (
                             <div className="empty-state"><Lightbulb size={32} color="#94a3b8" /><p>No pending ideas.</p></div>
@@ -251,7 +295,7 @@ export default function Dashboard() {
                         </div>
                         {isLoading ? (
                             <div className="schedule-feed">
-                                {Array.from({length: 3}).map((_,i) => <div key={i} className="skeleton skeleton-card" style={{ height: '70px' }}></div>)}
+                                {Array.from({ length: 3 }).map((_, i) => <div key={i} className="skeleton skeleton-card skel-schedule"></div>)}
                             </div>
                         ) : events.length > 0 ? (
                             <div className="schedule-feed">
@@ -261,7 +305,7 @@ export default function Dashboard() {
                                         <div className="schedule-details">
                                             <h4>{ev.title}</h4>
                                             <div className="schedule-meta">
-                                                <span className="meta-type"><Video size={12}/> {ev.type}</span>
+                                                <span className="meta-type"><Video size={12} /> {ev.type}</span>
                                                 <span className="meta-creator">• By: <strong>{ev.createdBy || 'Admin'}</strong></span>
                                             </div>
                                         </div>

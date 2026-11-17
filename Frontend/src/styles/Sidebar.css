@@ -443,3 +443,10 @@
         padding-bottom: calc(64px + env(safe-area-inset-bottom)) !important;
     }
 }
+
+/* --- GLOBAL POPUP/MODAL OVERLAP FIX --- */
+/* Completely hides mobile navbars whenever a modal is open on screen */
+body:has(.modal-overlay) .mobile-top-navbar,
+body:has(.modal-overlay) .mobile-bottom-navbar {
+    display: none !important;
+}

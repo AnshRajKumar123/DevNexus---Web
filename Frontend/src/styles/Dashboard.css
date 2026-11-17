@@ -197,6 +197,12 @@
     font-weight: 500;
 }
 
+.kpi-total {
+    font-size: 1rem;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
 .trend {
     font-size: 0.75rem;
     font-weight: 700;
@@ -224,6 +230,7 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    min-width: 0;
 }
 
 /* Premium Widgets */
@@ -235,6 +242,7 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .highlight-widget {
@@ -280,11 +288,35 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+    min-width: 0;
 }
 
 .feed-item:last-child {
     border-bottom: none;
     padding-bottom: 0;
+}
+
+.feed-item-gap {
+    gap: 1rem;
+}
+
+.feed-item-between {
+    justify-content: space-between;
+}
+
+.feed-item-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.feed-item-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
 }
 
 .status-dot {
@@ -310,6 +342,7 @@
 
 .feed-content {
     flex: 1;
+    min-width: 0;
 }
 
 .feed-title {
@@ -319,12 +352,45 @@
     font-weight: 700;
 }
 
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .feed-meta {
     display: flex;
     gap: 0.5rem;
     font-size: 0.75rem;
     color: #64748b;
     font-weight: 500;
+}
+
+/* Idea Board Specific */
+.feed-idea-item {
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.idea-content {
+    min-width: 150px;
+}
+
+.idea-actions-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.idea-repitch-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}
+
+.mr-1 {
+    margin-right: 0.25rem;
 }
 
 /* Schedule Cards */
@@ -392,7 +458,7 @@
     color: #2563eb;
 }
 
-/* Badges */
+/* Badges & Buttons */
 .badge {
     padding: 0.3rem 0.75rem;
     border-radius: 99px;
@@ -419,6 +485,12 @@
     border: 1px solid #a7f3d0;
 }
 
+.badge-rejected {
+    background: #fef2f2;
+    color: #ef4444;
+    border: 1px solid #fca5a5;
+}
+
 .badge-small {
     background: #1e3a8a;
     color: white;
@@ -442,6 +514,57 @@
     text-decoration: underline;
 }
 
+.btn-add-task-small {
+    margin-top: 0.75rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    text-decoration: none;
+    display: inline-flex;
+}
+
+.btn-action-small {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+}
+
+.text-success-small {
+    font-size: 0.75rem;
+    color: #10b981;
+    font-weight: 700;
+}
+
+/* Skeletons Helper Classes */
+.skel-short-mb {
+    margin-bottom: 1rem;
+}
+
+.skel-title-hero {
+    width: 350px;
+    height: 2.5rem;
+}
+
+.skel-stat-box {
+    width: 180px;
+    height: 80px;
+}
+
+.skel-kpi-card {
+    height: 160px;
+}
+
+.skel-avatar-sm {
+    width: 20px;
+    height: 20px;
+}
+
+.skel-flex-1 {
+    flex: 1;
+}
+
+.skel-schedule {
+    height: 70px;
+}
+
 /* Empty States */
 .empty-state {
     padding: 4rem 2rem;
@@ -459,79 +582,11 @@
     font-size: 0.9rem;
 }
 
-.empty-state-small {
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    color: #94a3b8;
-    gap: 0.5rem;
-}
-
-.empty-state-small p {
-    margin: 0;
-    font-weight: 500;
-    font-size: 0.85rem;
-}
-
-/* --- RESPONSIVE MOBILE ADJUSTMENTS --- */
-@media (max-width: 1024px) {
-    .dashboard-hero-modern {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1.5rem;
-        padding: 1rem;
-    }
-
-    .hero-visual-stats {
-        width: 100%;
-        gap: 0.75rem;
-    }
-
-    .modern-stat-box {
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .kpi-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .dashboard-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .dashboard-wrapper {
-        max-width: 100% !important;
-        padding: 0 1rem !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .dashboard-hero-modern {
-        padding: 1.25rem;
-    }
-
-    .hero-greeting {
-        font-size: 2rem;
-    }
-
-    .kpi-card-modern {
-        padding: 1.25rem;
-    }
-
-    .kpi-bottom h2 {
-        font-size: 1.6rem;
-    }
-}
-
 /* --- RESPONSIVE MOBILE ADJUSTMENTS --- */
 @media (max-width: 1024px) {
     .dashboard-wrapper {
         max-width: 100% !important;
-        /* Critical fix: 6rem bottom padding ensures the mobile nav bar doesn't cut off content */
-        padding: 1rem 0.5rem 6.5rem 0.5rem !important; 
+        padding: 1rem 0.5rem 6.5rem 0.5rem !important;
     }
 
     .dashboard-hero-modern {
@@ -544,7 +599,6 @@
     .hero-visual-stats {
         width: 100%;
         gap: 0.75rem;
-        flex-direction: column;
     }
 
     .modern-stat-box {
@@ -557,7 +611,7 @@
     }
 
     .dashboard-grid {
-        display: flex; /* Fixes grid crushing on tablets */
+        display: flex;
         flex-direction: column;
         gap: 1.5rem;
     }
@@ -579,7 +633,7 @@
     .kpi-bottom h2 {
         font-size: 1.6rem;
     }
-    
+
     .widget-feed {
         padding: 0.5rem 1rem 1rem 1rem;
     }
