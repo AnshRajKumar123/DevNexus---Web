@@ -324,9 +324,8 @@ export default function Profile() {
                                         <Key size={16} /> Change Password
                                     </button>
                                     
-                                    <p style={{ marginBottom: '0.75rem', borderTop: '1px solid #e2e8f0', paddingTop: '1rem' }}>Enable background notifications for Safari or Chrome.</p>
                                     <button className="btn-modern-primary hover-pop" onClick={requestNotificationPermission} style={{ width: '100%' }}>
-                                        <Bell size={16} /> Enable Desktop Notifications
+                                        <Bell size={16} /> Enable Notifications
                                     </button>
                                 </div>
                             ) : passFlow === 'otp' ? (
