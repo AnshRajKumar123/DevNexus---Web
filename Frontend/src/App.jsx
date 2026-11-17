@@ -14,6 +14,7 @@ import MyTodoList from './pages/MyTodoList';
 import ChatHub from './pages/ChatHub.jsx';
 import { useData } from './context/DataContext';
 import { DashPic } from './assets/assets';
+import Projects from './pages/Projects';
 import { Sparkles, Loader2, Home, AlertTriangle, CheckCircle2, X } from 'lucide-react';
 
 // --- GLOBAL CUSTOM DYNAMIC ISLAND API ---
@@ -234,6 +235,7 @@ export default function App() {
                     <Route path="/links" element={<QuickLinks />} />
                     <Route path="/apps" element={<ConnectedApps />} />
                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/projects" element={<Projects />} />
                     <Route path="/chat" element={<ChatHub />} />
                 </Route>
                 <Route path="*" element={<NotFound404 />} />

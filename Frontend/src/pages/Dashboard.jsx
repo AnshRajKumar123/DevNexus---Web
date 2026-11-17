@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { 
-    Inbox, CalendarX2, BarChart2, Users, AlertCircle, Video, TrendingUp, CheckCircle2, Clock, Activity, ListTodo, PlayCircle, Trash2, Plus 
+    Inbox, CalendarX2, BarChart2, Users, AlertCircle, Video, TrendingUp, CheckCircle2, Clock, Activity, ListTodo, PlayCircle, Trash2, Plus, Briefcase
 } from 'lucide-react';
 import { useData } from '../context/DataContext'; 
 import { Link } from 'react-router-dom';
 import '../styles/Dashboard.css';
 
 export default function Dashboard() {
-    const { inquiries, events, currentUser, team, todos = [], updateTodoStatus } = useData(); 
+    // Added projects = [] to pull from Context safely
+    const { inquiries, events, currentUser, team, todos = [], projects = [], updateTodoStatus } = useData(); 
     const [greeting, setGreeting] = useState('');
     const [motivation, setMotivation] = useState('');
-    
-    const [isLoading, setIsLoading] = useState(true); // NEW: Loading State
+    const [isLoading, setIsLoading] = useState(true); 
 
     useEffect(() => {
-        // Simulate data fetching delay for smooth skeleton transition
         const timer = setTimeout(() => setIsLoading(false), 800);
         
         const hour = new Date().getHours();
@@ -46,6 +45,10 @@ export default function Dashboard() {
     const userTodos = (todos || []).filter(t => t.userName === currentUser?.name);
     const priorityWeight = { 'High': 3, 'Medium': 2, 'Low': 1 };
     const sortedTodos = [...userTodos].sort((a, b) => (priorityWeight[b.priority] || 2) - (priorityWeight[a.priority] || 2));
+
+    // Calculate Project KPIs
+    const totalProjects = projects.length;
+    const ongoingProjects = projects.filter(p => p.status === 'In Progress').length;
 
     return (
         <div className="dashboard-wrapper page-animate">
@@ -97,12 +100,12 @@ export default function Dashboard() {
                     <>
                         <div className="kpi-card-modern">
                             <div className="kpi-top">
-                                <div className="kpi-icon-pill purple"><BarChart2 size={16} /> Revenue</div>
-                                <span className="trend positive"><TrendingUp size={14}/> +0%</span>
+                                <div className="kpi-icon-pill purple"><Briefcase size={16} /> Projects</div>
+                                <span className="trend positive">Active</span>
                             </div>
                             <div className="kpi-bottom">
-                                <h2>₹0</h2>
-                                <p>Total generated this week</p>
+                                <h2>{ongoingProjects} <span style={{fontSize: '1rem', color: '#94a3b8', fontWeight: 600}}>/ {totalProjects}</span></h2>
+                                <p>Ongoing / Total Projects</p>
                             </div>
                         </div>
                         <div className="kpi-card-modern">

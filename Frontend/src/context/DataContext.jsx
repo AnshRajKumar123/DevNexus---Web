@@ -27,7 +27,7 @@ export const DataProvider = ({ children }) => {
         return localStorage.getItem('devnexus_user_id') || null;
     });
     const [currentUser, setCurrentUser] = useState(null);
-    const [isServerOffline, setIsServerOffline] = useState(false); // NEW: Tracks server health
+    const [isServerOffline, setIsServerOffline] = useState(false);
 
     const [team, setTeam] = useState([]);
     const [inquiries, setInquiries] = useState([]);
@@ -36,6 +36,7 @@ export const DataProvider = ({ children }) => {
     const [websites, setWebsites] = useState([]);
     const [todos, setTodos] = useState([]);
     const [integrations, setIntegrations] = useState([]);
+    const [projects, setProjects] = useState([]); // Projects state initialized
 
     // Hydrate user details from server
     useEffect(() => {
@@ -52,7 +53,7 @@ export const DataProvider = ({ children }) => {
                         setCurrentUser(found);
                         setTeam(teamList);
                     } else {
-                        logout(); 
+                        logout();
                     }
                 })
                 .catch(err => {
@@ -76,6 +77,7 @@ export const DataProvider = ({ children }) => {
             fetchSafe('inquiries', setInquiries);
             fetchSafe('links', setLinks);
             fetchSafe('websites', setWebsites);
+            fetchSafe('projects', setProjects); // Fetch projects from MongoDB
             fetchSafe(`todos/${encodeURIComponent(currentUser.name)}`, setTodos);
             fetchSafe('integrations', setIntegrations);
         }
@@ -89,20 +91,20 @@ export const DataProvider = ({ children }) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
             });
-            
+
             if (!response.ok) {
                 const errorData = await response.json();
                 throw { status: response.status, message: errorData.message || 'Login failed', attempts: errorData.attempts };
             }
-            
+
             const userData = await response.json();
-            const user = userData.user || userData; 
-            
+            const user = userData.user || userData;
+
             setCurrentUser(user);
             setCurrentUserId(user._id);
-            localStorage.setItem('devnexus_user_id', user._id); 
+            localStorage.setItem('devnexus_user_id', user._id);
             setIsServerOffline(false);
-            
+
             return { success: true };
         } catch (error) {
             if (error instanceof TypeError) {
@@ -117,7 +119,7 @@ export const DataProvider = ({ children }) => {
         setCurrentUser(null);
         setCurrentUserId(null);
         localStorage.removeItem('devnexus_user_id');
-        localStorage.removeItem('devnexus_current_user'); 
+        localStorage.removeItem('devnexus_current_user');
     };
 
     const updateProfile = async (id, updatedData) => {
@@ -145,21 +147,21 @@ export const DataProvider = ({ children }) => {
         try {
             const res = await fetch(`${API_URL}/inquiries`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             if (res.ok) { const newInq = await res.json(); setInquiries([newInq, ...inquiries]); }
-        } catch (err) {}
+        } catch (err) { }
     };
-    
+
     const updateInquiryStatus = async (id, newStatus) => {
         try {
             const res = await fetch(`${API_URL}/inquiries/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: newStatus }) });
             if (res.ok) setInquiries(inquiries.map(inq => (inq._id || inq.id) === id ? { ...inq, status: newStatus } : inq));
-        } catch (err) {}
+        } catch (err) { }
     };
-    
+
     const removeInquiry = async (id) => {
         try {
             await fetch(`${API_URL}/inquiries/${id}`, { method: 'DELETE' });
             setInquiries(inquiries.filter(i => (i._id || i.id) !== id));
-        } catch (err) {}
+        } catch (err) { }
     };
 
     // --- Events / Calendar ---
@@ -167,13 +169,13 @@ export const DataProvider = ({ children }) => {
         try {
             const res = await fetch(`${API_URL}/events`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(event) });
             if (res.ok) { const newEv = await res.json(); setEvents([...events, newEv].sort((a, b) => a.time.localeCompare(b.time))); }
-        } catch (err) {}
+        } catch (err) { }
     };
     const removeEvent = async (id) => {
         try {
             await fetch(`${API_URL}/events/${id}`, { method: 'DELETE' });
             setEvents(events.filter(e => (e._id || e.id) !== id));
-        } catch (err) {}
+        } catch (err) { }
     };
 
     // --- Team ---
@@ -181,13 +183,13 @@ export const DataProvider = ({ children }) => {
         try {
             const res = await fetch(`${API_URL}/team`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(member) });
             if (res.ok) { const newMem = await res.json(); setTeam([...team, newMem]); }
-        } catch (err) {}
+        } catch (err) { }
     };
     const removeTeamMember = async (id) => {
         try {
             await fetch(`${API_URL}/team/${id}`, { method: 'DELETE' });
             setTeam(team.filter(t => t._id !== id));
-        } catch (err) {}
+        } catch (err) { }
     };
 
     // --- Quick Links ---
@@ -203,13 +205,13 @@ export const DataProvider = ({ children }) => {
                 const newLink = await res.json();
                 setLinks([...links, newLink]);
             }
-        } catch (err) {}
+        } catch (err) { }
     };
     const removeLink = async (id) => {
         try {
             await fetch(`${API_URL}/links/${id}`, { method: 'DELETE' });
             setLinks(links.filter(l => (l._id || l.id) !== id));
-        } catch (err) {}
+        } catch (err) { }
     };
 
     // --- Websites ---
@@ -217,19 +219,19 @@ export const DataProvider = ({ children }) => {
         try {
             const res = await fetch(`${API_URL}/websites`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(website) });
             if (res.ok) { const newWeb = await res.json(); setWebsites([...websites, newWeb]); }
-        } catch (err) {}
+        } catch (err) { }
     };
     const updateWebsite = async (id, data) => {
         try {
             const res = await fetch(`${API_URL}/websites/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
             if (res.ok) setWebsites(websites.map(w => (w._id || w.id) === id ? { ...data, _id: id } : w));
-        } catch (err) {}
+        } catch (err) { }
     };
     const removeWebsite = async (id) => {
         try {
             await fetch(`${API_URL}/websites/${id}`, { method: 'DELETE' });
             setWebsites(websites.filter(w => (w._id || w.id) !== id));
-        } catch (err) {}
+        } catch (err) { }
     };
 
     // --- Personal To-Do List ---
@@ -245,7 +247,7 @@ export const DataProvider = ({ children }) => {
                 const newTodo = await res.json();
                 setTodos([newTodo, ...todos]);
             }
-        } catch (err) {}
+        } catch (err) { }
     };
     const updateTodoStatus = async (id, status) => {
         try {
@@ -257,13 +259,13 @@ export const DataProvider = ({ children }) => {
             if (res.ok) {
                 setTodos(todos.map(t => (t._id === id || t.id === id) ? { ...t, status } : t));
             }
-        } catch (err) {}
+        } catch (err) { }
     };
     const removeTodo = async (id) => {
         try {
             await fetch(`${API_URL}/todos/${id}`, { method: 'DELETE' });
             setTodos(todos.filter(t => (t._id || t.id) !== id));
-        } catch (err) {}
+        } catch (err) { }
     };
 
     // --- Connected Apps / Integrations ---
@@ -296,9 +298,49 @@ export const DataProvider = ({ children }) => {
             if (res.ok) {
                 setIntegrations(prev => prev.filter(i => i.appName !== appName));
             }
-        } catch (err) {}
+        } catch (err) { }
     };
 
+    // --- Projects ---
+    const addProject = async (projectData) => {
+        try {
+            const res = await fetch(`${API_URL}/projects`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(projectData)
+            });
+            if (res.ok) {
+                const saved = await res.json();
+                setProjects([saved, ...projects]);
+                return true;
+            }
+        } catch (err) { return false; }
+    };
+
+    const updateProject = async (id, updates) => {
+        try {
+            const res = await fetch(`${API_URL}/projects/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updates)
+            });
+            if (res.ok) {
+                const updated = await res.json();
+                setProjects(projects.map(p => p._id === id ? updated : p));
+                return true;
+            }
+        } catch (err) { return false; }
+    };
+
+    const removeProject = async (id) => {
+        try {
+            await fetch(`${API_URL}/projects/${id}`, { method: 'DELETE' });
+            setProjects(projects.filter(p => p._id !== id));
+            return true;
+        } catch (err) { return false; }
+    };
+
+    // Pass everything explicitly down to the provider
     return (
         <DataContext.Provider value={{
             currentUser, login, logout, updateProfile,
@@ -309,7 +351,8 @@ export const DataProvider = ({ children }) => {
             links, addLink, removeLink,
             websites, addWebsite, updateWebsite, removeWebsite,
             todos, addTodo, updateTodoStatus, removeTodo,
-            integrations, connectIntegration, disconnectIntegration
+            integrations, connectIntegration, disconnectIntegration,
+            projects, addProject, updateProject, removeProject // Project bindings added here
         }}>
             {children}
         </DataContext.Provider>

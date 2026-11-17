@@ -3,7 +3,7 @@ import { NavLink, Link, useLocation } from 'react-router-dom';
 import {
     Sun, MessageCircle, Calendar,
     Globe, Users, MessageSquare, Link as LinkIcon, Plug,
-    CheckCircle2, Menu, X, LayoutDashboard
+    CheckCircle2, Menu, X, LayoutDashboard, Briefcase
 } from 'lucide-react';
 import { useData } from '../context/DataContext'; 
 import '../styles/Sidebar.css';
@@ -75,6 +75,7 @@ export default function Sidebar() {
         {
             label: 'Business',
             items: [
+                { title: 'Projects', icon: <Briefcase size={18} />, path: '/projects' },
                 { title: 'Live Website', icon: <Globe size={18} />, path: '/website' },
                 { title: 'Team', icon: <Users size={18} />, path: '/team' },
                 { title: 'Inquiry', icon: <MessageSquare size={18} />, path: '/inquiry' },
