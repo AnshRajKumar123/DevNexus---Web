@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Outlet } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Login from './pages/Login';
@@ -14,7 +14,77 @@ import MyTodoList from './pages/MyTodoList';
 import ChatHub from './pages/ChatHub.jsx';
 import { useData } from './context/DataContext';
 import { DashPic } from './assets/assets';
-import { Sparkles, Loader2, Home, AlertTriangle } from 'lucide-react';
+import { Sparkles, Loader2, Home, AlertTriangle, CheckCircle2, X } from 'lucide-react';
+
+// --- GLOBAL CUSTOM DYNAMIC ISLAND API ---
+window.island = {
+    show: (type, message, options = {}) => window.dispatchEvent(new CustomEvent('trigger-island', { detail: { type, message, ...options } })),
+    success: (msg, opts) => window.island.show('success', msg, opts),
+    error: (msg, opts) => window.island.show('error', msg, opts),
+    loading: (msg, opts) => window.island.show('loading', msg, opts),
+    promise: async (promise, msgs) => {
+        window.island.loading(msgs.loading);
+        try {
+            const res = await promise;
+            window.island.success(msgs.success);
+            return res;
+        } catch (err) {
+            window.island.error(msgs.error, msgs.errorOptions);
+            throw err;
+        }
+    }
+};
+
+const CustomDynamicIsland = () => {
+    const [toast, setToast] = useState({ visible: false, type: 'loading', message: '', options: {} });
+    const hideTimer = useRef(null);
+
+    useEffect(() => {
+        const handleTrigger = (e) => {
+            const { type, message, ...options } = e.detail;
+            setToast({ visible: true, type, message, options });
+
+            if (hideTimer.current) clearTimeout(hideTimer.current);
+
+            // Hide automatically UNLESS it's a loading state or explicitly marked permanent
+            if (type !== 'loading' && !options.permanent) {
+                hideTimer.current = setTimeout(() => {
+                    setToast(prev => ({ ...prev, visible: false }));
+                }, options.duration || 4000);
+            }
+        };
+
+        window.addEventListener('trigger-island', handleTrigger);
+        return () => window.removeEventListener('trigger-island', handleTrigger);
+    }, []);
+
+    const closeIsland = () => setToast(prev => ({ ...prev, visible: false }));
+
+    return (
+        <div className={`dynamic-island-wrapper ${toast.visible ? 'is-visible' : ''}`}>
+            <div className={`dynamic-island island-${toast.type}`}>
+                {toast.type === 'loading' && <Loader2 size={16} className="island-spinner" />}
+                {toast.type === 'success' && <CheckCircle2 size={16} color="#34d399" />}
+                {toast.type === 'error' && <AlertTriangle size={16} color="#f87171" />}
+                
+                <span className="island-text">{toast.message}</span>
+                
+                {toast.options.action && (
+                    <button className="island-action-btn" onClick={() => {
+                        toast.options.action.onClick();
+                        if (!toast.options.keepOpenOnAction) closeIsland();
+                    }}>
+                        {toast.options.action.label}
+                    </button>
+                )}
+                
+                {(toast.type !== 'loading' || toast.options.permanent) && (
+                    <button className="island-close-btn" onClick={closeIsland}><X size={14} /></button>
+                )}
+            </div>
+        </div>
+    );
+};
 
 const NotFound404 = () => (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', width: '100vw', textAlign: 'center', padding: '2rem', background: '#f8fafc' }}>
@@ -32,6 +102,7 @@ const NotFound404 = () => (
 
 const DashboardLayout = () => (
     <div className="dashboard-container" style={{ display: 'flex', minHeight: '100vh', background: '#f8fafc' }}>
+        <CustomDynamicIsland /> {/* Mounts inside layout, styled globally absolute */}
         <Sidebar />
         <div className="main-content-wrapper" style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
             <main className="main-content" style={{ flex: 1, padding: '0' }}>

@@ -389,3 +389,99 @@ body.dark-mode .website-empty-state {
 body.dark-mode .empty-icon-wrapper {
     background-color: #0f172a;
 }
+
+/* =========================================
+   CUSTOM DYNAMIC ISLAND TOAST
+   ========================================= */
+.dynamic-island-wrapper {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px) scale(0.9);
+    z-index: 2147483647;
+    /* Guarantees it sits above EVERYTHING */
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Apple-style spring bounce */
+    display: flex;
+    justify-content: center;
+}
+
+.dynamic-island-wrapper.is-visible {
+    transform: translateX(-50%) translateY(0) scale(1);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.dynamic-island {
+    background: #000000;
+    color: #ffffff;
+    padding: 0.6rem 1.25rem;
+    border-radius: 99px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    transition: background-color 0.4s ease, border-color 0.4s ease;
+}
+
+/* Morphing Types */
+.island-loading {
+    background: #000000;
+}
+
+.island-success {
+    background: #064e3b;
+    box-shadow: 0 15px 35px rgba(6, 78, 59, 0.3), 0 0 0 1px rgba(16, 185, 129, 0.4);
+}
+
+.island-error {
+    background: #7f1d1d;
+    box-shadow: 0 15px 35px rgba(127, 29, 29, 0.3), 0 0 0 1px rgba(239, 68, 68, 0.4);
+}
+
+.island-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+    letter-spacing: 0.2px;
+}
+
+.island-action-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    padding: 0.35rem 0.85rem;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-left: 0.5rem;
+}
+
+.island-action-btn:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+.island-close-btn {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.5);
+    border: none;
+    cursor: pointer;
+    padding: 0.2rem;
+    display: flex;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.island-close-btn:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.island-spinner {
+    animation: spin 1s linear infinite;
+}

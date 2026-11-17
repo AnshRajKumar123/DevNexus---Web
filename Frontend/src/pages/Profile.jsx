@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Mail, Phone, ShieldAlert, Key, Save, Edit3, X, CheckCircle2, Lock, Camera, Loader2, LogOut, Trash2, FileQuestion, CalendarDays, LinkIcon, Bell } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { requestFirebaseNotificationPermission } from '../firebase';
-import { dynaura } from 'dynaura'; 
 import '../styles/Profile.css';
 
 export default function Profile() {
@@ -26,14 +25,14 @@ export default function Profile() {
         const timer = setTimeout(() => {
             setIsLoading(false);
             
-            // Check Notification Permission on Load via Dynaura
+            // PERMANENT NOTIFICATION CHECK
             if (Notification.permission !== 'granted') {
-                dynaura.error('Notifications are off! Turn them on to stay tuned.', {
+                window.island.error('Notifications are off! Turn them on to stay tuned.', {
+                    permanent: true, // Custom flag: Prevents it from ever disappearing until closed
                     action: {
                         label: 'Enable',
                         onClick: requestNotificationPermission
-                    },
-                    duration: 7000
+                    }
                 });
             }
         }, 800);
@@ -77,10 +76,13 @@ export default function Profile() {
             }
         });
 
-        dynaura.promise(permissionOp, {
+        window.island.promise(permissionOp, {
             loading: 'Requesting permission...',
             success: 'Push Notifications enabled! ✅',
-            error: 'Failed to enable notifications. Check browser settings.'
+            error: 'Failed to enable notifications. Check browser settings.',
+            errorOptions: {
+                action: { label: 'Retry', onClick: requestNotificationPermission }
+            }
         });
     };
 
@@ -113,21 +115,23 @@ export default function Profile() {
             }
         });
 
-        dynaura.promise(uploadOp, {
+        window.island.promise(uploadOp, {
             loading: 'Uploading profile picture...',
             success: 'Profile picture updated! ✅',
-            error: 'Image upload failed.'
+            error: 'Image upload failed.',
+            errorOptions: {
+                action: { label: 'Retry', onClick: () => handleImageUpload(e) }
+            }
         });
     };
 
     const handleSaveProfile = (e) => {
         e.preventDefault();
         if (phone.length > 0 && phone.length < 10) {
-            dynaura.error('Please enter a valid 10-digit phone number.');
+            window.island.error('Please enter a valid 10-digit phone number.');
             return;
         }
         
-        // Strict Promise wrapper so Dynaura accurately catches success/fail
         const saveOperation = new Promise(async (resolve, reject) => {
             const success = await updateProfile(currentUserId, { name, phone });
             if (success) {
@@ -138,7 +142,7 @@ export default function Profile() {
             }
         });
         
-        dynaura.promise(saveOperation, {
+        window.island.promise(saveOperation, {
             loading: 'Saving profile changes...',
             success: 'Profile changes saved successfully! ✅',
             error: 'Failed to update profile.'
@@ -150,16 +154,16 @@ export default function Profile() {
         e.preventDefault();
         if (otp.length >= 4) {
             setPassFlow('new-password');
-            dynaura.success('Email verified successfully!');
+            window.island.success('Email verified successfully!');
         } else {
-            dynaura.error('Invalid OTP code entered.');
+            window.island.error('Invalid OTP code entered.');
         }
     };
     
     const handleSavePassword = (e) => {
         e.preventDefault();
         setPassFlow('success');
-        dynaura.success('Password updated successfully!');
+        window.island.success('Password updated successfully!');
         setTimeout(() => setPassFlow('idle'), 3000);
     };
 
