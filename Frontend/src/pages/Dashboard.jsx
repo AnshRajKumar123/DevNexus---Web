@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import {
+import { 
     CalendarX2, Users, AlertCircle, Video, CheckCircle2, Clock, Activity, ListTodo, Trash2, Plus, Briefcase, Lightbulb, RefreshCw
 } from 'lucide-react';
-import { useData } from '../context/DataContext';
+import { useData } from '../context/DataContext'; 
 import { Link } from 'react-router-dom';
 import '../styles/Dashboard.css';
 
 export default function Dashboard() {
-    const { inquiries, events, currentUser, team, todos = [], projects = [], updateTodoStatus, updateProject, removeProject } = useData();
+    const { inquiries, events, currentUser, team, todos = [], projects = [], updateTodoStatus, updateProject, removeProject } = useData(); 
     const [greeting, setGreeting] = useState('');
     const [motivation, setMotivation] = useState('');
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true); 
 
     useEffect(() => {
         const timer = setTimeout(() => setIsLoading(false), 800);
-
+        
         const hour = new Date().getHours();
         if (hour >= 0 && hour < 5) {
             setGreeting('Midnight Grind');
@@ -47,7 +47,7 @@ export default function Dashboard() {
 
     const totalProjects = projects.length;
     const ongoingProjects = projects.filter(p => p.status === 'In Progress').length;
-
+    
     const pendingIdeas = projects.filter(p => {
         if (p.status === 'Pending Approval') return true;
         if (p.status === 'Rejected' && (p.createdBy === currentUser?.name || currentUser?.isSupremeAdmin)) return true;
@@ -112,11 +112,12 @@ export default function Dashboard() {
             </header>
 
             <section className="kpi-grid stagger-2">
-                {isLoading ? Array.from({ length: 3 }).map((_, i) => <div key={i} className="kpi-card-modern skeleton skeleton-card skel-kpi-card"></div>) : (
+                {isLoading ? Array.from({length: 3}).map((_,i) => <div key={i} className="kpi-card-modern skeleton skeleton-card skel-kpi-card"></div>) : (
                     <>
                         <div className="kpi-card-modern">
                             <div className="kpi-top">
-                                <div className="kpi-icon-pill purple"><Briefcase size={16} /> Projects</div>
+                                {/* CHANGED: Replaced Purple with Dark Blue */}
+                                <div className="kpi-icon-pill dark-blue"><Briefcase size={16} /> Projects</div>
                                 <span className="trend positive">Active</span>
                             </div>
                             <div className="kpi-bottom">
@@ -157,7 +158,7 @@ export default function Dashboard() {
                         </div>
                         {isLoading ? (
                             <div className="widget-feed">
-                                {Array.from({ length: 3 }).map((_, i) => (
+                                {Array.from({length: 3}).map((_,i) => (
                                     <div key={i} className="feed-item feed-item-gap">
                                         <div className="skeleton skeleton-avatar skel-avatar-sm"></div>
                                         <div className="skel-flex-1"><div className="skeleton skeleton-text medium"></div><div className="skeleton skeleton-text short"></div></div>
@@ -208,7 +209,7 @@ export default function Dashboard() {
                         </div>
                         {isLoading ? (
                             <div className="widget-feed">
-                                {Array.from({ length: 2 }).map((_, i) => (
+                                {Array.from({length: 2}).map((_,i) => (
                                     <div key={i} className="feed-item"><div className="skel-flex-1"><div className="skeleton skeleton-text medium"></div><div className="skeleton skeleton-text short"></div></div></div>
                                 ))}
                             </div>
@@ -239,7 +240,7 @@ export default function Dashboard() {
                         </div>
                         {isLoading ? (
                             <div className="schedule-feed">
-                                {Array.from({ length: 2 }).map((_, i) => <div key={i} className="skeleton skeleton-card skel-schedule"></div>)}
+                                {Array.from({length: 2}).map((_,i) => <div key={i} className="skeleton skeleton-card skel-schedule"></div>)}
                             </div>
                         ) : pendingIdeas.length > 0 ? (
                             <div className="widget-feed">
@@ -247,7 +248,7 @@ export default function Dashboard() {
                                     const isRejected = idea.status === 'Rejected';
                                     const idToUse = idea._id || idea.id;
                                     const isCreator = idea.createdBy === currentUser?.name;
-
+                                    
                                     return (
                                         <div key={idToUse} className="feed-item feed-idea-item fade-in-row">
                                             <div className="feed-content idea-content">
@@ -256,22 +257,22 @@ export default function Dashboard() {
                                                     <span className="meta-creator">By: <strong>{idea.createdBy}</strong></span>
                                                 </div>
                                             </div>
-
+                                            
                                             <div className="idea-actions-col">
                                                 <span className={`badge badge-${isRejected ? 'rejected' : 'pending'}`}>
                                                     {isRejected ? 'Rejected' : 'Review'}
                                                 </span>
-
+                                                
                                                 {isRejected && isCreator && (
                                                     <div className="idea-repitch-row">
-                                                        <button
-                                                            className="btn-modern-primary hover-pop btn-action-small"
+                                                        <button 
+                                                            className="btn-modern-primary hover-pop btn-action-small" 
                                                             onClick={() => handleRepitch(idToUse)}
                                                         >
-                                                            <RefreshCw size={12} className="mr-1" /> Repitch
+                                                            <RefreshCw size={12} className="mr-1"/> Repitch
                                                         </button>
-                                                        <button
-                                                            className="btn-modern-danger hover-pop btn-action-small"
+                                                        <button 
+                                                            className="btn-modern-danger hover-pop btn-action-small" 
                                                             onClick={() => handleDeleteIdea(idToUse)}
                                                         >
                                                             <Trash2 size={12} />
@@ -295,7 +296,7 @@ export default function Dashboard() {
                         </div>
                         {isLoading ? (
                             <div className="schedule-feed">
-                                {Array.from({ length: 3 }).map((_, i) => <div key={i} className="skeleton skeleton-card skel-schedule"></div>)}
+                                {Array.from({length: 3}).map((_,i) => <div key={i} className="skeleton skeleton-card skel-schedule"></div>)}
                             </div>
                         ) : events.length > 0 ? (
                             <div className="schedule-feed">
@@ -305,7 +306,7 @@ export default function Dashboard() {
                                         <div className="schedule-details">
                                             <h4>{ev.title}</h4>
                                             <div className="schedule-meta">
-                                                <span className="meta-type"><Video size={12} /> {ev.type}</span>
+                                                <span className="meta-type"><Video size={12}/> {ev.type}</span>
                                                 <span className="meta-creator">• By: <strong>{ev.createdBy || 'Admin'}</strong></span>
                                             </div>
                                         </div>
