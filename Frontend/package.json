@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "dynaura": "^0.2.1",
     "firebase": "^13.3.0",
     "lucide-react": "^1.70.0",
     "react": "^19.3.1",

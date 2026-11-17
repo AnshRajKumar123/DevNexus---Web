@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, Phone, ShieldAlert, Key, Save, Edit3, X, CheckCircle2, Lock, Camera, Loader2, LogOut, Trash2, FileQuestion, CalendarDays, LinkIcon, Bell } from 'lucide-react';
 import { useData } from '../context/DataContext';
-import { requestFirebaseNotificationPermission } from '../firebase'; // Import Firebase function
+import { requestFirebaseNotificationPermission } from '../firebase';
+import { dynaura } from 'dynaura'; 
 import '../styles/Profile.css';
 
 export default function Profile() {
@@ -22,7 +23,20 @@ export default function Profile() {
     const [newPassword, setNewPassword] = useState('');
 
     useEffect(() => {
-        const timer = setTimeout(() => setIsLoading(false), 800);
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+            
+            // Check Notification Permission on Load via Dynaura
+            if (Notification.permission !== 'granted') {
+                dynaura.error('Notifications are off! Turn them on to stay tuned.', {
+                    action: {
+                        label: 'Enable',
+                        onClick: requestNotificationPermission
+                    },
+                    duration: 7000
+                });
+            }
+        }, 800);
         return () => clearTimeout(timer);
     }, []);
 
@@ -33,33 +47,44 @@ export default function Profile() {
     const myEvents = events.filter(e => e.createdBy === currentUser.name);
     const myLinks = links.filter(l => l.createdBy === currentUser.name);
 
-    // --- FIREBASE NOTIFICATION REGISTRATION ---
-    const requestNotificationPermission = async () => {
-        // PASTE THE KEY YOU GENERATED IN FIREBASE HERE
-        const FIREBASE_VAPID_KEY = "BCHWdUVgm-hBj_n9hh1YE7ygE0V9qHr_TiZbHMtM_zlM8xt0OsFkWWTQNY_gXGFqRHB6l8V7mSx_fvbEiqFIqPI"; 
-        
-        const token = await requestFirebaseNotificationPermission(FIREBASE_VAPID_KEY);
-        
-        if (token) {
-            console.log("Success! Firebase Token:", token);
-            try {
-                // Send the new Firebase token securely to your backend
-                await fetch(`${import.meta.env.VITE_API_URL || ''}/api/team/${currentUser.email}/subscribe`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fcmToken: token }) // Changed from subscription to fcmToken
-                });
-                alert('Success! Firebase Push Notifications are now enabled for this device.');
-            } catch (err) {
-                console.error("Failed to save token to database:", err);
-                alert("Token generated, but failed to save to server.");
-            }
-        } else {
-            alert('Failed to enable notifications. Please check browser permissions.');
+    // --- Phone Number Sanitizer (Only numbers, max 10 digits) ---
+    const handlePhoneChange = (e) => {
+        const raw = e.target.value.replace(/\D/g, ''); 
+        if (raw.length <= 10) {
+            setPhone(raw);
         }
     };
 
-    const handleImageUpload = async (e) => {
+    // --- FIREBASE NOTIFICATION REGISTRATION ---
+    const requestNotificationPermission = async () => {
+        const FIREBASE_VAPID_KEY = "BCHWdUVgm-hBj_n9hh1YE7ygE0V9qHr_TiZbHMtM_zlM8xt0OsFkWWTQNY_gXGFqRHB6l8V7mSx_fvbEiqFIqPI"; 
+        
+        const permissionOp = new Promise(async (resolve, reject) => {
+            try {
+                const token = await requestFirebaseNotificationPermission(FIREBASE_VAPID_KEY);
+                if (token) {
+                    await fetch(`${import.meta.env.VITE_API_URL || ''}/api/team/${currentUser.email}/subscribe`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ fcmToken: token })
+                    });
+                    resolve('Success');
+                } else {
+                    reject(new Error('Permission denied'));
+                }
+            } catch (err) {
+                reject(err);
+            }
+        });
+
+        dynaura.promise(permissionOp, {
+            loading: 'Requesting permission...',
+            success: 'Push Notifications enabled! ✅',
+            error: 'Failed to enable notifications. Check browser settings.'
+        });
+    };
+
+    const handleImageUpload = (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
@@ -68,42 +93,73 @@ export default function Profile() {
         formData.append('userId', currentUserId);
         formData.append('isProfile', 'true');
 
-        try {
-            setIsUploading(true);
-            const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/upload`, {
-                method: 'POST',
-                body: formData,
-            });
-            if (!response.ok) throw new Error('Image upload failed');
-            const data = await response.json();
+        const uploadOp = new Promise(async (resolve, reject) => {
+            try {
+                setIsUploading(true);
+                const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/upload`, {
+                    method: 'POST',
+                    body: formData,
+                });
+                if (!response.ok) throw new Error('Upload failed');
+                
+                const data = await response.json();
+                const finalUrl = data.imageUrl.startsWith('http') ? data.imageUrl : `${import.meta.env.VITE_API_URL || ''}${data.imageUrl}`;
+                await updateProfile(currentUserId, { imgUrl: finalUrl });
+                resolve('Success');
+            } catch (error) {
+                reject(error);
+            } finally {
+                setIsUploading(false);
+            }
+        });
 
-            const finalUrl = data.imageUrl.startsWith('http') ? data.imageUrl : `${import.meta.env.VITE_API_URL || ''}${data.imageUrl}`;
-            await updateProfile(currentUserId, { imgUrl: finalUrl });
-
-        } catch (error) {
-            console.error('Upload Error:', error);
-            alert('Failed to upload image. Ensure the backend server is running.');
-        } finally {
-            setIsUploading(false);
-        }
+        dynaura.promise(uploadOp, {
+            loading: 'Uploading profile picture...',
+            success: 'Profile picture updated! ✅',
+            error: 'Image upload failed.'
+        });
     };
 
-    const handleSaveProfile = async (e) => {
+    const handleSaveProfile = (e) => {
         e.preventDefault();
-        const success = await updateProfile(currentUserId, { name, phone });
-        if (success) setIsEditing(false);
-        else alert('Failed to update profile.');
+        if (phone.length > 0 && phone.length < 10) {
+            dynaura.error('Please enter a valid 10-digit phone number.');
+            return;
+        }
+        
+        // Strict Promise wrapper so Dynaura accurately catches success/fail
+        const saveOperation = new Promise(async (resolve, reject) => {
+            const success = await updateProfile(currentUserId, { name, phone });
+            if (success) {
+                setIsEditing(false);
+                resolve('Saved');
+            } else {
+                reject(new Error('Update failed'));
+            }
+        });
+        
+        dynaura.promise(saveOperation, {
+            loading: 'Saving profile changes...',
+            success: 'Profile changes saved successfully! ✅',
+            error: 'Failed to update profile.'
+        });
     };
 
     const handleSendOTP = () => setPassFlow('otp');
     const handleVerifyOTP = (e) => {
         e.preventDefault();
-        if (otp.length >= 4) setPassFlow('new-password');
-        else alert("Invalid OTP");
+        if (otp.length >= 4) {
+            setPassFlow('new-password');
+            dynaura.success('Email verified successfully!');
+        } else {
+            dynaura.error('Invalid OTP code entered.');
+        }
     };
+    
     const handleSavePassword = (e) => {
         e.preventDefault();
         setPassFlow('success');
+        dynaura.success('Password updated successfully!');
         setTimeout(() => setPassFlow('idle'), 3000);
     };
 
@@ -112,14 +168,11 @@ export default function Profile() {
             return `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name)}&background=${currentUser.isSupremeAdmin ? '0f172a' : 'e5e7eb'}&color=${currentUser.isSupremeAdmin ? 'fff' : '374151'}&size=150`;
         }
         if (currentUser.imgUrl.startsWith('http')) return currentUser.imgUrl;
-
-        const cleanPath = currentUser.imgUrl.startsWith('/') ? currentUser.imgUrl : `/${currentUser.imgUrl}`;
-        return cleanPath;
+        return currentUser.imgUrl.startsWith('/') ? currentUser.imgUrl : `/${currentUser.imgUrl}`;
     };
 
     return (
         <div className="dashboard-wrapper page-animate">
-
             <header className="profile-hero-modern stagger-1">
                 <div className="profile-hero-content">
                     <div className="profile-avatar-container">
@@ -164,7 +217,7 @@ export default function Profile() {
                                 <span className="hero-role-badge">{currentUser.role}</span>
                                 <div className="profile-hero-contacts">
                                     <span><Mail size={14} /> {currentUser.email}</span>
-                                    {currentUser.phone && <span><Phone size={14} /> {currentUser.phone}</span>}
+                                    {currentUser.phone && <span><Phone size={14} /> +91 {currentUser.phone}</span>}
                                 </div>
                             </>
                         )}
@@ -225,8 +278,19 @@ export default function Profile() {
                                             <input type="email" value={currentUser.email} disabled className="modern-input locked-input" />
                                         </div>
                                         <div className="form-group flex-1">
-                                            <label>Phone Number</label>
-                                            <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} disabled={!isEditing} className="modern-input" />
+                                            <label>Phone Number (10 digits)</label>
+                                            <div className="phone-input-group">
+                                                <span className="country-code-pill">+91</span>
+                                                <input 
+                                                    type="tel" 
+                                                    value={phone} 
+                                                    onChange={handlePhoneChange} 
+                                                    placeholder="9876543210"
+                                                    maxLength="10"
+                                                    disabled={!isEditing} 
+                                                    className="modern-input phone-field" 
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                     {isEditing && (
