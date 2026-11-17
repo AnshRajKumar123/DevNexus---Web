@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Send, Lock, Users, Sparkles, MessageSquareCode, ArrowLeft, Plus, Video, Image, FileText, File, BarChart2, X, Check, CheckCircle2, Circle, Ban, Pin, Maximize, Minimize, CheckCheck, ChevronLeft, ChevronRight, CornerUpLeft, Download, UploadCloud, ChevronDown } from 'lucide-react';
+import { Send, Lock, Users, Sparkles, MessageSquareCode, ArrowLeft, Plus, Video, Image, FileText, File, BarChart2, X, Check, CheckCircle2, Circle, Ban, Pin, Maximize, Minimize, CheckCheck, ChevronLeft, ChevronRight, CornerUpLeft, Download, UploadCloud, Loader2 } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import '../styles/ChatHub.css';
 
@@ -98,6 +98,8 @@ export default function ChatHub() {
 
     const [attachments, setAttachments] = useState([]);
     const [isUploading, setIsUploading] = useState(false);
+    const [uploadTimeLeft, setUploadTimeLeft] = useState(0);
+    const uploadTimerRef = useRef(null);
     const [replyingTo, setReplyingTo] = useState(null);
 
     const [swipeOffsets, setSwipeOffsets] = useState({});
@@ -169,7 +171,6 @@ export default function ChatHub() {
         setMobileChatOpen(true);
     };
 
-    // --- Universal Attachment Processing (Drag, Paste, Click) ---
     const addFilesToAttachments = (newFiles) => {
         if (!newFiles || newFiles.length === 0) return;
         const currentCount = attachments.length;
@@ -266,7 +267,6 @@ export default function ChatHub() {
         return uploadedUrls;
     };
 
-    // --- @Mention Logic ---
     const handleTextChange = (e) => {
         const text = e.target.value;
         setMessageText(text);
@@ -310,6 +310,15 @@ export default function ChatHub() {
         if (!finalMessageText && attachments.length === 0) return;
 
         setIsUploading(true);
+        // Estimate send time based on attachments size or count (approx 1s per attachment or 2s baseline)
+        const estimatedSeconds = Math.max(1, attachments.length * 1.5 + (finalMessageText.length > 50 ? 1 : 0));
+        setUploadTimeLeft(Math.ceil(estimatedSeconds));
+
+        if (uploadTimerRef.current) clearInterval(uploadTimerRef.current);
+        uploadTimerRef.current = setInterval(() => {
+            setUploadTimeLeft(prev => (prev > 1 ? prev - 1 : 1));
+        }, 1000);
+
         let fileUrls = [];
         if (attachments.length > 0 && !customMessage) {
             fileUrls = await uploadFiles();
@@ -350,10 +359,13 @@ export default function ChatHub() {
                 setShowMentionList(false);
                 fetchChats();
             }
-        } catch (err) { } finally { setIsUploading(false); }
+        } catch (err) { } finally {
+            if (uploadTimerRef.current) clearInterval(uploadTimerRef.current);
+            setIsUploading(false);
+            setUploadTimeLeft(0);
+        }
     };
 
-    // --- Poll Functions ---
     const handleAddPollOption = () => setPollOptions([...pollOptions, '']);
     const handlePollOptionChange = (index, value) => {
         const updated = [...pollOptions];
@@ -381,7 +393,6 @@ export default function ChatHub() {
         });
     };
 
-    // --- Context Menus ---
     const handleRightClick = (e, chat) => {
         if (chat.message === '[DELETED]') return;
         e.preventDefault();
@@ -483,7 +494,6 @@ export default function ChatHub() {
         swipeTargetId.current = null;
     };
 
-    // --- Message Bubble Rendering ---
     const renderMessageContent = (chat) => {
         if (!chat.message) return null;
         let text = chat.message;
@@ -708,7 +718,7 @@ export default function ChatHub() {
                         </div>
                     </div>
 
-                    {/* --- Main Chat Pane (Handles Drag & Drop) --- */}
+                    {/* --- Main Chat Pane --- */}
                     <div
                         className="chat-hub-main-pane"
                         style={{ position: 'relative' }}
@@ -817,17 +827,6 @@ export default function ChatHub() {
                                                 {!isMe && !isPoll && selectedRecipient === 'all' && <span className="chat-hub-sender-label">{chat.senderName}</span>}
                                                 <div className={`chat-hub-bubble ${isPoll ? 'poll-bubble-whatsapp' : (isMe ? 'bubble-mine' : 'bubble-theirs')}`}>
 
-                                                    {/* NEW: Dropdown for Mobile Users x(Tap to open context menu) */}
-                                                    <button className="bubble-action-btn" onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        let x = e.pageX; let y = e.pageY;
-                                                        if (window.innerWidth - x < 180) x -= 180;
-                                                        if (window.innerHeight - y < 350) y -= 350;
-                                                        setContextMenu({ visible: true, x, y, chat });
-                                                    }}>
-                                                        <ChevronDown size={16} />
-                                                    </button>
-
                                                     <div>{renderMessageContent(chat)}</div>
 
                                                     <div className="chat-hub-bubble-footer">
@@ -855,7 +854,7 @@ export default function ChatHub() {
                             <div ref={messagesEndRef} />
                         </div>
 
-                        {/* --- Input Form (Includes Paste Logic & Mentions) --- */}
+                        {/* --- Input Form (Includes Send Timer & Loading Spinner) --- */}
                         <form onSubmit={(e) => handleSendMessage(e)} className="chat-hub-input-form" style={{ position: 'relative' }}>
 
                             {/* @ Mention Dropdown Overlay */}
@@ -918,7 +917,7 @@ export default function ChatHub() {
                                 <input
                                     ref={inputRef}
                                     type="text"
-                                    placeholder="Type your message here"
+                                    placeholder={isUploading ? `Sending message... (~${uploadTimeLeft}s left)` : "Type your message here"}
                                     value={messageText}
                                     onChange={handleTextChange}
                                     onPaste={handlePaste}
@@ -928,8 +927,8 @@ export default function ChatHub() {
                                 />
                             </div>
 
-                            <button type="submit" className="chat-hub-send-btn" disabled={(!messageText.trim() && attachments.length === 0) || isUploading}>
-                                {isUploading ? <Sparkles size={18} className="pulse-anim" /> : <Send size={18} style={{ transform: 'translateX(-1px) translateY(1px)' }} />}
+                            <button type="submit" className="chat-hub-send-btn" disabled={(!messageText.trim() && attachments.length === 0) || isUploading} title={isUploading ? `Sending... ~${uploadTimeLeft}s remaining` : 'Send message'}>
+                                {isUploading ? <Loader2 size={18} className="pulse-anim animate-spin" color="#ffffff" /> : <Send size={18} style={{ transform: 'translateX(-1px) translateY(1px)' }} />}
                             </button>
                         </form>
                     </div>
@@ -994,7 +993,6 @@ export default function ChatHub() {
                 document.body
             )}
 
-            {/* --- RESTORED MODALS AND MENUS --- */}
             {contextMenu.visible && (
                 <div className="custom-context-menu pop-in" style={{ top: contextMenu.y, left: contextMenu.x }} onClick={(e) => e.stopPropagation()}>
                     <div className="context-menu-reactions">
