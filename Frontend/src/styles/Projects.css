@@ -127,12 +127,13 @@
     border-radius: 50%;
 }
 
+/* CHANGED: Replaced Purple with Dark Blue */
 .planning .status-dot {
-    background: #8b5cf6;
+    background: #1e3a8a;
 }
 
 .planning {
-    color: #8b5cf6;
+    color: #1e3a8a;
 }
 
 .in-progress .status-dot {
@@ -187,10 +188,6 @@
 
 .align-start {
     align-self: flex-start;
-}
-
-.btn-pitch-idea {
-    background: #8b5cf6 !important;
 }
 
 .grid-span-2 {

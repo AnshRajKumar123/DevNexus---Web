@@ -122,7 +122,8 @@ export default function Projects() {
     const renderCategoryIcon = (cat) => {
         if (cat.includes('Web')) return <Layout size={18} color="#3b82f6" />;
         if (cat.includes('App') || cat.includes('Mobile')) return <Terminal size={18} color="#10b981" />;
-        if (cat.includes('AI') || cat.includes('Machine')) return <Rocket size={18} color="#8b5cf6" />;
+        // CHANGED: Removed Purple, now Dark Blue
+        if (cat.includes('AI') || cat.includes('Machine')) return <Rocket size={18} color="#1e3a8a" />; 
         return <Code2 size={18} color="#f59e0b" />;
     };
 
@@ -148,7 +149,7 @@ export default function Projects() {
                         <Briefcase size={18} /> Add Project
                     </button>
                 ) : (
-                    <button className="btn-modern-primary btn-pitch-idea hover-pop" onClick={handleOpenAdd}>
+                    <button className="btn-modern-primary hover-pop" onClick={handleOpenAdd}>
                         <Lightbulb size={18} /> Pitch Idea
                     </button>
                 )}
@@ -192,7 +193,10 @@ export default function Projects() {
                                     const statusClass = proj.status.replace(/\s+/g, '-').toLowerCase();
 
                                     return (
-                                        <div key={idToUse} className="project-card-modern fade-in-row" onClick={() => setViewingProject(proj)}>
+                                        <div key={idToUse} className="project-card-modern fade-in-row" onClick={() => {
+                                            setViewingProject(proj);
+                                            window.island.success(`Project ${proj.name} selected ✅`); // NEW SUCCESS POPUP
+                                        }}>
                                             <div className="proj-card-header">
                                                 <div className="proj-cat-badge">
                                                     {renderCategoryIcon(proj.category)}
