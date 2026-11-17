@@ -20,15 +20,15 @@
 }
 
 .brand-logo {
-    height: 36px;
-    width: 36px;
+    height: 45px;
+    width: 45px;
     border-radius: 8px;
     margin-right: 0.75rem;
     object-fit: contain;
 }
 
 .brand-text {
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 700;
     color: #111827;
     font-family: var(--Font3);
