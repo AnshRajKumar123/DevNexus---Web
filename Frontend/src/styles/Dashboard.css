@@ -600,7 +600,6 @@
     .hero-visual-stats {
         width: 100%;
         gap: 0.75rem;
-        flex-direction: column;
     }
 
     .modern-stat-box {
