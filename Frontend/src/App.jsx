@@ -12,9 +12,10 @@ import LiveWebsite from './pages/LiveWebsite';
 import Profile from './pages/Profile';
 import MyTodoList from './pages/MyTodoList';
 import ChatHub from './pages/ChatHub.jsx';
+import Projects from './pages/Projects';
+import ScrollToTop from './components/ScrollToTop'; // <-- Imported ScrollToTop
 import { useData } from './context/DataContext';
 import { DashPic } from './assets/assets';
-import Projects from './pages/Projects';
 import { Sparkles, Loader2, Home, AlertTriangle, CheckCircle2, X } from 'lucide-react';
 
 // --- GLOBAL CUSTOM DYNAMIC ISLAND API ---
@@ -67,9 +68,9 @@ const CustomDynamicIsland = () => {
                 {toast.type === 'loading' && <Loader2 size={16} className="island-spinner" />}
                 {toast.type === 'success' && <CheckCircle2 size={16} color="#34d399" />}
                 {toast.type === 'error' && <AlertTriangle size={16} color="#f87171" />}
-                
+
                 <span className="island-text">{toast.message}</span>
-                
+
                 {toast.options.action && (
                     <button className="island-action-btn" onClick={() => {
                         toast.options.action.onClick();
@@ -78,7 +79,7 @@ const CustomDynamicIsland = () => {
                         {toast.options.action.label}
                     </button>
                 )}
-                
+
                 {(toast.type !== 'loading' || toast.options.permanent) && (
                     <button className="island-close-btn" onClick={closeIsland}><X size={14} /></button>
                 )}
@@ -224,6 +225,7 @@ export default function App() {
 
     return (
         <Router>
+            <ScrollToTop /> {/* <-- Mounted Globally */}
             <Routes>
                 <Route element={<DashboardLayout />}>
                     <Route path="/" element={<Dashboard />} />
