@@ -221,22 +221,22 @@ export default function Projects() {
                                 ) : pendingIdeas.map(idea => {
                                     const idToUse = idea._id || idea.id;
                                     return (
-                                        <div key={idToUse} className="feed-item fade-in-row" style={{ justifyContent: 'space-between' }}>
-                                            <div style={{ flex: 1 }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                                        <div key={idToUse} className="feed-item idea-board-item fade-in-row">
+                                            <div className="idea-content-area">
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem', flexWrap: 'wrap' }}>
                                                     <span className="badge badge-pending">Review Pending</span>
-                                                    <h4 className="feed-title">{idea.name}</h4>
+                                                    <h4 className="feed-title" style={{ margin: 0 }}>{idea.name}</h4>
                                                 </div>
-                                                <p className="feed-meta" style={{ marginBottom: '0.25rem' }}>{idea.desc}</p>
+                                                <p className="feed-meta" style={{ marginBottom: '0.5rem' }}>{idea.desc}</p>
                                                 <span className="meta-tag">Pitched by: <strong>{idea.createdBy}</strong> • {idea.category}</span>
                                             </div>
                                             
                                             {isMainAdmin && (
-                                                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                                    <button className="btn-modern-primary hover-pop" onClick={() => handleApprove(idToUse)} style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem' }}>
+                                                <div className="idea-action-btns">
+                                                    <button className="btn-modern-primary hover-pop" onClick={() => handleApprove(idToUse)}>
                                                         <CheckCircle2 size={14}/> Approve
                                                     </button>
-                                                    <button className="btn-modern-danger hover-pop" onClick={() => handleDelete(idToUse)} style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem' }}>
+                                                    <button className="btn-modern-danger hover-pop" onClick={() => handleDelete(idToUse)}>
                                                         Reject
                                                     </button>
                                                 </div>

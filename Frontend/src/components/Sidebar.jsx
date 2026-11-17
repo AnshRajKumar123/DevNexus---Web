@@ -90,18 +90,19 @@ export default function Sidebar() {
         }
     ];
 
+    // Determine avatar source early so we can use it in the mobile bottom nav
+    const avatarSrc = currentUser?.imgUrl 
+        ? (currentUser.imgUrl.startsWith('http') ? currentUser.imgUrl : `${import.meta.env.VITE_API_URL}${currentUser.imgUrl}`)
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser?.name || 'User')}&background=${currentUser?.isSupremeAdmin ? '0f172a' : 'e5e7eb'}&color=${currentUser?.isSupremeAdmin ? 'fff' : '374151'}&bold=true`;
+
     // Bottom 5 Nav buttons for Mobile View
     const mobileBottomNav = [
         { title: 'Today', icon: <Sun size={20} />, path: '/' },
         { title: 'ChatBox', icon: <MessageCircle size={20} />, path: '/chat', badge: unreadCount > 0 ? unreadCount : null },
-        { title: 'Calendar', icon: <Calendar size={20} />, path: '/calendar' },
+        { title: 'Projects', icon: <Briefcase size={20} />, path: '/projects' },
         { title: 'To-Do', icon: <CheckCircle2 size={20} />, path: '/todo' },
-        { title: 'Team', icon: <Users size={20} />, path: '/team' }
+        { title: 'Profile', icon: <img src={avatarSrc} alt="Profile" style={{ width: '22px', height: '22px', borderRadius: '50%', objectFit: 'cover' }} />, path: '/profile' }
     ];
-
-    const avatarSrc = currentUser?.imgUrl 
-        ? (currentUser.imgUrl.startsWith('http') ? currentUser.imgUrl : `${import.meta.env.VITE_API_URL}${currentUser.imgUrl}`)
-        : `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser?.name || 'User')}&background=${currentUser?.isSupremeAdmin ? '0f172a' : 'e5e7eb'}&color=${currentUser?.isSupremeAdmin ? 'fff' : '374151'}&bold=true`;
 
     return (
         <>
