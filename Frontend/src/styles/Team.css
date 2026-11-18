@@ -70,7 +70,7 @@
 .admin-star {
     position: absolute;
     bottom: -2px;
-    right: 20px;
+    left: -2px;
     background: #f59e0b;
     border: 2px solid white;
     border-radius: 50%;
@@ -79,6 +79,40 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.status-indicator {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid white;
+    z-index: 5;
+}
+
+.status-indicator.online {
+    background-color: #10b981;
+}
+
+.status-indicator.offline {
+    background-color: #ef4444;
+    animation: pulseOffline 2s infinite ease-in-out;
+}
+
+@keyframes pulseOffline {
+    0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
 }
 
 .member-details {
@@ -155,11 +189,98 @@
     flex: 0.5;
 }
 
+.action-btn-group {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.btn-icon-primary,
+.btn-icon-danger {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 0.4rem;
+    border-radius: 6px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon-primary:hover {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.btn-icon-danger:hover {
+    background: #fef2f2;
+    color: #ef4444;
+}
+
 .btn-icon-ghost {
     background: transparent;
     border: none;
     padding: 0.5rem;
     cursor: default;
+}
+
+/* --- NEW MODAL REDESIGN --- */
+.team-modal-large {
+    max-width: 650px !important;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.team-modal-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+}
+
+.team-modal-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #0f172a;
+}
+
+.team-modal-body {
+    display: flex;
+    padding: 2rem;
+    gap: 2.5rem;
+}
+
+.team-modal-sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 140px;
+    flex-shrink: 0;
+}
+
+.modal-avatar-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem;
+    border: 4px solid #ffffff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.team-modal-form {
+    flex: 1;
+}
+
+.upload-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.5rem !important;
+    font-size: 0.75rem !important;
+    margin: 0;
 }
 
 /* --- RESPONSIVE MOBILE ADJUSTMENTS --- */
@@ -185,18 +306,6 @@
         justify-content: flex-end;
     }
 
-    .modal-content {
-        max-width: 90% !important;
-        padding: 1.25rem !important;
-        margin: 1rem;
-    }
-
-    .form-group-row {
-        flex-direction: column !important;
-        gap: 0 !important;
-    }
-
-    /* --- RESPONSIVE MOBILE ADJUSTMENTS FOR HERO BANNER --- */
     .team-hero {
         flex-direction: column !important;
         align-items: flex-start !important;
@@ -218,7 +327,6 @@
         font-size: 0.9rem !important;
     }
 
-    /* Make buttons inside headers fit nicely on mobile */
     .team-hero button,
     .team-hero .btn-modern-primary {
         width: 100% !important;
@@ -226,48 +334,22 @@
         margin-top: 0.5rem;
     }
 
-}
-
-.status-indicator {
-    position: absolute;
-    bottom: -2px;
-    right: -2px;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    border: 2px solid white;
-    z-index: 5;
-}
-
-.status-indicator.online {
-    background-color: #10b981;
-    /* Green */
-}
-
-.status-indicator.offline {
-    background-color: #ef4444;
-    /* Red */
-    animation: pulseOffline 2s infinite ease-in-out;
-}
-
-@keyframes pulseOffline {
-    0% {
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    /* Modal Mobile Adjustments */
+    .team-modal-body {
+        flex-direction: column;
+        align-items: center;
+        padding: 1.5rem;
+        gap: 1.5rem;
     }
 
-    70% {
-        box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+    .team-modal-sidebar {
+        width: 100%;
+        border-bottom: 1px dashed #e2e8f0;
+        padding-bottom: 1.5rem;
     }
 
-    100% {
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    .form-group-row {
+        flex-direction: column;
+        gap: 1.25rem;
     }
-}
-
-/* Adjust admin star if it overlaps with status dot */
-.admin-star {
-    bottom: -2px;
-    left: -2px;
-    /* Move to bottom-left to make room for status dot */
-    right: auto;
 }
