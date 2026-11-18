@@ -24,7 +24,6 @@
     z-index: -1;
 }
 
-/* Modern List View */
 .team-list-container {
     display: flex;
     flex-direction: column;
@@ -45,7 +44,6 @@
     padding-bottom: 0;
 }
 
-/* Avatar & Info */
 .team-member-info {
     display: flex;
     align-items: center;
@@ -128,7 +126,6 @@
     font-weight: 700;
 }
 
-/* Badges */
 .role-pill {
     display: inline-flex;
     align-items: center;
@@ -153,7 +150,6 @@
     border: 1px solid #e2e8f0;
 }
 
-/* Contact Details */
 .member-contact-info {
     display: flex;
     flex-direction: column;
@@ -181,7 +177,6 @@
     pointer-events: none;
 }
 
-/* Actions */
 .member-actions {
     display: flex;
     align-items: center;
@@ -225,7 +220,6 @@
     cursor: default;
 }
 
-/* --- NEW MODAL REDESIGN --- */
 .team-modal-large {
     max-width: 650px !important;
     padding: 0 !important;
@@ -283,7 +277,50 @@
     margin: 0;
 }
 
-/* --- RESPONSIVE MOBILE ADJUSTMENTS --- */
+/* =========================================================
+   PITCH BLACK DARK MODE (TEAM)
+   ========================================================= */
+body.dark-mode .team-hero {
+    background: #0a0a0a;
+    border-color: #1a1a1a;
+}
+
+body.dark-mode .team-list-item {
+    border-bottom-color: #1a1a1a;
+}
+
+body.dark-mode .member-details h4 {
+    color: #ffffff;
+}
+
+body.dark-mode .standard-pill {
+    background: #111111;
+    border-color: #333333;
+    color: #a3a3a3;
+}
+
+body.dark-mode .admin-pill {
+    background: #1a1100;
+    border-color: #4d3300;
+}
+
+body.dark-mode .btn-icon-primary:hover {
+    background: #111111;
+}
+
+body.dark-mode .team-modal-header {
+    background: #0a0a0a;
+    border-bottom-color: #1a1a1a;
+}
+
+body.dark-mode .team-modal-sidebar {
+    border-bottom-color: #333333;
+}
+
+body.dark-mode .modal-avatar-preview {
+    border-color: #1a1a1a;
+}
+
 @media (max-width: 768px) {
     .team-list-item {
         flex-direction: column;
@@ -334,7 +371,6 @@
         margin-top: 0.5rem;
     }
 
-    /* Modal Mobile Adjustments */
     .team-modal-body {
         flex-direction: column;
         align-items: center;

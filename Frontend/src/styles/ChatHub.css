@@ -247,7 +247,6 @@
     display: inline-block;
 }
 
-/* Toggles the dropdown arrow on mobile/hover */
 .bubble-action-btn {
     position: absolute;
     top: 4px;
@@ -268,7 +267,6 @@
     background: rgba(0, 0, 0, 0.05);
 }
 
-/* Fixed absolute positioning for timestamp */
 .chat-hub-bubble-footer {
     position: absolute;
     bottom: 4px;
@@ -308,7 +306,6 @@
     padding: 2rem;
 }
 
-/* --- CHAT ATTACHMENTS (NON-IMAGE) --- */
 .chat-bubble-video {
     display: block;
     width: 100%;
@@ -343,9 +340,7 @@
     color: #2563eb;
 }
 
-/* ========================================================
-   WHATSAPP-STYLE IMAGE COLLAGE & LIGHTBOX
-   ======================================================== */
+/* Image Collage */
 .chat-message-blocks {
     display: flex;
     flex-direction: column;
@@ -517,10 +512,7 @@
     background: rgba(255, 255, 255, 0.25);
 }
 
-
-/* ========================================================
-   CUSTOM POLL UI
-   ======================================================== */
+/* Polls */
 .poll-msg-wrapper {
     max-width: 380px !important;
 }
@@ -644,9 +636,7 @@
     text-decoration: underline;
 }
 
-/* ========================================================
-   REFACTORED FORM UI (WHATSAPP STYLE)
-   ======================================================== */
+/* Input form */
 .chat-hub-input-form {
     padding: 0.75rem 1rem;
     background: #f0f2f5;
@@ -784,7 +774,7 @@
     cursor: not-allowed;
 }
 
-/* Attachments Gallery Preview */
+/* Attachments */
 .chat-attachment-gallery {
     display: flex;
     align-items: center;
@@ -851,7 +841,7 @@
     background: #ef4444;
 }
 
-/* Replying Preview Overlay */
+/* Menus & Overlays */
 .replying-preview-box {
     display: flex;
     align-items: center;
@@ -910,7 +900,6 @@
     color: #0f172a;
 }
 
-/* Rendered Embedded Reply Inside Bubble */
 .rendered-reply-box {
     background: rgba(0, 0, 0, 0.05);
     border-left: 4px solid #2563eb;
@@ -938,10 +927,6 @@
     font-size: 0.75rem;
 }
 
-
-/* ========================================================
-   CUSTOM RIGHT CLICK CONTEXT MENU & MODALS
-   ======================================================== */
 .custom-context-menu {
     position: absolute;
     background: #ffffff;
@@ -1008,7 +993,6 @@
     color: #dc2626;
 }
 
-/* Emoji Reaction Badge on Chat Bubble */
 .chat-reaction-badge {
     position: absolute;
     bottom: -10px;
@@ -1022,7 +1006,7 @@
     z-index: 5;
 }
 
-/* Modals (Pin, Delete) */
+/* Modals */
 .pin-duration-modal,
 .delete-action-modal {
     background: #ffffff;
@@ -1080,7 +1064,6 @@
     margin-top: 0.25rem;
 }
 
-/* EXISTING MODALS (Poll / View Votes) */
 .poll-votes-modal {
     background: #f8fafc;
     width: 100%;
@@ -1261,47 +1244,6 @@
     color: #1e293b;
 }
 
-.custom-checkbox {
-    position: relative;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-}
-
-.custom-checkbox input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.custom-checkbox .checkmark {
-    width: 22px;
-    height: 22px;
-    background: #cbd5e1;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-}
-
-.custom-checkbox input:checked~.checkmark {
-    background: #10b981;
-}
-
-.mobile-back-btn {
-    display: none;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #0f172a;
-    padding: 0.2rem;
-    align-items: center;
-    justify-content: center;
-}
-
-
-/* --- DELETED MESSAGE BUBBLE --- */
 .deleted-message-bubble {
     display: flex;
     align-items: center;
@@ -1315,7 +1257,6 @@
     color: #60a5fa;
 }
 
-/* --- PINNED MESSAGE BANNER --- */
 .pinned-message-banner {
     display: flex;
     align-items: center;
@@ -1386,7 +1327,7 @@
     margin-bottom: 2px;
 }
 
-/* --- FULLSCREEN TOGGLE STYLES --- */
+/* Fullscreen Mode */
 .chatbox-wrapper.fullscreen-mode {
     position: fixed !important;
     top: 0 !important;
@@ -1433,7 +1374,6 @@
     transform: scale(1.1);
 }
 
-/* --- WHATSAPP-STYLE STICKY DATE BADGE --- */
 .chat-date-wrapper {
     display: flex;
     justify-content: center;
@@ -1441,11 +1381,8 @@
     margin: 1.5rem 0 0.5rem 0;
     position: sticky;
     top: 10px;
-    /* Gives it breathing room from the top edge */
     z-index: 50;
-    /* Sits above everything while scrolling */
     pointer-events: none;
-    /* Allows you to click messages underneath it */
 }
 
 .chat-date-badge {
@@ -1461,14 +1398,6 @@
     letter-spacing: 0.5px;
 }
 
-body.dark-mode .chat-date-badge {
-    background-color: #1e293b;
-    color: #94a3b8;
-    border-color: #334155;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-/* --- Sidebar Meta Layout (WhatsApp Style) --- */
 .sidebar-meta-layout {
     display: flex;
     flex-direction: column;
@@ -1476,12 +1405,7 @@ body.dark-mode .chat-date-badge {
     gap: 0.15rem;
 }
 
-.sidebar-meta-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
+.sidebar-meta-top,
 .sidebar-meta-bottom {
     display: flex;
     justify-content: space-between;
@@ -1508,9 +1432,6 @@ body.dark-mode .chat-date-badge {
     box-shadow: 0 1px 3px rgba(16, 185, 129, 0.4);
 }
 
-/* ========================================================
-   NEW: DRAG & DROP OVERLAY
-   ======================================================== */
 .drag-drop-overlay {
     position: absolute;
     top: 0;
@@ -1550,9 +1471,6 @@ body.dark-mode .chat-date-badge {
     color: #cbd5e1;
 }
 
-/* ========================================================
-   NEW: @MENTION DROPDOWN (WhatsApp Dark Theme)
-   ======================================================== */
 .mention-dropdown {
     position: absolute;
     bottom: 100%;
@@ -1595,6 +1513,320 @@ body.dark-mode .chat-date-badge {
     color: #ffffff;
 }
 
+/* FIX: Hide back button on desktop entirely */
+.mobile-back-btn {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #0f172a;
+    padding: 0.2rem;
+    align-items: center;
+    justify-content: center;
+}
+
+/* =========================================================
+   PITCH BLACK DARK MODE (CHATHUB)
+   ========================================================= */
+body.dark-mode .chat-hub-layout {
+    border-color: #1a1a1a;
+    background: #000000;
+}
+
+body.dark-mode .chat-hub-sidebar {
+    background: #0a0a0a;
+    border-right-color: #1a1a1a;
+}
+
+body.dark-mode .chat-hub-sidebar-header {
+    border-bottom-color: #1a1a1a;
+    color: #ffffff;
+}
+
+body.dark-mode .chat-hub-section-title {
+    color: #737373;
+}
+
+body.dark-mode .chat-hub-channel-item:hover {
+    background: #111111;
+}
+
+body.dark-mode .chat-hub-channel-item.active-channel {
+    background: #1a1a1a;
+    border-color: #333333;
+}
+
+body.dark-mode .chat-hub-channel-info h4 {
+    color: #ffffff;
+}
+
+body.dark-mode .chat-hub-channel-info p {
+    color: #a3a3a3;
+}
+
+body.dark-mode .chat-hub-icon-circle {
+    background: #111111 !important;
+    color: #3b82f6 !important;
+}
+
+body.dark-mode .chat-hub-main-pane {
+    background: #000000;
+}
+
+body.dark-mode .chat-hub-main-header {
+    background: #0a0a0a;
+    border-bottom-color: #1a1a1a;
+}
+
+body.dark-mode .chat-hub-header-info h3 {
+    color: #ffffff;
+}
+
+body.dark-mode .chat-hub-security-tag {
+    background: #111111;
+}
+
+body.dark-mode .chat-hub-messages-scroll {
+    background: #000000;
+}
+
+body.dark-mode .bubble-theirs {
+    background: #111111;
+    color: #ffffff;
+    border-color: #1a1a1a;
+}
+
+body.dark-mode .bubble-theirs .chat-hub-bubble-footer {
+    color: #737373;
+}
+
+body.dark-mode .bubble-mine {
+    background: #1e3a8a !important;
+    color: #ffffff !important;
+    border-color: #1e3a8a;
+}
+
+body.dark-mode .bubble-mine .chat-hub-bubble-footer {
+    color: #93c5fd !important;
+}
+
+body.dark-mode .chat-hub-sender-label {
+    color: #737373;
+}
+
+body.dark-mode .chat-date-badge {
+    background-color: #111111;
+    color: #a3a3a3;
+    border-color: #1a1a1a;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .chat-hub-input-form {
+    background: #0a0a0a;
+    border-top-color: #1a1a1a;
+}
+
+body.dark-mode .chat-input-wrapper {
+    background: #111111;
+    border-color: #1a1a1a;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .chat-hub-text-input {
+    color: #ffffff;
+}
+
+body.dark-mode .chat-hub-text-input::placeholder {
+    color: #737373;
+}
+
+body.dark-mode .chat-upside-dropdown {
+    background: #111111;
+    border-color: #1a1a1a;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
+}
+
+body.dark-mode .chat-upside-dropdown button {
+    color: #d4d4d4;
+}
+
+body.dark-mode .chat-upside-dropdown button:hover {
+    background: #1a1a1a;
+    color: #3b82f6;
+}
+
+body.dark-mode .chat-attachment-gallery {
+    background: #0a0a0a;
+    border-bottom-color: #1a1a1a;
+}
+
+body.dark-mode .chat-attachment-item {
+    border-color: #333333;
+}
+
+body.dark-mode .replying-preview-box {
+    background: #111111;
+}
+
+body.dark-mode .replying-text {
+    color: #a3a3a3;
+}
+
+body.dark-mode .rendered-reply-box {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .custom-context-menu {
+    background: #111111;
+    border-color: #1a1a1a;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.8);
+}
+
+body.dark-mode .context-menu-reactions {
+    border-bottom-color: #1a1a1a;
+}
+
+body.dark-mode .context-menu-actions button {
+    color: #d4d4d4;
+}
+
+body.dark-mode .context-menu-actions button:hover {
+    background: #1a1a1a;
+    color: #3b82f6;
+}
+
+body.dark-mode .chat-reaction-badge {
+    background: #111111;
+    border-color: #333333;
+    color: white;
+}
+
+body.dark-mode .poll-bubble-whatsapp {
+    background: #111111 !important;
+    border-color: #1a1a1a;
+    color: white !important;
+}
+
+body.dark-mode .poll-question-header h4 {
+    color: white;
+}
+
+body.dark-mode .poll-option-row {
+    background: #1a1a1a;
+}
+
+body.dark-mode .poll-option-row:hover {
+    background: #262626;
+}
+
+body.dark-mode .poll-progress-bg {
+    background: #1e3a8a !important;
+}
+
+body.dark-mode .poll-opt-text {
+    color: white;
+}
+
+body.dark-mode .poll-vote-count {
+    color: #d4d4d4;
+}
+
+body.dark-mode .poll-checkbox-row {
+    background: #111111;
+    border-color: #1a1a1a;
+    color: white;
+}
+
+body.dark-mode .poll-input {
+    background: #111111 !important;
+    border-color: #333333 !important;
+    color: white !important;
+}
+
+body.dark-mode .poll-modal-header h2 {
+    color: white !important;
+}
+
+body.dark-mode .poll-votes-question-bubble {
+    background: #111111;
+    color: white;
+    border-color: #333333;
+}
+
+body.dark-mode .poll-votes-option-group {
+    background: #111111;
+    border-color: #333333;
+}
+
+body.dark-mode .poll-votes-option-header {
+    border-bottom-color: #333333;
+}
+
+body.dark-mode .poll-votes-option-header h4 {
+    color: white;
+}
+
+body.dark-mode .poll-voter-item {
+    border-bottom-color: #1a1a1a;
+}
+
+body.dark-mode .voter-name {
+    color: white;
+}
+
+body.dark-mode .poll-votes-modal-header {
+    background: #0a0a0a;
+    border-bottom-color: #1a1a1a;
+}
+
+body.dark-mode .poll-votes-modal-header h2 {
+    color: white;
+}
+
+body.dark-mode .modal-close-btn svg {
+    color: white !important;
+}
+
+body.dark-mode .mobile-back-btn {
+    color: white;
+}
+
+body.dark-mode .pinned-message-banner {
+    background: #111111;
+    border-bottom-color: #1a1a1a;
+}
+
+body.dark-mode .pinned-message-banner:hover {
+    background: #1a1a1a;
+}
+
+body.dark-mode .pinned-banner-title {
+    color: #10b981;
+}
+
+body.dark-mode .pinned-banner-text {
+    color: #a3a3a3;
+}
+
+body.dark-mode .pin-duration-modal,
+body.dark-mode .delete-action-modal {
+    background: #0a0a0a;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .pin-duration-modal h3,
+body.dark-mode .delete-action-modal h3 {
+    color: white;
+}
+
+body.dark-mode .pin-duration-options button {
+    background: #111111;
+    color: white;
+}
+
+body.dark-mode .pin-duration-options button:hover {
+    background: #1a1a1a;
+}
 
 /* --- MOBILE SPECIFIC FIXES --- */
 @media (max-width: 768px) {
@@ -1631,6 +1863,7 @@ body.dark-mode .chat-date-badge {
         display: flex;
     }
 
+    /* FIX: Only show back button on mobile */
     .mobile-back-btn {
         display: flex !important;
     }
@@ -1676,7 +1909,6 @@ body.dark-mode .chat-date-badge {
         right: 10px;
     }
 
-    /* Ensure the touch menu button is always visible on mobile */
     .bubble-action-btn {
         opacity: 1;
     }

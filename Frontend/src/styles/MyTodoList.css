@@ -52,9 +52,21 @@
     font-weight: 700;
     text-transform: uppercase;
 }
-.priority-low { background: #f1f5f9; color: #475569; }
-.priority-medium { background: #eff6ff; color: #2563eb; }
-.priority-high { background: #fef2f2; color: #dc2626; }
+
+.priority-low {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.priority-medium {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.priority-high {
+    background: #fef2f2;
+    color: #dc2626;
+}
 
 .todo-status-col {
     flex: 0.8;
@@ -88,7 +100,10 @@
     gap: 0.35rem;
     transition: all 0.2s;
 }
-.btn-action-start:hover { background: #dbeafe; }
+
+.btn-action-start:hover {
+    background: #dbeafe;
+}
 
 .btn-action-finish {
     background: #ecfdf5;
@@ -104,7 +119,10 @@
     gap: 0.35rem;
     transition: all 0.2s;
 }
-.btn-action-finish:hover { background: #d1fae5; }
+
+.btn-action-finish:hover {
+    background: #d1fae5;
+}
 
 .btn-action-reset {
     background: #f8fafc;
@@ -117,9 +135,62 @@
     cursor: pointer;
     transition: all 0.2s;
 }
-.btn-action-reset:hover { background: #f1f5f9; }
 
-/* --- RESPONSIVE MOBILE ADJUSTMENTS --- */
+.btn-action-reset:hover {
+    background: #f1f5f9;
+}
+
+/* =========================================================
+   PITCH BLACK DARK MODE (TODO)
+   ========================================================= */
+body.dark-mode .todo-card-item {
+    border-bottom-color: #1a1a1a;
+}
+
+body.dark-mode .todo-main-info h4 {
+    color: #ffffff;
+}
+
+body.dark-mode .todo-main-info h4.completed-text {
+    color: #475569;
+}
+
+body.dark-mode .btn-action-reset {
+    background: #111111;
+    border-color: #333333;
+    color: #f8fafc;
+}
+
+body.dark-mode .btn-action-reset:hover {
+    background: #1a1a1a;
+}
+
+body.dark-mode .priority-low {
+    background: #111111;
+    color: #a3a3a3;
+}
+
+body.dark-mode .priority-medium {
+    background: #111111;
+    border: 1px solid #1e3a8a;
+}
+
+body.dark-mode .priority-high {
+    background: #1a0a0a;
+    border: 1px solid #7f1d1d;
+}
+
+body.dark-mode .btn-action-start,
+body.dark-mode .btn-action-finish {
+    background: #111111;
+    border-color: #333333;
+}
+
+body.dark-mode .btn-action-start:hover,
+body.dark-mode .btn-action-finish:hover {
+    background: #1a1a1a;
+}
+
 @media (max-width: 768px) {
     .todo-card-item {
         flex-direction: column;
@@ -142,7 +213,6 @@
 
     .kpi-grid {
         grid-template-columns: 3, 1fr;
-
     }
 
     .modal-content {

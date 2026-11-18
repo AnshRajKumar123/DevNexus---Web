@@ -32,7 +32,6 @@
     width: 100%;
 }
 
-/* Avatar Setup */
 .profile-avatar-container {
     position: relative;
     width: 140px;
@@ -97,7 +96,6 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
-/* Profile Specific Hero Text */
 .profile-hero-text {
     display: flex;
     flex-direction: column;
@@ -142,7 +140,6 @@
     gap: 0.5rem;
 }
 
-/* Forms & Widgets */
 .widget-body {
     padding: 1.5rem;
 }
@@ -214,7 +211,6 @@
     background: #f1f5f9 !important;
 }
 
-/* Modern Buttons */
 .btn-modern-primary {
     background: #1e3a8a;
     color: white;
@@ -270,7 +266,6 @@
     color: white;
 }
 
-/* Security Flow Cards */
 .security-state-idle p {
     margin: 0 0 1rem 0;
     color: #64748b;
@@ -351,7 +346,6 @@
     font-size: 1.1rem;
 }
 
-/* Danger Widget */
 .danger-widget {
     background: linear-gradient(to right, #fff1f2, #ffffff);
     border-color: #fecaca;
@@ -377,7 +371,6 @@
     font-weight: 500;
 }
 
-/* Contributions Grid */
 .activity-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -410,27 +403,6 @@
     color: #ef4444;
 }
 
-body.dark-mode .activity-section-header h2 {
-    color: #f8fafc !important;
-}
-
-@media (max-width: 1024px) {
-    .profile-hero-content {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .form-group-row {
-        flex-direction: column;
-        gap: 1.25rem;
-    }
-
-    .activity-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* --- PHONE INPUT STYLING --- */
 .phone-input-group {
     display: flex;
     align-items: center;
@@ -459,230 +431,102 @@ body.dark-mode .activity-section-header h2 {
     box-shadow: none !important;
 }
 
-.projects-grid-modern {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.5rem;
-    padding: 0.5rem;
+
+/* =========================================================
+   PITCH BLACK DARK MODE (PROFILE)
+   ========================================================= */
+body.dark-mode .profile-hero-modern {
+    background: linear-gradient(135deg, #0a0a0a 0%, #000000 100%);
+    border-color: #1a1a1a;
 }
 
-.project-card-modern {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
-    transition: all 0.3s ease;
+body.dark-mode .profile-avatar-container {
+    background: #000000;
+    border-color: #1a1a1a;
 }
 
-.project-card-modern:hover {
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-    transform: translateY(-4px);
-    border-color: #cbd5e1;
+body.dark-mode .admin-badge-modern {
+    border-color: #000000;
 }
 
-.proj-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
+body.dark-mode .hero-role-badge {
+    background: #111111;
+    border-color: #333333;
 }
 
-.proj-cat-badge {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: #f1f5f9;
-    padding: 0.35rem 0.75rem;
-    border-radius: 99px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: #475569;
+body.dark-mode .security-flow-card {
+    background: #0a0a0a;
+    border-color: #1a1a1a;
 }
 
-.proj-actions {
-    display: flex;
-    gap: 0.5rem;
+body.dark-mode .flow-icon-header h4 {
+    color: #ffffff;
 }
 
-.proj-actions button {
-    background: transparent;
-    border: none;
-    color: #94a3b8;
-    cursor: pointer;
-    padding: 0.2rem;
-    border-radius: 6px;
-    transition: all 0.2s;
+body.dark-mode .icon-circle.blue {
+    background: #111111;
+    border: 1px solid #1e3a8a;
 }
 
-.proj-actions button:hover {
-    color: #3b82f6;
-    background: #eff6ff;
+body.dark-mode .icon-circle.green {
+    background: #0a1a0a;
+    border: 1px solid #064e3b;
 }
 
-.proj-actions button.danger-btn:hover {
+body.dark-mode .security-success-card {
+    background: #0a1a0a;
+    border-color: #064e3b;
+    color: #10b981;
+}
+
+body.dark-mode .security-success-card h4 {
+    color: #10b981;
+}
+
+body.dark-mode .danger-widget {
+    background: linear-gradient(to right, #1a0505, #000000);
+    border-color: #450a0a;
+}
+
+body.dark-mode .danger-title {
     color: #ef4444;
-    background: #fef2f2;
 }
 
-.proj-card-body {
-    flex: 1;
+body.dark-mode .danger-desc {
+    color: #fca5a5;
 }
 
-.proj-card-body h4 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.1rem;
-    color: #0f172a;
+body.dark-mode .phone-input-group {
+    background: #111111;
+    border-color: #333333;
 }
 
-.proj-card-body p {
-    margin: 0 0 1rem 0;
-    font-size: 0.85rem;
-    color: #64748b;
-    line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+body.dark-mode .country-code-pill {
+    background: #1a1a1a;
+    border-right-color: #333333;
+    color: #f8fafc;
 }
 
-.proj-tech-stack {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    margin-bottom: 1rem;
+body.dark-mode .phone-field {
+    background: transparent !important;
 }
 
-.tech-pill {
-    background: #eff6ff;
-    color: #2563eb;
-    border: 1px solid #bfdbfe;
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 0.2rem 0.5rem;
-    border-radius: 6px;
+body.dark-mode .activity-section-header h2 {
+    color: #f8fafc !important;
 }
 
-.proj-card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 1rem;
-    border-top: 1px solid #f1f5f9;
-}
-
-.proj-status-indicator {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-}
-
-.status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-}
-
-.planning .status-dot { background: #8b5cf6; }
-.planning { color: #8b5cf6; }
-
-.in-progress .status-dot { background: #3b82f6; }
-.in-progress { color: #3b82f6; }
-
-.completed .status-dot { background: #10b981; }
-.completed { color: #10b981; }
-
-.on-hold .status-dot { background: #f59e0b; }
-.on-hold { color: #f59e0b; }
-
-.proj-deadline {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    font-size: 0.75rem;
-    color: #94a3b8;
-    font-weight: 600;
-}
-
-/* --- Idea Board Structure --- */
-.idea-board-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1.5rem;
-}
-
-.idea-content-area {
-    flex: 1;
-    min-width: 0;
-}
-
-.idea-action-btns {
-    display: flex;
-    gap: 0.5rem;
-    flex-shrink: 0;
-}
-
-.idea-action-btns button {
-    padding: 0.5rem 1rem;
-    font-size: 0.8rem;
-}
-
-/* Dark mode overrides */
-body.dark-mode .project-card-modern {
-    background: #1e293b;
-    border-color: #334155;
-}
-body.dark-mode .proj-cat-badge {
-    background: #0f172a;
-    color: #cbd5e1;
-}
-body.dark-mode .proj-card-footer {
-    border-top-color: #334155;
-}
-body.dark-mode .tech-pill {
-    background: rgba(37, 99, 235, 0.1);
-    border-color: rgba(37, 99, 235, 0.3);
-}
-
-/* --- MOBILE RESPONSIVENESS FIXES --- */
 @media (max-width: 1024px) {
-    /* Guarantees the bottom of the page clears the mobile nav bar */
-    .dashboard-wrapper {
-        padding-bottom: 6.5rem !important; 
-    }
-}
-
-@media (max-width: 768px) {
-    .projects-grid-modern {
-        grid-template-columns: 1fr;
-    }
-
-    /* Stacks the text and buttons on mobile so they don't squish */
-    .idea-board-item {
+    .profile-hero-content {
         flex-direction: column;
         align-items: flex-start;
-        gap: 1rem;
     }
 
-    .idea-action-btns {
-        width: 100%;
+    .form-group-row {
+        flex-direction: column;
+        gap: 1.25rem;
     }
 
-    .idea-action-btns button {
-        flex: 1;
-        justify-content: center;
-    }
-
-    /* Keep long descriptions neat on mobile */
-    .feed-meta {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+    .activity-grid {
+        grid-template-columns: 1fr;
     }
 }

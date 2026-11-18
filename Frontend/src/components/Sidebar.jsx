@@ -12,7 +12,8 @@ import { DashPic } from '../assets/assets';
 const API_URL = `${import.meta.env.VITE_API_URL}/api`;
 
 export default function Sidebar() {
-    const { currentUser } = useData();
+    // Pulling the dark mode state and toggle function from DataContext
+    const { currentUser, isDarkMode, toggleTheme } = useData(); 
     const [unreadCount, setUnreadCount] = useState(0);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const location = useLocation();
@@ -90,12 +91,10 @@ export default function Sidebar() {
         }
     ];
 
-    // Determine avatar source early so we can use it in the mobile bottom nav
     const avatarSrc = currentUser?.imgUrl 
         ? (currentUser.imgUrl.startsWith('http') ? currentUser.imgUrl : `${import.meta.env.VITE_API_URL}${currentUser.imgUrl}`)
         : `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser?.name || 'User')}&background=${currentUser?.isSupremeAdmin ? '0f172a' : 'e5e7eb'}&color=${currentUser?.isSupremeAdmin ? 'fff' : '374151'}&bold=true`;
 
-    // Bottom 5 Nav buttons for Mobile View
     const mobileBottomNav = [
         { title: 'Today', icon: <Sun size={20} />, path: '/' },
         { title: 'ChatBox', icon: <MessageCircle size={20} />, path: '/chat', badge: unreadCount > 0 ? unreadCount : null },
@@ -151,13 +150,18 @@ export default function Sidebar() {
                         ))}
                     </div>
                     <div className="sidebar-bottom">
+                        {/* Custom Theme Toggle */}
+                        <div className="theme-toggle-container">
+                            <label className="switch">
+                                <input type="checkbox" checked={isDarkMode} onChange={toggleTheme} />
+                                <span className="slider" />
+                            </label>
+                            <span className="theme-text">{isDarkMode ? 'Dark Mode' : 'Light Mode'}</span>
+                        </div>
+
                         <Link to="/profile" style={{ textDecoration: 'none' }}>
                             <div className="profile-widget hover-pop">
-                                <img
-                                    src={avatarSrc}
-                                    alt={currentUser?.name || "Profile"}
-                                    className="profile-pic"
-                                />
+                                <img src={avatarSrc} alt={currentUser?.name || "Profile"} className="profile-pic" />
                                 <div className="profile-info">
                                     <h4 className="profile-name">{currentUser?.name || 'Loading...'}</h4>
                                     <p className="profile-role">{currentUser?.role || 'Team Member'}</p>
@@ -204,13 +208,18 @@ export default function Sidebar() {
                 </div>
 
                 <div className="sidebar-bottom">
+                    {/* Custom Theme Toggle */}
+                    <div className="theme-toggle-container">
+                        <label className="switch">
+                            <input type="checkbox" checked={isDarkMode} onChange={toggleTheme} />
+                            <span className="slider" />
+                        </label>
+                        <span className="theme-text">{isDarkMode ? 'Dark Mode' : 'Light Mode'}</span>
+                    </div>
+
                     <Link to="/profile" style={{ textDecoration: 'none' }}>
                         <div className="profile-widget hover-pop">
-                            <img
-                                src={avatarSrc}
-                                alt={currentUser?.name || "Profile"}
-                                className="profile-pic"
-                            />
+                            <img src={avatarSrc} alt={currentUser?.name || "Profile"} className="profile-pic" />
                             <div className="profile-info">
                                 <h4 className="profile-name">{currentUser?.name || 'Loading...'}</h4>
                                 <p className="profile-role">{currentUser?.role || 'Team Member'}</p>

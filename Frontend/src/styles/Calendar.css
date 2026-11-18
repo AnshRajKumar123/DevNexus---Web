@@ -40,7 +40,6 @@
     background-color: #1e40af;
 }
 
-/* Empty State */
 .calendar-grid {
     width: 100%;
     min-height: 50vh;
@@ -81,7 +80,6 @@
     margin: 0;
 }
 
-/* Modern Calendar List Layout */
 .calendar-list-modern {
     display: flex;
     flex-direction: column;
@@ -159,8 +157,17 @@
     text-transform: uppercase;
 }
 
-.type-virtual { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
-.type-physical { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+.type-virtual {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+}
+
+.type-physical {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
 
 .calendar-attendees-col {
     flex: 1;
@@ -181,9 +188,6 @@
     font-weight: 600;
 }
 
-/* =========================================
-   MODAL POPUP CSS FIX
-   ========================================= */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -203,8 +207,13 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .modal-content {
@@ -227,6 +236,7 @@
         opacity: 0;
         transform: scale(0.9) translateY(20px);
     }
+
     100% {
         opacity: 1;
         transform: scale(1) translateY(0);
@@ -265,7 +275,56 @@
     color: #ef4444;
 }
 
-/* --- RESPONSIVE MOBILE ADJUSTMENTS --- */
+/* =========================================================
+   PITCH BLACK DARK MODE (CALENDAR)
+   ========================================================= */
+body.dark-mode .calendar-title {
+    color: #ffffff;
+}
+
+body.dark-mode .calendar-empty-state {
+    background: transparent;
+    border-color: #1a1a1a;
+}
+
+body.dark-mode .empty-icon-wrapper {
+    background: #111111;
+}
+
+body.dark-mode .calendar-empty-state h3 {
+    color: #ffffff;
+}
+
+body.dark-mode .calendar-card-item {
+    border-bottom-color: #1a1a1a;
+}
+
+body.dark-mode .calendar-time-pill {
+    background: #111111;
+    border-color: #333333;
+    color: #60a5fa;
+}
+
+body.dark-mode .calendar-main-info h4 {
+    color: #ffffff;
+}
+
+body.dark-mode .attendees-pill {
+    background: #111111;
+    border-color: #333333;
+    color: #f8fafc;
+}
+
+body.dark-mode .type-virtual {
+    background: #111111;
+    border-color: #333333;
+}
+
+body.dark-mode .type-physical {
+    background: #1a0a0a;
+    border-color: #331111;
+}
+
 @media (max-width: 768px) {
     .calendar-card-item {
         flex-direction: column;

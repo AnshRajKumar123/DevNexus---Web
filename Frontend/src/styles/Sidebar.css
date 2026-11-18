@@ -9,7 +9,6 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     height: 100vh;
     height: 100dvh;
-    /* Fixes browser viewport clipping */
 }
 
 /* --- TOP BRAND SECTION --- */
@@ -20,8 +19,8 @@
 }
 
 .brand-logo {
-    height: 45px;
-    width: 45px;
+    height: 36px;
+    width: 36px;
     border-radius: 8px;
     margin-right: 0.75rem;
     object-fit: contain;
@@ -42,16 +41,12 @@
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
-}
-
-/* Hide scrollbar for cleaner look */
-.sidebar-scrollable::-webkit-scrollbar {
-    display: none;
-}
-
-.sidebar-scrollable {
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+.sidebar-scrollable::-webkit-scrollbar {
+    display: none;
 }
 
 .sidebar-section {
@@ -105,7 +100,6 @@
     color: #6b7280;
 }
 
-/* Hover State */
 .nav-link:hover {
     background-color: #f3f4f6;
     color: #1e3a8a;
@@ -115,25 +109,95 @@
     color: #1e3a8a;
 }
 
-/* Active State */
 .nav-link.active {
     background-color: #eff6ff;
     color: #1e3a8a;
     font-weight: 600;
 }
 
-/* --- BOTTOM PROFILE SECTION --- */
+/* --- BOTTOM SECTION --- */
 .sidebar-bottom {
     padding: 1rem;
     padding-bottom: calc(1rem + env(safe-area-inset-bottom));
-    /* iOS safe-area support */
     border-top: 1px solid #f3f4f6;
     background-color: #ffffff;
     flex-shrink: 0;
-    /* Prevents being crushed by scrollable links */
     z-index: 10;
 }
 
+/* --- THEME TOGGLE (CUSTOM) --- */
+.theme-toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid #f3f4f6;
+    padding-bottom: 1.25rem;
+}
+
+.theme-text {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #64748b;
+    transition: color 0.3s;
+}
+
+.switch {
+    display: block;
+    --width-of-switch: 3.5em;
+    --height-of-switch: 2em;
+    --size-of-icon: 1.4em;
+    --slider-offset: 0.3em;
+    position: relative;
+    width: var(--width-of-switch);
+    height: var(--height-of-switch);
+    flex-shrink: 0;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #f4f4f5;
+    transition: .4s;
+    border-radius: 30px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: var(--size-of-icon, 1.4em);
+    width: var(--size-of-icon, 1.4em);
+    border-radius: 20px;
+    left: var(--slider-offset, 0.3em);
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(40deg, #ff0080, #ff8c00 70%);
+    transition: .4s;
+}
+
+.switch input:checked+.slider {
+    background-color: #303136;
+}
+
+.switch input:checked+.slider:before {
+    left: calc(100% - (var(--size-of-icon, 1.4em) + var(--slider-offset, 0.3em)));
+    background: #303136;
+    box-shadow: inset -3px -2px 5px -2px #8983f7, inset -10px -4px 0 0 #a3dafb;
+}
+
+/* --- PROFILE WIDGET --- */
 .profile-widget {
     display: flex;
     align-items: center;
@@ -177,82 +241,6 @@
     font-weight: 500;
 }
 
-/* --- ANIMATED SVG THEME TOGGLE --- */
-.theme-toggle-wrapper {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #f3f4f6;
-}
-
-#theme-toggle-button {
-    font-size: 17px;
-    position: relative;
-    display: inline-block;
-    width: 6em;
-    cursor: pointer;
-}
-
-#theme-toggle-button #toggle {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-#container,
-#patches,
-#stars,
-#button,
-#sun,
-#moon,
-#cloud {
-    transition-property: all;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 0.25s;
-}
-
-#toggle:checked+svg #container {
-    fill: #2b4360;
-}
-
-#toggle:checked+svg #button {
-    transform: translate(28px, 2.333px);
-}
-
-#sun {
-    opacity: 1;
-}
-
-#toggle:checked+svg #sun {
-    opacity: 0;
-}
-
-#moon {
-    opacity: 0;
-}
-
-#toggle:checked+svg #moon {
-    opacity: 1;
-}
-
-#cloud {
-    opacity: 1;
-}
-
-#toggle:checked+svg #cloud {
-    opacity: 0;
-}
-
-#stars {
-    opacity: 0;
-}
-
-#toggle:checked+svg #stars {
-    opacity: 1;
-}
-
-/* Badges */
 .nav-badge {
     background-color: #2563eb;
     color: #ffffff;
@@ -313,7 +301,6 @@
     align-items: center;
     padding: 0 0.5rem;
     padding-bottom: env(safe-area-inset-bottom);
-    /* iOS safe area */
 }
 
 .mobile-btm-item {
@@ -377,7 +364,6 @@
     width: 280px;
     height: 100vh;
     height: 100dvh;
-    /* Fixes browser viewport clipping */
     background: #ffffff;
     box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
     z-index: 1200;
@@ -422,6 +408,85 @@
     gap: 1.25rem;
 }
 
+
+/* =========================================================
+   PITCH BLACK DARK MODE (SIDEBAR)
+   ========================================================= */
+body.dark-mode .sidebar,
+body.dark-mode .sidebar-bottom,
+body.dark-mode .mobile-slide-drawer,
+body.dark-mode .mobile-top-navbar,
+body.dark-mode .mobile-bottom-navbar {
+    background-color: #000000;
+    border-color: #1a1a1a;
+}
+
+body.dark-mode .theme-toggle-container {
+    border-bottom-color: #1a1a1a;
+}
+
+body.dark-mode .theme-text {
+    color: #a3a3a3;
+}
+
+body.dark-mode .drawer-header {
+    border-bottom-color: #1a1a1a;
+}
+
+body.dark-mode .drawer-header h3 {
+    color: #ffffff;
+}
+
+body.dark-mode .profile-widget:hover {
+    background-color: #111111;
+}
+
+body.dark-mode .profile-name {
+    color: #ffffff;
+}
+
+body.dark-mode .profile-role {
+    color: #a3a3a3;
+}
+
+body.dark-mode .brand-text {
+    color: #ffffff;
+}
+
+body.dark-mode .section-label {
+    color: #737373;
+}
+
+body.dark-mode .nav-link {
+    color: #d4d4d4;
+}
+
+body.dark-mode .nav-link:hover {
+    background-color: #111111;
+    color: #3b82f6;
+}
+
+body.dark-mode .nav-link.active {
+    background-color: #1a1a1a;
+    color: #3b82f6;
+}
+
+body.dark-mode .nav-icon {
+    color: #737373;
+}
+
+body.dark-mode .mobile-btm-item {
+    color: #737373;
+}
+
+body.dark-mode .mobile-btm-item.active {
+    color: #3b82f6;
+}
+
+body.dark-mode .mobile-hamburger-btn {
+    color: #ffffff;
+}
+
 /* --- MEDIA QUERY FOR MOBILE BREAKPOINT --- */
 @media (max-width: 768px) {
     .desktop-sidebar {
@@ -445,7 +510,6 @@
 }
 
 /* --- GLOBAL POPUP/MODAL OVERLAP FIX --- */
-/* Completely hides mobile navbars whenever a modal is open on screen */
 body:has(.modal-overlay) .mobile-top-navbar,
 body:has(.modal-overlay) .mobile-bottom-navbar {
     display: none !important;

@@ -1,5 +1,3 @@
-
-/* Modern Inquiry List Layout */
 .inquiry-list-modern {
     display: flex;
     flex-direction: column;
@@ -27,9 +25,17 @@
     flex-shrink: 0;
 }
 
-.status-pill-indicator.pending { background: #f59e0b; }
-.status-pill-indicator.in-progress { background: #3b82f6; }
-.status-pill-indicator.completed { background: #10b981; }
+.status-pill-indicator.pending {
+    background: #f59e0b;
+}
+
+.status-pill-indicator.in-progress {
+    background: #3b82f6;
+}
+
+.status-pill-indicator.completed {
+    background: #10b981;
+}
 
 .inquiry-main-info {
     flex: 2;
@@ -134,7 +140,28 @@
     font-weight: 600;
 }
 
-/* --- RESPONSIVE MOBILE ADJUSTMENTS --- */
+/* =========================================================
+   PITCH BLACK DARK MODE (INQUIRY)
+   ========================================================= */
+body.dark-mode .inquiry-card-item {
+    border-bottom-color: #1a1a1a;
+}
+
+body.dark-mode .inquiry-main-info h4 {
+    color: #ffffff;
+}
+
+body.dark-mode .btn-action-start,
+body.dark-mode .btn-action-finish {
+    background: #111111;
+    border-color: #333333;
+}
+
+body.dark-mode .btn-action-start:hover,
+body.dark-mode .btn-action-finish:hover {
+    background: #1a1a1a;
+}
+
 @media (max-width: 768px) {
     .inquiry-card-item {
         flex-direction: column;
