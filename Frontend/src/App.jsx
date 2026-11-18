@@ -13,7 +13,7 @@ import Profile from './pages/Profile';
 import MyTodoList from './pages/MyTodoList';
 import ChatHub from './pages/ChatHub.jsx';
 import Projects from './pages/Projects';
-import ScrollToTop from './components/ScrollToTop'; // <-- Imported ScrollToTop
+import ScrollToTop from './components/ScrollToTop'; 
 import { useData } from './context/DataContext';
 import { DashPic } from './assets/assets';
 import { Sparkles, Loader2, Home, AlertTriangle, CheckCircle2, X } from 'lucide-react';
@@ -48,7 +48,6 @@ const CustomDynamicIsland = () => {
 
             if (hideTimer.current) clearTimeout(hideTimer.current);
 
-            // Hide automatically UNLESS it's a loading state or explicitly marked permanent
             if (type !== 'loading' && !options.permanent) {
                 hideTimer.current = setTimeout(() => {
                     setToast(prev => ({ ...prev, visible: false }));
@@ -89,25 +88,24 @@ const CustomDynamicIsland = () => {
 };
 
 const NotFound404 = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', width: '100vw', textAlign: 'center', padding: '2rem', background: '#f8fafc' }}>
+    <div className="not-found-page">
         <AlertTriangle size={64} color="#ef4444" style={{ marginBottom: '1.5rem' }} />
-        <h1 style={{ fontSize: '4rem', color: '#0f172a', margin: '0 0 0.5rem 0', fontWeight: 800 }}>404</h1>
-        <h2 style={{ fontSize: '1.5rem', color: '#334155', margin: '0 0 1rem 0' }}>Page Not Found or Restricted</h2>
-        <p style={{ color: '#64748b', marginBottom: '2.5rem', maxWidth: '400px', lineHeight: 1.5 }}>
-            The page you are trying to access doesn't exist, or you do not have permission to view it. Please return to your workspace.
-        </p>
-        <Link to="/" className="btn-modern-primary hover-pop" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', padding: '0.8rem 1.5rem', borderRadius: '10px', background: '#2563eb', color: 'white', fontWeight: 600 }}>
-            <Home size={18} style={{ marginRight: '0.5rem' }} /> Back to Dashboard
+        <h1>404</h1>
+        <h2>Page Not Found or Restricted</h2>
+        <p>The page you are trying to access doesn't exist, or you do not have permission to view it. Please return to your workspace.</p>
+        <Link to="/" className="btn-modern-primary hover-pop not-found-home-btn">
+            <Home size={18} /> Back to Dashboard
         </Link>
     </div>
 );
 
+// CLEANED LAYOUT: Removed all inline background colors and padding that caused white lines!
 const DashboardLayout = () => (
-    <div className="dashboard-container" style={{ display: 'flex', minHeight: '100vh', background: '#f8fafc' }}>
-        <CustomDynamicIsland /> {/* Mounts inside layout, styled globally absolute */}
+    <div className="dashboard-container">
+        <CustomDynamicIsland />
         <Sidebar />
-        <div className="main-content-wrapper" style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-            <main className="main-content" style={{ flex: 1, padding: '0' }}>
+        <div className="main-content-wrapper">
+            <main className="main-content">
                 <Outlet />
             </main>
         </div>
@@ -175,13 +173,13 @@ export default function App() {
 
     if (isVerifyingSession && !currentUser) {
         return (
-            <div className="splash-fullscreen" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', height: '100vh', width: '100vw' }}>
+            <div className="splash-fullscreen">
                 <div className="blob blob-1"></div>
                 <div className="blob blob-2"></div>
-                <img src={DashPic.WebLogo} alt="DevNexus Logo" style={{ width: '180px', marginBottom: '2.5rem', zIndex: 10 }} />
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', zIndex: 10, background: 'white', padding: '0.85rem 1.75rem', borderRadius: '99px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
-                    <Loader2 size={22} color="#2563eb" style={{ animation: 'spin 1s linear infinite' }} />
-                    <span style={{ fontWeight: 700, color: '#1e293b', fontSize: '1rem' }}>Verifying secure session...</span>
+                <img src={DashPic.WebLogo} alt="DevNexus Logo" className="splash-verify-logo" />
+                <div className="splash-verify-pill">
+                    <Loader2 size={22} color="#2563eb" className="island-spinner" />
+                    <span>Verifying secure session...</span>
                 </div>
             </div>
         );
@@ -225,7 +223,7 @@ export default function App() {
 
     return (
         <Router>
-            <ScrollToTop /> {/* <-- Mounted Globally */}
+            <ScrollToTop />
             <Routes>
                 <Route element={<DashboardLayout />}>
                     <Route path="/" element={<Dashboard />} />

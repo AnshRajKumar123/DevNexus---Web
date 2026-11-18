@@ -20,24 +20,29 @@
     --Font4: "Playwrite HU", cursive;
 }
 
+/* Base Body fixes to prevent bouncing white lines on mobile */
+html,
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background-color: #f3f4f6;
     color: #1f2937;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 /* Dashboard Shell Layout */
 .dashboard-container {
     display: flex;
     height: 100vh;
+    height: 100dvh;
     width: 100vw;
     overflow: hidden;
+    background-color: #f8fafc;
 }
 
 .main-content-wrapper {
     flex: 1;
     display: flex;
     flex-direction: column;
+    min-width: 0;
     overflow: hidden;
 }
 
@@ -45,12 +50,11 @@ body {
     flex: 1;
     overflow-x: hidden;
     overflow-y: auto;
-    background-color: #f9fafb;
-    padding: 1.5rem;
+    background-color: #f8fafc;
+    padding: 0;
 }
 
 /* --- GLOBAL ANIMATIONS --- */
-
 @keyframes slideUpFade {
     0% {
         opacity: 0;
@@ -73,12 +77,10 @@ body {
     }
 }
 
-/* Apply this to the main container of every page */
 .page-animate {
     animation: fadeIn 0.4s ease-out forwards;
 }
 
-/* Staggered slide up effects for cards and elements */
 .stagger-1 {
     opacity: 0;
     animation: slideUpFade 0.5s ease-out 0.1s forwards;
@@ -99,12 +101,10 @@ body {
     animation: slideUpFade 0.5s ease-out 0.4s forwards;
 }
 
-/* Row animations for tables and lists */
 .fade-in-row {
     animation: fadeIn 0.3s ease-in forwards;
 }
 
-/* Interactive Hover Effects */
 .hover-pop {
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s;
 }
@@ -142,7 +142,6 @@ body {
 /* =========================================
    SKELETON LOADING SYSTEM
    ========================================= */
-
 @keyframes shimmer {
     0% {
         background-position: -1000px 0;
@@ -165,12 +164,10 @@ body {
     overflow: hidden;
 }
 
-/* Hide any inner content if wrapping an existing element */
 .skeleton * {
     visibility: hidden !important;
 }
 
-/* Helpful Presets for Skeletons */
 .skeleton-avatar {
     width: 48px;
     height: 48px;
@@ -223,14 +220,14 @@ body {
    PITCH BLACK DARK MODE GLOBAL OVERRIDES
    ========================================= */
 
-/* 1. Global Background & Text */
-body.dark-mode {
-    background-color: #000000;
-    color: #f8fafc;
-}
-
+/* 1. Global Background & Text (Locks out white lines) */
+html.dark-mode,
+body.dark-mode,
+body.dark-mode .dashboard-container,
+body.dark-mode .main-content-wrapper,
 body.dark-mode .main-content {
     background-color: #000000;
+    color: #f8fafc;
 }
 
 /* 2. Sidebar */
@@ -279,7 +276,6 @@ body.dark-mode .calendar-form-card {
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
     position: relative;
     z-index: 1;
-    /* For Glow Effect */
 }
 
 /* GLOBAL RGB GLOW EFFECT FOR CARDS */
@@ -409,7 +405,6 @@ body.dark-mode .btn-secondary:hover {
     background-color: #333333;
 }
 
-/* Dark Mode Skeleton Loading Overrides */
 body.dark-mode .skeleton {
     background: #111111;
     background-image: linear-gradient(90deg, #111111 25%, #1a1a1a 50%, #111111 75%);
@@ -440,11 +435,9 @@ body.dark-mode .empty-icon-wrapper {
     left: 50%;
     transform: translateX(-50%) translateY(-100px) scale(0.9);
     z-index: 2147483647;
-    /* Guarantees it sits above EVERYTHING */
     opacity: 0;
     pointer-events: none;
     transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-    /* Apple-style spring bounce */
     display: flex;
     justify-content: center;
 }
@@ -468,7 +461,6 @@ body.dark-mode .empty-icon-wrapper {
     transition: background-color 0.4s ease, border-color 0.4s ease;
 }
 
-/* Morphing Types */
 .island-loading {
     background: #000000;
 }
@@ -525,4 +517,67 @@ body.dark-mode .empty-icon-wrapper {
 
 .island-spinner {
     animation: spin 1s linear infinite;
+}
+
+/* Misc Layout Classes migrated from App.jsx */
+.not-found-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+    text-align: center;
+    padding: 2rem;
+    background: #f8fafc;
+}
+
+.not-found-page h1 {
+    font-size: 4rem;
+    color: #0f172a;
+    margin: 0 0 0.5rem 0;
+    font-weight: 800;
+}
+
+.not-found-page h2 {
+    font-size: 1.5rem;
+    color: #334155;
+    margin: 0 0 1rem 0;
+}
+
+.not-found-page p {
+    color: #64748b;
+    margin-bottom: 2.5rem;
+    max-width: 400px;
+    line-height: 1.5;
+}
+
+.not-found-home-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.splash-verify-logo {
+    width: 180px;
+    margin-bottom: 2.5rem;
+    z-index: 10;
+}
+
+.splash-verify-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    z-index: 10;
+    background: white;
+    padding: 0.85rem 1.75rem;
+    border-radius: 99px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e8f0;
+}
+
+.splash-verify-pill span {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 1rem;
 }
