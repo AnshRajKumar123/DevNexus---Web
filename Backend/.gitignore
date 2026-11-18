@@ -1,2 +1,5 @@
 uploads/
 firebase-service-account.json
+
+.env
+.env.*
