@@ -269,6 +269,12 @@
     align-items: center;
     justify-content: space-between;
     z-index: 1000;
+    pointer-events: none;
+}
+
+.mobile-brand,
+.mobile-hamburger-btn {
+    pointer-events: auto;
 }
 
 .mobile-brand {
@@ -343,13 +349,13 @@
     border-radius: 9999px;
 }
 
-/* Slide-out Drawer */
+/* Slide-out Drawer Overlay */
 .mobile-drawer-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.65);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: rgba(0, 0, 0, 0.68);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
     z-index: 1100;
     opacity: 0;
     visibility: hidden;
@@ -366,7 +372,7 @@
     position: fixed;
     top: 0;
     right: 0;
-    width: 280px;
+    width: 290px;
     height: 100vh;
     height: 100dvh;
     background: #ffffff;
@@ -486,7 +492,6 @@ body.dark-mode .nav-icon {
         transition: background 0.25s ease;
     }
 
-    /* Transparent over the full-bleed Dashboard hero */
     .mobile-top-navbar.is-dashboard,
     body.dark-mode .mobile-top-navbar.is-dashboard {
         background: transparent !important;
@@ -494,7 +499,6 @@ body.dark-mode .nav-icon {
         box-shadow: none !important;
     }
 
-    /* Frosted pitch-black glass on subpages */
     .mobile-top-navbar.is-subpage,
     body.dark-mode .mobile-top-navbar.is-subpage {
         background: rgba(0, 0, 0, 0.72) !important;
@@ -503,7 +507,6 @@ body.dark-mode .nav-icon {
         border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
     }
 
-    /* Hide logo image on mobile, keep bold DEVNEXUS text only */
     .mobile-top-navbar .brand-logo {
         display: none !important;
     }
@@ -531,150 +534,21 @@ body.dark-mode .nav-icon {
         color: #ffffff !important;
     }
 
-    /* Pure Black & White Liquid Glass Slide-Out Drawer */
+    /* Apple Liquid Glass Slide-Out Drawer (Single Clean Rule) */
     .mobile-slide-drawer,
     body.dark-mode .mobile-slide-drawer {
         width: 290px;
         background: linear-gradient(160deg,
-                rgba(18, 24, 42, 0.86) 0%,
-                rgba(8, 12, 24, 0.9) 50%,
-                rgba(0, 0, 0, 0.94) 100%) !important;
+                rgba(18, 24, 42, 0.88) 0%,
+                rgba(8, 12, 24, 0.92) 50%,
+                rgba(0, 0, 0, 0.96) 100%) !important;
         backdrop-filter: blur(40px) saturate(180%) !important;
         -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
-        border-left: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-left: 1px solid rgba(255, 255, 255, 0.22) !important;
         border-radius: 28px 0 0 28px;
         box-shadow:
-            inset 1px 0 0 rgba(255, 255, 255, 0.22),
-            -16px 0 42px rgba(0, 0, 0, 0.75) !important;
-    }
-
-    .mobile-slide-drawer .drawer-header,
-    body.dark-mode .mobile-slide-drawer .drawer-header {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
-    }
-
-    .mobile-slide-drawer .drawer-header h3,
-    .mobile-slide-drawer .drawer-close,
-    .mobile-slide-drawer .profile-name {
-        color: #ffffff !important;
-    }
-
-    .mobile-slide-drawer .section-label,
-    .mobile-slide-drawer .profile-role,
-    .mobile-slide-drawer .theme-text {
-        color: rgba(255, 255, 255, 0.55) !important;
-    }
-
-    .mobile-slide-drawer .nav-link {
-        color: rgba(255, 255, 255, 0.85) !important;
-        border-radius: 12px;
-    }
-
-    .mobile-slide-drawer .nav-icon {
-        color: rgba(255, 255, 255, 0.65) !important;
-    }
-
-    .mobile-slide-drawer .nav-link.active {
-        background: #ffffff !important;
-        color: #000000 !important;
-    }
-
-    .mobile-slide-drawer .nav-link.active .nav-icon {
-        color: #000000 !important;
-    }
-
-    .mobile-slide-drawer .sidebar-bottom,
-    body.dark-mode .mobile-slide-drawer .sidebar-bottom {
-        background: transparent !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
-    }
-
-    .mobile-slide-drawer .theme-toggle-container {
-        border-bottom-color: rgba(255, 255, 255, 0.12) !important;
-    }
-
-    /* Floating Liquid Glass Pill Bottom Navbar */
-    .mobile-bottom-navbar,
-    body.dark-mode .mobile-bottom-navbar {
-        display: flex !important;
-        left: 1rem !important;
-        right: 1rem !important;
-        bottom: calc(0.85rem + env(safe-area-inset-bottom)) !important;
-        height: 62px !important;
-        padding: 0.35rem 0.4rem !important;
-        border-radius: 999px !important;
-        background: rgba(10, 10, 10, 0.65) !important;
-        backdrop-filter: blur(26px) saturate(180%) !important;
-        -webkit-backdrop-filter: blur(26px) saturate(180%) !important;
-        border: 1px solid rgba(255, 255, 255, 0.18) !important;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24), 0 14px 34px rgba(0, 0, 0, 0.6) !important;
-    }
-
-    .mobile-btm-glass-wrap {
-        width: 100%;
-        height: 100%;
-    }
-
-    .mobile-btm-inner {
-        width: 100%;
-        height: 62px;
-        display: flex;
-        align-items: center;
-        justify-content: space-around;
-        padding: 0.35rem 0.4rem;
-        border-radius: 999px;
-        background: rgba(0, 0, 0, 0.55);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-    }
-
-    .mobile-btm-item,
-    body.dark-mode .mobile-btm-item {
-        height: 100%;
-        border-radius: 999px;
-        color: rgba(255, 255, 255, 0.58) !important;
-    }
-
-    .mobile-btm-item.active,
-    body.dark-mode .mobile-btm-item.active {
-        color: #000000 !important;
-        background: #ffffff !important;
-    }
-
-    /* Subpages keep top spacing; Dashboard starts flush at top: 0 */
-    .main-content-wrapper {
-        margin-left: 0 !important;
-        width: 100% !important;
-        padding-top: 76px !important;
-        padding-bottom: calc(64px + env(safe-area-inset-bottom)) !important;
-    }
-
-    body:has(.mobile-liquid-dashboard) .main-content-wrapper,
-    body:has(.mobile-liquid-profile) .main-content-wrapper {
-        padding-top: 0 !important;
-        padding-bottom: 0 !important;
-        background-color: #000000 !important;
-    }
-
-    body:has(.mobile-liquid-dashboard),
-    body:has(.mobile-liquid-profile) {
-        background-color: #000000 !important;
-    }
-
-    /* Apple Liquid Glass Slide-Out Drawer (Mobile Only) */
-    .mobile-slide-drawer,
-    body.dark-mode .mobile-slide-drawer {
-        width: 290px;
-        background: linear-gradient(160deg,
-                rgba(255, 255, 255, 0.13) 0%,
-                rgba(15, 23, 42, 0.52) 45%,
-                rgba(0, 0, 0, 0.68) 100%) !important;
-        backdrop-filter: blur(36px) saturate(200%) !important;
-        -webkit-backdrop-filter: blur(36px) saturate(200%) !important;
-        border-left: 1px solid rgba(255, 255, 255, 0.24) !important;
-        border-radius: 28px 0 0 28px;
-        box-shadow:
-            inset 1px 0 0 rgba(255, 255, 255, 0.28),
-            -16px 0 42px rgba(0, 0, 0, 0.6) !important;
+            inset 1px 0 0 rgba(255, 255, 255, 0.24),
+            -16px 0 42px rgba(0, 0, 0, 0.78) !important;
     }
 
     .mobile-slide-drawer .drawer-header,
@@ -691,7 +565,6 @@ body.dark-mode .nav-icon {
         text-transform: uppercase;
     }
 
-    /* Circular Liquid Glass Close Button */
     .mobile-slide-drawer .drawer-close {
         width: 36px;
         height: 36px;
@@ -719,13 +592,12 @@ body.dark-mode .nav-icon {
         gap: 0.35rem;
     }
 
-    /* Liquid Glass Nav Buttons */
     .mobile-slide-drawer .nav-link {
         color: rgba(255, 255, 255, 0.88) !important;
         padding: 0.68rem 0.9rem;
         border-radius: 14px;
         border: 1px solid transparent;
-        background: rgba(255, 255, 255, 0.03);
+        background: rgba(255, 255, 255, 0.04);
         transition: all 0.2s ease;
     }
 
@@ -740,14 +612,13 @@ body.dark-mode .nav-icon {
         color: rgba(255, 255, 255, 0.72) !important;
     }
 
-    /* Active Liquid Glass Pill Button */
     .mobile-slide-drawer .nav-link.active {
         background: linear-gradient(145deg,
-                rgba(255, 255, 255, 0.28) 0%,
+                rgba(255, 255, 255, 0.26) 0%,
                 rgba(255, 255, 255, 0.12) 100%) !important;
-        border: 1px solid rgba(255, 255, 255, 0.38) !important;
+        border: 1px solid rgba(255, 255, 255, 0.36) !important;
         box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.5),
+            inset 0 1px 0 rgba(255, 255, 255, 0.45),
             0 8px 20px rgba(0, 0, 0, 0.3);
         color: #ffffff !important;
         font-weight: 700;
@@ -757,7 +628,6 @@ body.dark-mode .nav-icon {
         color: #ffffff !important;
     }
 
-    /* Bottom Glass Cards (Theme Toggle + Profile) */
     .mobile-slide-drawer .sidebar-bottom,
     body.dark-mode .mobile-slide-drawer .sidebar-bottom {
         background: transparent !important;
@@ -799,10 +669,60 @@ body.dark-mode .nav-icon {
     .mobile-slide-drawer .profile-role {
         color: rgba(255, 255, 255, 0.6) !important;
     }
+
+    /* Floating Liquid Glass Pill Bottom Navbar */
+    .mobile-bottom-navbar,
+    body.dark-mode .mobile-bottom-navbar {
+        display: flex !important;
+        left: 1rem !important;
+        right: 1rem !important;
+        bottom: calc(0.85rem + env(safe-area-inset-bottom)) !important;
+        height: 62px !important;
+        padding: 0.35rem 0.4rem !important;
+        border-radius: 999px !important;
+        background: rgba(10, 10, 10, 0.65) !important;
+        backdrop-filter: blur(26px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(26px) saturate(180%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24), 0 14px 34px rgba(0, 0, 0, 0.6) !important;
+    }
+
+    .mobile-btm-item,
+    body.dark-mode .mobile-btm-item {
+        height: 100%;
+        border-radius: 999px;
+        color: rgba(255, 255, 255, 0.58) !important;
+    }
+
+    .mobile-btm-item.active,
+    body.dark-mode .mobile-btm-item.active {
+        color: #000000 !important;
+        background: #ffffff !important;
+    }
+
+    .main-content-wrapper {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding-top: 76px !important;
+        padding-bottom: calc(64px + env(safe-area-inset-bottom)) !important;
+    }
+
+    body:has(.mobile-liquid-dashboard) .main-content-wrapper,
+    body:has(.mobile-liquid-profile) .main-content-wrapper {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        background-color: #000000 !important;
+    }
+
+    body:has(.mobile-liquid-dashboard),
+    body:has(.mobile-liquid-profile) {
+        background-color: #000000 !important;
+    }
 }
 
 /* --- GLOBAL POPUP/MODAL OVERLAP FIX --- */
 body:has(.modal-overlay) .mobile-top-navbar,
-body:has(.modal-overlay) .mobile-bottom-navbar {
+body:has(.modal-overlay) .mobile-bottom-navbar,
+body:has(.modal-overlay) .mp-edit-fab {
     display: none !important;
 }

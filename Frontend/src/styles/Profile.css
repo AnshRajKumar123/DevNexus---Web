@@ -621,7 +621,7 @@ body.dark-mode .activity-section-header h2 {
 
     /* Top-Right Liquid Glass Pencil Edit Button */
     .mp-edit-fab {
-        position: absolute;
+        position: fixed;
         top: calc(0.75rem + env(safe-area-inset-top));
         right: 4.5rem;
         width: 40px;
@@ -637,7 +637,7 @@ body.dark-mode .activity-section-header h2 {
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        z-index: 5;
+        z-index: 1001;
     }
 
     /* Centered Avatar */
