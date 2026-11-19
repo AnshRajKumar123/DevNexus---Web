@@ -581,3 +581,28 @@ body.dark-mode .empty-icon-wrapper {
     color: #1e293b;
     font-size: 1rem;
 }
+
+/* --- UNLOCK NATIVE WINDOW SCROLL ON MOBILE (AUTO-HIDE CHROME URL BAR) --- */
+@media (max-width: 768px) {
+    html,
+    body {
+        height: auto;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .dashboard-container {
+        height: auto;
+        min-height: 100dvh;
+        overflow: visible;
+    }
+
+    .main-content-wrapper {
+        overflow: visible;
+    }
+
+    .main-content {
+        overflow-y: visible;
+        overflow-x: hidden;
+    }
+}
