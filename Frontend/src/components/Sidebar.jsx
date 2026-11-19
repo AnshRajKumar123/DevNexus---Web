@@ -3,22 +3,22 @@ import { NavLink, Link, useLocation } from 'react-router-dom';
 import {
     Sun, MessageCircle, Calendar,
     Globe, Users, MessageSquare, Link as LinkIcon, Plug,
-    CheckCircle2, Menu, X, LayoutDashboard, Briefcase
+    CheckCircle2, Menu, X, Briefcase
 } from 'lucide-react';
-import { useData } from '../context/DataContext'; 
+import { useData } from '../context/DataContext';
 import '../styles/Sidebar.css';
 import { DashPic } from '../assets/assets';
 
 const API_URL = `${import.meta.env.VITE_API_URL}/api`;
 
 export default function Sidebar() {
-    // Pulling the dark mode state and toggle function from DataContext
-    const { currentUser, isDarkMode, toggleTheme } = useData(); 
+    const { currentUser, isDarkMode, toggleTheme } = useData();
     const [unreadCount, setUnreadCount] = useState(0);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const location = useLocation();
 
-    // Close mobile menu on route change
+    const isDashboard = location.pathname === '/';
+
     useEffect(() => {
         setMobileMenuOpen(false);
     }, [location.pathname]);
@@ -31,8 +31,8 @@ export default function Sidebar() {
                 const res = await fetch(`${API_URL}/chats`);
                 if (res.ok) {
                     const chats = await res.json();
-                    const unread = chats.filter(c => 
-                        c.senderEmail !== currentUser.email && 
+                    const unread = chats.filter(c =>
+                        c.senderEmail !== currentUser.email &&
                         (c.recipientEmail === 'all' || c.recipientEmail === currentUser.email) &&
                         (!c.readBy || !c.readBy.includes(currentUser.email))
                     );
@@ -58,11 +58,11 @@ export default function Sidebar() {
         {
             label: 'Messages',
             items: [
-                { 
-                    title: 'ChatBox', 
-                    icon: <MessageCircle size={18} />, 
+                {
+                    title: 'ChatBox',
+                    icon: <MessageCircle size={18} />,
                     path: '/chat',
-                    badge: unreadCount > 0 ? unreadCount : null 
+                    badge: unreadCount > 0 ? unreadCount : null
                 },
             ]
         },
@@ -91,7 +91,7 @@ export default function Sidebar() {
         }
     ];
 
-    const avatarSrc = currentUser?.imgUrl 
+    const avatarSrc = currentUser?.imgUrl
         ? (currentUser.imgUrl.startsWith('http') ? currentUser.imgUrl : `${import.meta.env.VITE_API_URL}${currentUser.imgUrl}`)
         : `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser?.name || 'User')}&background=${currentUser?.isSupremeAdmin ? '0f172a' : 'e5e7eb'}&color=${currentUser?.isSupremeAdmin ? 'fff' : '374151'}&bold=true`;
 
@@ -100,23 +100,25 @@ export default function Sidebar() {
         { title: 'ChatBox', icon: <MessageCircle size={20} />, path: '/chat', badge: unreadCount > 0 ? unreadCount : null },
         { title: 'Projects', icon: <Briefcase size={20} />, path: '/projects' },
         { title: 'To-Do', icon: <CheckCircle2 size={20} />, path: '/todo' },
-        { title: 'Profile', icon: <img src={avatarSrc} alt="Profile" style={{ width: '22px', height: '22px', borderRadius: '50%', objectFit: 'cover' }} />, path: '/profile' }
+        { title: 'Profile', icon: <img src={avatarSrc} alt="Profile" className="mobile-btm-avatar" />, path: '/profile' }
     ];
 
     return (
         <>
             {/* --- MOBILE TOP NAVBAR --- */}
-            <div className="mobile-top-navbar">
+            <div className={`mobile-top-navbar ${isDashboard ? 'is-dashboard' : 'is-subpage'}`}>
                 <div className="mobile-brand">
                     <img src={DashPic.WebLogo} alt="DevNexus" className="brand-logo" />
                     <span className="brand-text">DevNexus</span>
                 </div>
-                <button 
-                    className="mobile-hamburger-btn" 
+
+                <button
+                    className="mobile-hamburger-btn"
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                     aria-label="Toggle Menu"
+                    type="button"
                 >
-                    {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                    {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
                 </button>
             </div>
 
@@ -124,7 +126,7 @@ export default function Sidebar() {
             <div className={`mobile-drawer-overlay ${mobileMenuOpen ? 'open' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                 <div className={`mobile-slide-drawer ${mobileMenuOpen ? 'open' : ''}`} onClick={e => e.stopPropagation()}>
                     <div className="drawer-header">
-                        <h3>Navigation Menu</h3>
+                        <h3>DevNexus</h3>
                         <button className="drawer-close" onClick={() => setMobileMenuOpen(false)}>
                             <X size={20} />
                         </button>
@@ -150,7 +152,6 @@ export default function Sidebar() {
                         ))}
                     </div>
                     <div className="sidebar-bottom">
-                        {/* Custom Theme Toggle */}
                         <div className="theme-toggle-container">
                             <label className="switch">
                                 <input type="checkbox" checked={isDarkMode} onChange={toggleTheme} />
@@ -159,7 +160,7 @@ export default function Sidebar() {
                             <span className="theme-text">{isDarkMode ? 'Dark Mode' : 'Light Mode'}</span>
                         </div>
 
-                        <Link to="/profile" style={{ textDecoration: 'none' }}>
+                        <Link to="/profile" className="profile-link-reset">
                             <div className="profile-widget hover-pop">
                                 <img src={avatarSrc} alt={currentUser?.name || "Profile"} className="profile-pic" />
                                 <div className="profile-info">
@@ -208,7 +209,6 @@ export default function Sidebar() {
                 </div>
 
                 <div className="sidebar-bottom">
-                    {/* Custom Theme Toggle */}
                     <div className="theme-toggle-container">
                         <label className="switch">
                             <input type="checkbox" checked={isDarkMode} onChange={toggleTheme} />
@@ -217,7 +217,7 @@ export default function Sidebar() {
                         <span className="theme-text">{isDarkMode ? 'Dark Mode' : 'Light Mode'}</span>
                     </div>
 
-                    <Link to="/profile" style={{ textDecoration: 'none' }}>
+                    <Link to="/profile" className="profile-link-reset">
                         <div className="profile-widget hover-pop">
                             <img src={avatarSrc} alt={currentUser?.name || "Profile"} className="profile-pic" />
                             <div className="profile-info">
@@ -229,12 +229,12 @@ export default function Sidebar() {
                 </div>
             </aside>
 
-            {/* --- MOBILE BOTTOM NAVBAR --- */}
+            {/* --- MOBILE BOTTOM NAVBAR (LIQUID GLASS PILL) --- */}
             <nav className="mobile-bottom-navbar">
                 {mobileBottomNav.map((nav, idx) => (
-                    <NavLink 
-                        key={idx} 
-                        to={nav.path} 
+                    <NavLink
+                        key={idx}
+                        to={nav.path}
                         className={({ isActive }) => isActive ? "mobile-btm-item active" : "mobile-btm-item"}
                     >
                         <div className="mobile-btm-icon-wrapper">

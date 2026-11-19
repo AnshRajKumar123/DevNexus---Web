@@ -639,3 +639,539 @@
         padding: 0.5rem 1rem 1rem 1rem;
     }
 }
+
+/* =========================================================
+   MOBILE LIQUID GLASS DASHBOARD (<= 768px)
+   Top 50vh: Very Dark Blue -> Fog Fade -> Pure Black & White
+   ========================================================= */
+.mobile-liquid-dashboard {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .desktop-dashboard-view {
+        display: none !important;
+    }
+
+    .mobile-liquid-dashboard {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        min-height: 100dvh;
+        background: #000000;
+        color: #ffffff;
+        padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
+        margin-top: 0;
+    }
+
+    /* Top 50% Screen Height: Deep Dark Blue (No Neon) */
+    .ml-hero {
+        width: 100%;
+        height: 50dvh;
+        min-height: 360px;
+        padding: calc(5.25rem + env(safe-area-inset-top)) 1.25rem 3.5rem 1.25rem;
+        background: linear-gradient(180deg,
+                #0b1d42 0%,
+                #081533 42%,
+                #040b1d 76%,
+                #000000 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Fog / Soft Blur Shadow Transition at the Middle of the Screen */
+    .ml-hero-fog {
+        position: absolute;
+        left: -10%;
+        right: -10%;
+        bottom: -2px;
+        height: 130px;
+        background: linear-gradient(to bottom,
+                rgba(0, 0, 0, 0) 0%,
+                rgba(0, 0, 0, 0.55) 45%,
+                rgba(0, 0, 0, 0.92) 78%,
+                #000000 100%);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        mask-image: linear-gradient(to bottom, transparent 0%, #000 65%);
+        -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 65%);
+        pointer-events: none;
+        z-index: 3;
+    }
+
+    /* Date Ruler */
+    .ml-date-ruler {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.9rem;
+        width: 100%;
+        z-index: 2;
+        margin-bottom: 1.75rem;
+    }
+
+    .ml-ticks {
+        flex: 1;
+        height: 14px;
+        background-image: repeating-linear-gradient(90deg,
+                rgba(255, 255, 255, 0.35) 0px,
+                rgba(255, 255, 255, 0.35) 1.5px,
+                transparent 1.5px,
+                transparent 6px);
+        -webkit-mask-image: linear-gradient(90deg, transparent, #000 35%, #000 65%, transparent);
+        mask-image: linear-gradient(90deg, transparent, #000 35%, #000 65%, transparent);
+    }
+
+    .ml-date-center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        line-height: 1.15;
+    }
+
+    .ml-today-label {
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .ml-date-val {
+        font-size: 0.95rem;
+        font-weight: 800;
+        color: #ffffff;
+    }
+
+    /* Hero Typography */
+    .ml-hero-headline {
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .ml-hero-headline h1 {
+        margin: 0;
+        font-size: 2.3rem;
+        font-weight: 900;
+        letter-spacing: -1px;
+        text-transform: uppercase;
+        line-height: 1;
+        color: #ffffff;
+    }
+
+    .ml-hero-name {
+        margin: 0.15rem 0 0.75rem 0;
+        font-size: 3rem;
+        font-weight: 900;
+        letter-spacing: -1.5px;
+        text-transform: uppercase;
+        line-height: 0.95;
+        background: linear-gradient(180deg, #ffffff 30%, rgba(255, 255, 255, 0.65) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .ml-hero-sub {
+        margin: 0;
+        font-size: 0.84rem;
+        color: rgba(255, 255, 255, 0.65);
+        max-width: 280px;
+        line-height: 1.4;
+    }
+
+    /* Pure Black & White Lower Half */
+    .ml-body {
+        display: flex;
+        flex-direction: column;
+        gap: 1.15rem;
+        padding: 0 1rem 1rem 1rem;
+        background: #000000;
+        position: relative;
+        z-index: 4;
+        margin-top: -1.25rem;
+    }
+
+    .ml-lg-block {
+        width: 100%;
+    }
+
+    .ml-lg-todo-wrap {
+        flex-shrink: 0;
+        scroll-snap-align: start;
+    }
+
+    .ml-section-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.65rem;
+        padding: 0 0.25rem;
+    }
+
+    .ml-section-label {
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        color: rgba(255, 255, 255, 0.55);
+    }
+
+    .ml-bw-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #ffffff;
+        text-decoration: none;
+    }
+
+    /* Horizontal To-Do Cards */
+    .ml-horizontal-scroll {
+        display: flex;
+        gap: 0.85rem;
+        overflow-x: auto;
+        padding-bottom: 0.35rem;
+        scroll-snap-type: x mandatory;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .ml-horizontal-scroll::-webkit-scrollbar {
+        display: none;
+    }
+
+    .ml-todo-card {
+        width: 225px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 22px;
+        padding: 1.1rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 0.85rem;
+    }
+
+    .ml-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .ml-card-eyebrow {
+        font-size: 0.62rem;
+        font-weight: 800;
+        letter-spacing: 0.8px;
+        color: rgba(255, 255, 255, 0.55);
+    }
+
+    .ml-card-status {
+        font-size: 0.62rem;
+        font-weight: 800;
+        padding: 0.15rem 0.5rem;
+        border-radius: 99px;
+        background: rgba(255, 255, 255, 0.12);
+        color: #ffffff;
+    }
+
+    .ml-card-title {
+        margin: 0;
+        font-size: 0.98rem;
+        font-weight: 800;
+        color: #ffffff;
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .ml-card-foot {
+        display: flex;
+        align-items: center;
+    }
+
+    /* Monochrome Glass Pill Buttons */
+    .ml-bw-pill-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.45rem 0.9rem;
+        border-radius: 99px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        color: #ffffff;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .ml-bw-pill-btn.solid {
+        background: #ffffff;
+        color: #000000;
+        border-color: #ffffff;
+    }
+
+    .ml-done-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #ffffff;
+    }
+
+    /* Oversized Metrics Strip (Pure Black & White) */
+    .ml-metrics-glass {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 24px;
+        padding: 1.25rem 1.1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .ml-metric-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .ml-metric-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .ml-big-num {
+        font-size: 2rem;
+        font-weight: 900;
+        color: #ffffff;
+        letter-spacing: -1px;
+        line-height: 1;
+    }
+
+    .ml-big-sub {
+        font-size: 1rem;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.45);
+    }
+
+    .ml-metric-unit {
+        margin-top: 0.35rem;
+        font-size: 0.62rem;
+        font-weight: 800;
+        letter-spacing: 1.2px;
+        color: rgba(255, 255, 255, 0.55);
+    }
+
+    .ml-metric-divider {
+        width: 1px;
+        height: 36px;
+        background: rgba(255, 255, 255, 0.14);
+    }
+
+    .ml-metric-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+
+    .ml-metric-actions .ml-bw-pill-btn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    /* Compact "All Caught Up" Box */
+    .ml-compact-done-box {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 20px;
+        padding: 0.9rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+
+    .ml-done-left {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .ml-done-icon {
+        color: #ffffff;
+        flex-shrink: 0;
+    }
+
+    .ml-compact-done-box h4 {
+        margin: 0;
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: #ffffff;
+    }
+
+    .ml-compact-done-box p {
+        margin: 0.15rem 0 0 0;
+        font-size: 0.73rem;
+        color: rgba(255, 255, 255, 0.55);
+    }
+
+    /* Populated Glass Activity Widgets */
+    .ml-activity-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .ml-glass-widget {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 22px;
+        padding: 1.1rem;
+    }
+
+    .ml-widget-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.85rem;
+    }
+
+    .ml-widget-head h3 {
+        margin: 0;
+        font-size: 0.92rem;
+        font-weight: 800;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+    }
+
+    .ml-widget-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .ml-list-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .ml-list-row:first-child {
+        padding-top: 0;
+        border-top: none;
+    }
+
+    .ml-list-text {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .ml-list-text h4 {
+        margin: 0;
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: #ffffff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .ml-list-text span {
+        font-size: 0.72rem;
+        color: rgba(255, 255, 255, 0.55);
+    }
+
+    .ml-list-right {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .ml-mini-badge {
+        font-size: 0.65rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        padding: 0.22rem 0.6rem;
+        border-radius: 99px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        color: #ffffff;
+        white-space: nowrap;
+    }
+
+    .ml-mini-badge.danger {
+        background: rgba(239, 68, 68, 0.2);
+        border-color: rgba(252, 165, 165, 0.4);
+    }
+
+    .ml-inline-actions {
+        display: flex;
+        gap: 0.35rem;
+    }
+
+    .ml-icon-glass-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .ml-icon-glass-btn.danger {
+        color: #fca5a5;
+    }
+
+    .ml-time-chip {
+        padding: 0.35rem 0.6rem;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        font-size: 0.72rem;
+        font-weight: 800;
+        flex-shrink: 0;
+    }
+
+    /* Apple Liquid Glass Surface (Pure Black & White) */
+    .ml-liquid-surface {
+        background: linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.09) 0%,
+            rgba(255, 255, 255, 0.03) 100%
+        );
+        backdrop-filter: blur(24px) saturate(160%);
+        -webkit-backdrop-filter: blur(24px) saturate(160%);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.25),
+            inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+            0 12px 30px rgba(0, 0, 0, 0.45);
+    }
+}

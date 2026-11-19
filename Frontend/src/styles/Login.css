@@ -504,3 +504,182 @@
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
     }
 }
+
+/* --- TABLET ADJUSTMENT (769px - 900px) --- */
+@media (max-width: 900px) and (min-width: 769px) {
+    .login-wrapper {
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .login-banner-side {
+        display: none;
+    }
+
+    .login-form-side {
+        padding: 1.5rem;
+        background: #f8fafc;
+    }
+
+    .login-card {
+        padding: 2.5rem 2rem;
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+    }
+}
+
+/* =========================================================
+   MOBILE APPLE LIQUID GLASSMORPHISM LOGIN (<= 768px ONLY)
+   ========================================================= */
+@media (max-width: 768px) {
+    .login-wrapper {
+        flex-direction: column;
+        min-height: 100dvh;
+        height: auto;
+        overflow-y: auto;
+        background:
+            radial-gradient(circle at 50% 0%, #0b1d42 0%, #050d21 38%, #000000 72%),
+            #000000 !important;
+        position: relative;
+    }
+
+    .login-banner-side {
+        display: none;
+    }
+
+    .login-form-side {
+        flex: 1;
+        width: 100%;
+        min-height: 100dvh;
+        padding: calc(2rem + env(safe-area-inset-top)) 1.25rem calc(2rem + env(safe-area-inset-bottom)) 1.25rem;
+        background: transparent !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Liquid Glass Login Card */
+    .login-card {
+        width: 100%;
+        max-width: 390px;
+        padding: 2.25rem 1.6rem;
+        border-radius: 28px;
+        background: linear-gradient(
+            155deg,
+            rgba(255, 255, 255, 0.11) 0%,
+            rgba(255, 255, 255, 0.03) 100%
+        ) !important;
+        backdrop-filter: blur(28px) saturate(180%);
+        -webkit-backdrop-filter: blur(28px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.28),
+            inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+            0 20px 50px rgba(0, 0, 0, 0.65);
+    }
+
+    .login-header {
+        margin-bottom: 2rem;
+    }
+
+    .login-logo {
+        height: 66px;
+        width: 66px;
+        border-radius: 18px;
+        margin-bottom: 1.15rem;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .login-header h2 {
+        color: #ffffff !important;
+        font-size: 1.65rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+
+    .login-header p {
+        color: rgba(255, 255, 255, 0.6) !important;
+        font-size: 0.88rem;
+    }
+
+    .input-group label {
+        color: rgba(255, 255, 255, 0.78) !important;
+        font-size: 0.8rem;
+        font-weight: 700;
+    }
+
+    /* Liquid Glass Inputs */
+    .input-group input {
+        padding: 0.88rem 1rem;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.07) !important;
+        border: 1px solid rgba(255, 255, 255, 0.16) !important;
+        color: #ffffff !important;
+        font-size: 0.95rem;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .input-group input::placeholder {
+        color: rgba(255, 255, 255, 0.38);
+    }
+
+    .input-group input:focus {
+        background: rgba(255, 255, 255, 0.12) !important;
+        border-color: rgba(255, 255, 255, 0.42) !important;
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .password-toggle-btn {
+        color: rgba(255, 255, 255, 0.58) !important;
+    }
+
+    .password-toggle-btn:hover {
+        color: #ffffff !important;
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .remember-me {
+        color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    .forgot-password {
+        color: #ffffff !important;
+        opacity: 0.85;
+    }
+
+    /* Crisp White Liquid Glass Sign In Pill */
+    .login-button {
+        margin-top: 0.75rem;
+        padding: 0.92rem;
+        border-radius: 999px;
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: 0.98rem;
+        font-weight: 800;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 10px 26px rgba(255, 255, 255, 0.16);
+    }
+
+    .login-button:hover:not(:disabled),
+    .login-button:active:not(:disabled) {
+        background: rgba(255, 255, 255, 0.9) !important;
+        transform: scale(0.98);
+    }
+
+    .login-button:disabled {
+        background: rgba(255, 255, 255, 0.2) !important;
+        color: rgba(255, 255, 255, 0.5) !important;
+        box-shadow: none;
+    }
+
+    /* Mobile Toast */
+    .security-toast {
+        width: 90%;
+        max-width: 360px;
+        border-radius: 16px;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+}
