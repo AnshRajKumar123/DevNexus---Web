@@ -562,7 +562,7 @@ body.dark-mode .activity-section-header h2 {
         min-height: 100dvh;
         background: #000000;
         color: #ffffff;
-        padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
+        padding-bottom: calc(5.25rem + env(safe-area-inset-bottom));
     }
 
     /* Dynamic Avatar-Colored Top Hero */

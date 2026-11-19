@@ -660,7 +660,7 @@
         min-height: 100dvh;
         background: #000000;
         color: #ffffff;
-        padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
+        padding-bottom: calc(5.25rem + env(safe-area-inset-bottom));
         margin-top: 0;
     }
 
@@ -682,6 +682,23 @@
         text-align: center;
         position: relative;
         overflow: hidden;
+    }
+    
+    /* Dotted Circle Halo + Subtle Glow (Matching Profile Hero) */
+    .ml-hero::before {
+        content: "";
+        position: absolute;
+        top: 12%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 280px;
+        height: 280px;
+        background-image: radial-gradient(rgba(255, 255, 255, 0.22) 1px, transparent 1px);
+        background-size: 11px 11px;
+        mask-image: radial-gradient(circle, #000 18%, transparent 70%);
+        -webkit-mask-image: radial-gradient(circle, #000 18%, transparent 70%);
+        pointer-events: none;
+        z-index: 1;
     }
 
     /* Fog / Soft Blur Shadow Transition at the Middle of the Screen */

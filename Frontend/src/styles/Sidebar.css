@@ -347,13 +347,14 @@
 .mobile-drawer-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(2, 6, 23, 0.55);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     z-index: 1100;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
+    touch-action: none;
 }
 
 .mobile-drawer-overlay.open {
@@ -533,11 +534,18 @@ body.dark-mode .nav-icon {
     /* Pure Black & White Liquid Glass Slide-Out Drawer */
     .mobile-slide-drawer,
     body.dark-mode .mobile-slide-drawer {
-        background: rgba(0, 0, 0, 0.86) !important;
-        backdrop-filter: blur(28px) saturate(160%) !important;
-        -webkit-backdrop-filter: blur(28px) saturate(160%) !important;
-        border-left: 1px solid rgba(255, 255, 255, 0.14) !important;
-        box-shadow: -12px 0 36px rgba(0, 0, 0, 0.7) !important;
+        width: 290px;
+        background: linear-gradient(160deg,
+                rgba(18, 24, 42, 0.86) 0%,
+                rgba(8, 12, 24, 0.9) 50%,
+                rgba(0, 0, 0, 0.94) 100%) !important;
+        backdrop-filter: blur(40px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
+        border-left: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 28px 0 0 28px;
+        box-shadow:
+            inset 1px 0 0 rgba(255, 255, 255, 0.22),
+            -16px 0 42px rgba(0, 0, 0, 0.75) !important;
     }
 
     .mobile-slide-drawer .drawer-header,
@@ -640,8 +648,16 @@ body.dark-mode .nav-icon {
         padding-bottom: calc(64px + env(safe-area-inset-bottom)) !important;
     }
 
-    body:has(.mobile-liquid-dashboard) .main-content-wrapper {
+    body:has(.mobile-liquid-dashboard) .main-content-wrapper,
+    body:has(.mobile-liquid-profile) .main-content-wrapper {
         padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        background-color: #000000 !important;
+    }
+
+    body:has(.mobile-liquid-dashboard),
+    body:has(.mobile-liquid-profile) {
+        background-color: #000000 !important;
     }
 
     /* Apple Liquid Glass Slide-Out Drawer (Mobile Only) */
