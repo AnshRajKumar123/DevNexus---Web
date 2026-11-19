@@ -35,7 +35,7 @@ export default function Calendar() {
     };
 
     return (
-        <div className="dashboard-wrapper page-animate">
+        <div className="dashboard-wrapper page-animate calendar-page">
             <header className="team-hero stagger-1">
                 <div className="hero-text-content">
                     <h1 className="hero-greeting">Team <span className="highlight-name">Schedule</span></h1>

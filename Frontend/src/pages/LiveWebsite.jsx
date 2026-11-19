@@ -73,7 +73,7 @@ export default function LiveWebsite() {
     };
 
     return (
-        <div className="dashboard-wrapper page-animate">
+        <div className="dashboard-wrapper page-animate website-page">
             <header className="team-hero stagger-1">
                 <div className="hero-text-content">
                     <h1 className="hero-greeting">Live <span className="highlight-name">Websites</span></h1>

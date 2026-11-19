@@ -32,7 +32,7 @@ export default function Inquiry() {
     };
 
     return (
-        <div className="dashboard-wrapper page-animate">
+        <div className="dashboard-wrapper page-animate inquiry-page">
             <header className="team-hero stagger-1">
                 <div className="hero-text-content">
                     <h1 className="hero-greeting">Task & <span className="highlight-name">Inquiries</span></h1>

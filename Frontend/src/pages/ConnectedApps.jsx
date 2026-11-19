@@ -77,7 +77,7 @@ export default function ConnectedApps() {
     };
 
     return (
-        <div className="dashboard-wrapper page-animate">
+        <div className="dashboard-wrapper page-animate apps-page">
             <header className="team-hero stagger-1">
                 <div className="hero-text-content">
                     <h1 className="hero-greeting">Connected <span className="highlight-name">Integrations</span></h1>

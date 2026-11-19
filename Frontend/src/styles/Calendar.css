@@ -144,6 +144,7 @@
     font-size: 0.75rem;
     color: #64748b;
     font-weight: 500;
+    flex-wrap: wrap;
 }
 
 .event-type-badge-modern {
@@ -276,7 +277,7 @@
 }
 
 /* =========================================================
-   PITCH BLACK DARK MODE (CALENDAR)
+   PITCH BLACK DARK MODE (DESKTOP CALENDAR)
    ========================================================= */
 body.dark-mode .calendar-title {
     color: #ffffff;
@@ -325,33 +326,218 @@ body.dark-mode .type-physical {
     border-color: #331111;
 }
 
+/* =========================================================
+   MOBILE APPLE LIQUID GLASSMORPHISM CALENDAR (<= 768px)
+   ========================================================= */
 @media (max-width: 768px) {
-    .calendar-card-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
+
+    body:has(.calendar-page),
+    body:has(.calendar-page) .main-content-wrapper,
+    body:has(.calendar-page) .main-content {
+        background-color: #000000 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
     }
 
-    .calendar-time-pill {
+    body:has(.calendar-page) .mobile-top-navbar,
+    body.dark-mode:has(.calendar-page) .mobile-top-navbar {
+        background: transparent !important;
+        border-bottom: none !important;
+        box-shadow: none !important;
+    }
+
+    .calendar-page.dashboard-wrapper {
+        max-width: 100% !important;
+        padding: 0 0 calc(5.5rem + env(safe-area-inset-bottom)) 0 !important;
+        gap: 1.25rem !important;
+        background: #000000;
+        min-height: 100dvh;
+    }
+
+    .calendar-page .team-hero {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1.15rem !important;
+        border-radius: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: calc(5.25rem + env(safe-area-inset-top)) 1.25rem 2rem 1.25rem !important;
+        background: linear-gradient(180deg, #0b1d42 0%, #07132c 52%, #000000 100%) !important;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .calendar-page .team-hero::before {
+        content: "";
+        position: absolute;
+        top: 10%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 240px;
+        height: 240px;
+        background-image: radial-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+        background-size: 11px 11px;
+        mask-image: radial-gradient(circle, #000 20%, transparent 70%);
+        -webkit-mask-image: radial-gradient(circle, #000 20%, transparent 70%);
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .calendar-page .team-hero .hero-greeting {
+        color: #ffffff !important;
+        font-size: 1.85rem !important;
+        font-weight: 900 !important;
+    }
+
+    .calendar-page .team-hero .highlight-name {
+        background: linear-gradient(180deg, #ffffff 30%, rgba(255, 255, 255, 0.6) 100%) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+    }
+
+    .calendar-page .team-hero .hero-subtitle {
+        color: rgba(255, 255, 255, 0.62) !important;
+        font-size: 0.84rem !important;
+    }
+
+    .calendar-page .team-hero .btn-modern-primary {
+        width: 100% !important;
+        justify-content: center !important;
+        border-radius: 999px !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-weight: 800 !important;
+        box-shadow: 0 8px 22px rgba(255, 255, 255, 0.16);
+    }
+
+    .calendar-page .dashboard-grid {
+        padding: 0 1rem;
+    }
+
+    .calendar-page .premium-widget {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        overflow: visible !important;
+    }
+
+    .calendar-page .premium-widget::before {
+        display: none !important;
+    }
+
+    .calendar-page .widget-header {
+        padding: 0.25rem 0.25rem 0.85rem 0.25rem !important;
+        border-bottom: none !important;
+    }
+
+    .calendar-page .widget-header h3 {
+        color: rgba(255, 255, 255, 0.6) !important;
+        font-size: 0.72rem !important;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+    }
+
+    .calendar-page .calendar-list-modern {
+        padding: 0 !important;
+        gap: 0.85rem;
+    }
+
+    .calendar-page .calendar-card-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.85rem;
+        padding: 1.1rem !important;
+        border-radius: 22px;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 100%) !important;
+        backdrop-filter: blur(24px) saturate(160%);
+        -webkit-backdrop-filter: blur(24px) saturate(160%);
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 10px 26px rgba(0, 0, 0, 0.45);
+    }
+
+    .calendar-page .calendar-time-pill {
         width: 100%;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        color: #ffffff !important;
+        border-radius: 14px;
     }
 
-    .calendar-attendees-col {
+    .calendar-page .cal-date-sub {
+        margin-top: 0;
+        color: rgba(255, 255, 255, 0.65) !important;
+    }
+
+    .calendar-page .calendar-main-info h4 {
+        color: #ffffff !important;
+        font-size: 1rem;
+    }
+
+    .calendar-page .calendar-meta-tags {
+        color: rgba(255, 255, 255, 0.58) !important;
+    }
+
+    .calendar-page .event-type-badge-modern,
+    .calendar-page .attendees-pill {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        color: #ffffff !important;
+    }
+
+    .calendar-page .calendar-attendees-col {
         width: 100%;
         justify-content: flex-start;
+        padding-top: 0.65rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.09);
     }
 
-    .modal-content {
-        max-width: 90% !important;
-        padding: 1.25rem !important;
-        margin: 1rem;
+    .calendar-page .empty-state {
+        padding: 2.5rem 1.25rem;
+        border-radius: 22px;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        color: rgba(255, 255, 255, 0.6);
     }
 
-    .form-group-row {
+    .calendar-page .empty-state h3 {
+        color: #ffffff !important;
+    }
+
+    .calendar-page .empty-state .btn-modern-primary {
+        border-radius: 999px;
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
+
+    /* Liquid Glass Modal */
+    .calendar-page .modal-content {
+        width: 92% !important;
+        max-width: 400px !important;
+        padding: 1.5rem !important;
+        border-radius: 26px !important;
+        background: linear-gradient(160deg, rgba(255, 255, 255, 0.14) 0%, rgba(10, 10, 10, 0.92) 100%) !important;
+        backdrop-filter: blur(32px) saturate(190%) !important;
+        -webkit-backdrop-filter: blur(32px) saturate(190%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.22) !important;
+        color: #ffffff !important;
+    }
+
+    .calendar-page .modal-header h2 {
+        color: #ffffff !important;
+    }
+
+    .calendar-page .form-group-row {
         flex-direction: column !important;
-        gap: 0 !important;
+        gap: 1rem !important;
+    }
+
+    .calendar-page .modern-input {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        color: #ffffff !important;
+        border-radius: 14px !important;
     }
 }

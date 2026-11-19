@@ -24,7 +24,7 @@ export default function QuickLinks() {
     };
 
     return (
-        <div className="dashboard-wrapper page-animate">
+        <div className="dashboard-wrapper page-animate links-page">
             <header className="team-hero stagger-1">
                 <div className="hero-text-content">
                     <h1 className="hero-greeting">Quick <span className="highlight-name">Links</span></h1>
