@@ -12,6 +12,13 @@
         content="Centralized team management dashboard for DevNexus. Manage tasks, quick links, and connected apps including WhatsApp, Instagram, Gmail, and Calendar." />
     <meta name="keywords" content="DevNexus, Team Dashboard, Task Management, API Integration" />
 
+    <!-- PWA Manifest & Standalone Mode -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="DevNexus" />
+
     <!-- Favicon (Website Logo) -->
     <link rel="icon" type="image/png" href="/WebLogo.png" />
     <link rel="apple-touch-icon" href="/WebLogo.png" />
@@ -36,6 +43,15 @@
 <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+
+    <!-- Register Service Worker for Standalone PWA & Firebase Notifications -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/firebase-messaging-sw.js').catch(() => {});
+            });
+        }
+    </script>
 </body>
 
 </html>

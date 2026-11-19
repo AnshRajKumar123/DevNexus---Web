@@ -16,9 +16,9 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification.title || "DevNexus";
   const notificationOptions = {
     body: payload.notification.body || "You have a new message.",
-    icon: payload.notification.icon || '/logo.png',
+    icon: payload.notification.icon || '/WebLogo.png',
     image: payload.notification.image || undefined,
-    tag: 'devnexus-chat-notification', // Overwrites any existing notification with the same tag
+    tag: 'devnexus-chat-notification',
     renotify: true,
     data: { url: payload.webpush?.notification?.click_action || '/chat' }
   };
@@ -41,4 +41,17 @@ self.addEventListener('notificationclick', (event) => {
       }
     })
   );
+});
+
+// --- PWA INSTALLABILITY HANDLERS ---
+self.addEventListener('install', () => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
+});
+
+self.addEventListener('fetch', () => {
+  // Pass-through handler required for Android Chrome standalone PWA installation
 });
