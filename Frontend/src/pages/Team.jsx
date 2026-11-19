@@ -126,7 +126,7 @@ export default function Team() {
 
         await saveOp;
         setShowModal(false);
-        fetchTeam(); // Refresh immediately
+        fetchTeam();
     };
 
     const isUserOnline = (lastSeen) => {
@@ -135,13 +135,12 @@ export default function Team() {
         return diff < 15000;
     };
 
-    // Calculate avatar for preview in the modal
     const previewAvatar = imgUrl
         ? (imgUrl.startsWith('http') ? imgUrl : `${import.meta.env.VITE_API_URL}${imgUrl}`)
         : `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'New')}&background=e5e7eb&color=374151&size=150`;
 
     return (
-        <div className="dashboard-wrapper page-animate">
+        <div className="dashboard-wrapper page-animate team-page">
             <header className="team-hero stagger-1">
                 <div className="hero-text-content">
                     <h1 className="hero-greeting">Team <span className="highlight-name">Directory</span></h1>
@@ -244,7 +243,6 @@ export default function Team() {
                         </div>
 
                         <div className="team-modal-body">
-                            {/* Left Side: Avatar Upload */}
                             <div className="team-modal-sidebar">
                                 <img src={previewAvatar} alt="Preview" className="modal-avatar-preview" />
                                 <label className="btn-modern-secondary upload-btn hover-pop">
@@ -253,7 +251,6 @@ export default function Team() {
                                 </label>
                             </div>
 
-                            {/* Right Side: Form */}
                             <form onSubmit={handleSave} className="modern-form team-modal-form">
                                 <div className="form-group-row">
                                     <div className="form-group flex-1">

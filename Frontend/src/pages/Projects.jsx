@@ -122,8 +122,7 @@ export default function Projects() {
     const renderCategoryIcon = (cat) => {
         if (cat.includes('Web')) return <Layout size={18} color="#3b82f6" />;
         if (cat.includes('App') || cat.includes('Mobile')) return <Terminal size={18} color="#10b981" />;
-        // CHANGED: Removed Purple, now Dark Blue
-        if (cat.includes('AI') || cat.includes('Machine')) return <Rocket size={18} color="#1e3a8a" />; 
+        if (cat.includes('AI') || cat.includes('Machine')) return <Rocket size={18} color="#1e3a8a" />;
         return <Code2 size={18} color="#f59e0b" />;
     };
 
@@ -137,7 +136,7 @@ export default function Projects() {
     const pendingIdeas = displayProjects.filter(p => p.status === 'Pending Approval');
 
     return (
-        <div className="dashboard-wrapper page-animate">
+        <div className="dashboard-wrapper page-animate projects-page">
             <header className="team-hero stagger-1">
                 <div className="hero-text-content">
                     <h1 className="hero-greeting">Team <span className="highlight-name">Projects</span></h1>
@@ -195,7 +194,7 @@ export default function Projects() {
                                     return (
                                         <div key={idToUse} className="project-card-modern fade-in-row" onClick={() => {
                                             setViewingProject(proj);
-                                            window.island.success(`Project ${proj.name} selected ✅`); // NEW SUCCESS POPUP
+                                            window.island.success(`Project ${proj.name} selected ✅`);
                                         }}>
                                             <div className="proj-card-header">
                                                 <div className="proj-cat-badge">

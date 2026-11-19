@@ -278,7 +278,7 @@
 }
 
 /* =========================================================
-   PITCH BLACK DARK MODE (TEAM)
+   PITCH BLACK DARK MODE (DESKTOP TEAM)
    ========================================================= */
 body.dark-mode .team-hero {
     background: #0a0a0a;
@@ -321,71 +321,237 @@ body.dark-mode .modal-avatar-preview {
     border-color: #1a1a1a;
 }
 
+/* =========================================================
+   MOBILE APPLE LIQUID GLASSMORPHISM TEAM PAGE (<= 768px)
+   ========================================================= */
 @media (max-width: 768px) {
-    .team-list-item {
+
+    body:has(.team-page),
+    body:has(.team-page) .main-content-wrapper,
+    body:has(.team-page) .main-content {
+        background-color: #000000 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    body:has(.team-page) .mobile-top-navbar,
+    body.dark-mode:has(.team-page) .mobile-top-navbar {
+        background: transparent !important;
+        border-bottom: none !important;
+        box-shadow: none !important;
+    }
+
+    .team-page.dashboard-wrapper {
+        max-width: 100% !important;
+        padding: 0 0 calc(5.5rem + env(safe-area-inset-bottom)) 0 !important;
+        gap: 1.25rem !important;
+        background: #000000;
+        min-height: 100dvh;
+    }
+
+    /* Deep Dark Blue Hero */
+    .team-page .team-hero {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1.15rem !important;
+        border-radius: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: calc(5.25rem + env(safe-area-inset-top)) 1.25rem 2rem 1.25rem !important;
+        background: linear-gradient(180deg, #0b1d42 0%, #07132c 52%, #000000 100%) !important;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .team-page .team-hero::before {
+        content: "";
+        position: absolute;
+        top: 10%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 240px;
+        height: 240px;
+        background-image: radial-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+        background-size: 11px 11px;
+        mask-image: radial-gradient(circle, #000 20%, transparent 70%);
+        -webkit-mask-image: radial-gradient(circle, #000 20%, transparent 70%);
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .team-page .team-hero .hero-greeting {
+        color: #ffffff !important;
+        font-size: 1.85rem !important;
+        font-weight: 900 !important;
+    }
+
+    .team-page .team-hero .highlight-name {
+        background: linear-gradient(180deg, #ffffff 30%, rgba(255, 255, 255, 0.6) 100%) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+    }
+
+    .team-page .team-hero .hero-subtitle {
+        color: rgba(255, 255, 255, 0.62) !important;
+        font-size: 0.84rem !important;
+    }
+
+    .team-page .team-hero .btn-modern-primary {
+        width: 100% !important;
+        justify-content: center !important;
+        border-radius: 999px !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-weight: 800 !important;
+        box-shadow: 0 8px 22px rgba(255, 255, 255, 0.16);
+    }
+
+    .team-page .dashboard-grid {
+        padding: 0 1rem;
+    }
+
+    .team-page .premium-widget {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        overflow: visible !important;
+    }
+
+    .team-page .premium-widget::before {
+        display: none !important;
+    }
+
+    .team-page .widget-header {
+        padding: 0.25rem 0.25rem 0.85rem 0.25rem !important;
+        border-bottom: none !important;
+    }
+
+    .team-page .widget-header h3 {
+        color: rgba(255, 255, 255, 0.6) !important;
+        font-size: 0.72rem !important;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+    }
+
+    /* Liquid Glass Member Cards */
+    .team-page .team-list-container {
+        padding: 0 !important;
+        gap: 0.85rem;
+    }
+
+    .team-page .team-list-item {
         flex-direction: column;
         align-items: flex-start;
-        gap: 1rem;
-        padding: 1rem 0;
+        gap: 0.9rem;
+        padding: 1.1rem !important;
+        border-radius: 22px;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 100%) !important;
+        backdrop-filter: blur(24px) saturate(160%);
+        -webkit-backdrop-filter: blur(24px) saturate(160%);
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 10px 26px rgba(0, 0, 0, 0.45);
     }
 
-    .team-member-info {
+    .team-page .team-member-info {
         width: 100%;
     }
 
-    .member-contact-info {
-        width: 100%;
-        padding-left: 3.5rem;
+    .team-page .status-indicator,
+    .team-page .admin-star {
+        border-color: #000000;
     }
 
-    .member-actions {
+    .team-page .member-details h4 {
+        color: #ffffff !important;
+    }
+
+    .team-page .standard-pill,
+    .team-page .admin-pill {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        color: rgba(255, 255, 255, 0.85) !important;
+    }
+
+    .team-page .member-contact-info {
+        width: 100%;
+        padding-left: 0 !important;
+        padding-top: 0.75rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.09);
+        gap: 0.45rem;
+    }
+
+    .team-page .contact-link {
+        color: rgba(255, 255, 255, 0.72) !important;
+        font-size: 0.82rem;
+    }
+
+    .team-page .member-actions {
         width: 100%;
         justify-content: flex-end;
     }
 
-    .team-hero {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 1.25rem !important;
-        padding: 1.5rem !important;
-        text-align: left !important;
+    .team-page .btn-icon-primary {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: #ffffff !important;
     }
 
-    .team-hero .hero-text-content {
-        width: 100% !important;
+    .team-page .btn-icon-danger {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: rgba(239, 68, 68, 0.14);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #f87171 !important;
     }
 
-    .team-hero .hero-greeting {
-        font-size: 1.8rem !important;
-        line-height: 1.2 !important;
+    /* Liquid Glass Invite / Edit Modal */
+    .team-page .team-modal-large {
+        width: 92% !important;
+        max-width: 400px !important;
+        border-radius: 26px !important;
+        background: linear-gradient(160deg, rgba(255, 255, 255, 0.14) 0%, rgba(10, 10, 10, 0.92) 100%) !important;
+        backdrop-filter: blur(32px) saturate(190%) !important;
+        -webkit-backdrop-filter: blur(32px) saturate(190%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.22) !important;
+        color: #ffffff !important;
     }
 
-    .team-hero .hero-subtitle {
-        font-size: 0.9rem !important;
+    .team-page .team-modal-header {
+        background: transparent !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+        padding: 1.25rem 1.5rem;
     }
 
-    .team-hero button,
-    .team-hero .btn-modern-primary {
-        width: 100% !important;
-        justify-content: center !important;
-        margin-top: 0.5rem;
+    .team-page .team-modal-header h2 {
+        color: #ffffff !important;
     }
 
-    .team-modal-body {
+    .team-page .team-modal-body {
         flex-direction: column;
         align-items: center;
-        padding: 1.5rem;
-        gap: 1.5rem;
-    }
-
-    .team-modal-sidebar {
-        width: 100%;
-        border-bottom: 1px dashed #e2e8f0;
-        padding-bottom: 1.5rem;
-    }
-
-    .form-group-row {
-        flex-direction: column;
+        padding: 1.25rem 1.5rem 1.5rem 1.5rem;
         gap: 1.25rem;
+    }
+
+    .team-page .team-modal-sidebar {
+        width: 100%;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        padding-bottom: 1.25rem;
+    }
+
+    .team-page .form-group-row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .team-page .modern-input {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        color: #ffffff !important;
+        border-radius: 14px !important;
     }
 }

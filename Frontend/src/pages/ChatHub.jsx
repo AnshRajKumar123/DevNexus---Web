@@ -658,7 +658,7 @@ export default function ChatHub() {
         <div className={`chatbox-wrapper page-animate ${isFullScreen ? 'fullscreen-mode' : ''}`}>
             <header className="team-hero stagger-1">
                 <div className="hero-text-content">
-                    <h1 className="hero-greeting">DevNexus <span className="highlight-name">Secure Chat Hub</span></h1>
+                    <h1 className="hero-greeting"><span className="highlight-name">Secure Chat Box</span></h1>
                     <p className="hero-subtitle">End-to-end encrypted workspace messaging for the DevNexus team.</p>
                 </div>
             </header>

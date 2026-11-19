@@ -141,7 +141,7 @@
 }
 
 /* =========================================================
-   PITCH BLACK DARK MODE (TODO)
+   PITCH BLACK DARK MODE (DESKTOP TODO)
    ========================================================= */
 body.dark-mode .todo-card-item {
     border-bottom-color: #1a1a1a;
@@ -191,33 +191,300 @@ body.dark-mode .btn-action-finish:hover {
     background: #1a1a1a;
 }
 
+/* =========================================================
+   MOBILE APPLE LIQUID GLASSMORPHISM TO-DO PAGE (<= 768px)
+   ========================================================= */
 @media (max-width: 768px) {
-    .todo-card-item {
-        flex-direction: column;
-        align-items: flex-start;
+
+    body:has(.todo-page),
+    body:has(.todo-page) .main-content-wrapper,
+    body:has(.todo-page) .main-content {
+        background-color: #000000 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    body:has(.todo-page) .mobile-top-navbar,
+    body.dark-mode:has(.todo-page) .mobile-top-navbar {
+        background: transparent !important;
+        border-bottom: none !important;
+        box-shadow: none !important;
+    }
+
+    .todo-page.dashboard-wrapper {
+        max-width: 100% !important;
+        padding: 0 0 calc(5.5rem + env(safe-area-inset-bottom)) 0 !important;
+        gap: 1.25rem !important;
+        background: #000000;
+        min-height: 100dvh;
+    }
+
+    /* Deep Dark Blue Edge-to-Edge Hero */
+    .todo-page .team-hero {
+        border-radius: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: calc(5.25rem + env(safe-area-inset-top)) 1.25rem 2rem 1.25rem !important;
+        background: linear-gradient(180deg, #0b1d42 0%, #07132c 52%, #000000 100%) !important;
+        position: relative;
+        overflow: hidden;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1.15rem !important;
+    }
+
+    .todo-page .team-hero::before {
+        content: "";
+        position: absolute;
+        top: 10%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 240px;
+        height: 240px;
+        background-image: radial-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+        background-size: 11px 11px;
+        mask-image: radial-gradient(circle, #000 20%, transparent 70%);
+        -webkit-mask-image: radial-gradient(circle, #000 20%, transparent 70%);
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .todo-page .team-hero .hero-greeting {
+        color: #ffffff !important;
+        font-size: 1.85rem !important;
+        font-weight: 900 !important;
+    }
+
+    .todo-page .team-hero .highlight-name {
+        background: linear-gradient(180deg, #ffffff 30%, rgba(255, 255, 255, 0.6) 100%) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+    }
+
+    .todo-page .team-hero .hero-subtitle {
+        color: rgba(255, 255, 255, 0.62) !important;
+        font-size: 0.84rem !important;
+    }
+
+    .todo-page .team-hero .btn-modern-primary {
+        border-radius: 999px !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-weight: 800 !important;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        box-shadow: 0 8px 22px rgba(255, 255, 255, 0.16);
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    /* Compact 3-Column Liquid Glass KPI Row */
+    .todo-page .kpi-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 0.65rem !important;
+        padding: 0 1rem;
+    }
+
+    .todo-page .kpi-card-modern {
+        padding: 0.9rem 0.65rem !important;
+        border-radius: 20px !important;
+        gap: 0.55rem !important;
+        align-items: center;
+        text-align: center;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 100%) !important;
+        backdrop-filter: blur(22px) saturate(160%);
+        -webkit-backdrop-filter: blur(22px) saturate(160%);
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 8px 20px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    .todo-page .kpi-card-modern::before {
+        display: none !important;
+    }
+
+    .todo-page .kpi-icon-pill {
+        padding: 0.2rem 0.55rem;
+        font-size: 0.62rem;
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: rgba(255, 255, 255, 0.85) !important;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .todo-page .kpi-bottom h2 {
+        font-size: 1.55rem !important;
+        color: #ffffff !important;
+    }
+
+    .todo-page .kpi-bottom p {
+        display: none;
+    }
+
+    /* Outer Widget Shell becomes transparent so each Task Card floats */
+    .todo-page .dashboard-grid {
+        padding: 0 1rem;
+    }
+
+    .todo-page .premium-widget {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        overflow: visible !important;
+    }
+
+    .todo-page .premium-widget::before {
+        display: none !important;
+    }
+
+    .todo-page .widget-header {
+        padding: 0.25rem 0.25rem 0.85rem 0.25rem !important;
+        border-bottom: none !important;
+    }
+
+    .todo-page .widget-header h3 {
+        color: rgba(255, 255, 255, 0.6) !important;
+        font-size: 0.72rem !important;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+    }
+
+    /* --- REDESIGNED LIQUID GLASS WORKSPACE TASK CARDS --- */
+    .todo-page .todo-list-modern {
+        padding: 0 !important;
+        gap: 0.85rem;
+    }
+
+    .todo-page .todo-card-item {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+            "meta status"
+            "title title"
+            "actions actions";
         gap: 0.75rem;
+        padding: 1.05rem 1.1rem 1rem 1.25rem !important;
+        border-radius: 22px !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 100%) !important;
+        backdrop-filter: blur(24px) saturate(160%);
+        -webkit-backdrop-filter: blur(24px) saturate(160%);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 10px 26px rgba(0, 0, 0, 0.45);
+        overflow: hidden;
     }
 
-    .todo-main-info {
+    /* Sleek Left Accent Strip inside the Glass Card */
+    .todo-page .status-pill-indicator {
+        position: absolute;
+        left: 0;
+        top: 14px;
+        bottom: 14px;
+        width: 4px !important;
+        height: auto !important;
+        border-radius: 0 99px 99px 0 !important;
+    }
+
+    /* Put title & priority in their own grid areas */
+    .todo-page .todo-main-info {
+        display: contents;
+    }
+
+    .todo-page .todo-meta-tags {
+        grid-area: meta;
+        align-self: center;
+    }
+
+    .todo-page .todo-status-col {
+        grid-area: status;
+        justify-content: flex-end;
+        align-self: center;
+    }
+
+    .todo-page .todo-main-info h4 {
+        grid-area: title;
+        font-size: 0.96rem !important;
+        line-height: 1.45 !important;
+        color: #ffffff !important;
+        font-weight: 700;
+        word-break: break-word;
+    }
+
+    .todo-page .todo-main-info h4.completed-text {
+        color: rgba(255, 255, 255, 0.45) !important;
+        text-decoration: line-through;
+    }
+
+    .todo-page .priority-badge {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        color: rgba(255, 255, 255, 0.85) !important;
+        border-radius: 99px;
+        padding: 0.2rem 0.6rem;
+    }
+
+    .todo-page .badge {
+        background: rgba(255, 255, 255, 0.12) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        color: #ffffff !important;
+    }
+
+    .todo-page .todo-actions-col {
+        grid-area: actions;
         width: 100%;
+        padding-top: 0.75rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.09);
     }
 
-    .todo-status-col {
-        justify-content: flex-start;
-    }
-
-    .todo-actions-col {
+    .todo-page .action-button-group {
         width: 100%;
-        justify-content: flex-start;
+        justify-content: space-between;
     }
 
-    .kpi-grid {
-        grid-template-columns: 3, 1fr;
+    .todo-page .btn-action-start,
+    .todo-page .btn-action-finish,
+    .todo-page .btn-action-reset {
+        padding: 0.48rem 1rem !important;
+        border-radius: 999px !important;
+        background: rgba(255, 255, 255, 0.12) !important;
+        border: 1px solid rgba(255, 255, 255, 0.24) !important;
+        color: #ffffff !important;
+        font-size: 0.78rem !important;
     }
 
-    .modal-content {
-        max-width: 90% !important;
-        padding: 1.25rem !important;
-        margin: 1rem;
+    .todo-page .btn-action-finish {
+        background: #ffffff !important;
+        color: #000000 !important;
+        border-color: #ffffff !important;
+    }
+
+    .todo-page .btn-icon-danger {
+        width: 34px;
+        height: 34px;
+        border-radius: 50% !important;
+        background: rgba(239, 68, 68, 0.14) !important;
+        border: 1px solid rgba(239, 68, 68, 0.3) !important;
+        color: #f87171 !important;
+    }
+
+    /* Liquid Glass Create Task Modal */
+    .todo-page .modal-content {
+        width: 92% !important;
+        max-width: 390px !important;
+        padding: 1.5rem !important;
+        border-radius: 26px !important;
+        background: linear-gradient(160deg, rgba(255, 255, 255, 0.14) 0%, rgba(10, 10, 10, 0.9) 100%) !important;
+        backdrop-filter: blur(32px) saturate(190%) !important;
+        -webkit-backdrop-filter: blur(32px) saturate(190%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.22) !important;
+        color: #ffffff !important;
+    }
+
+    .todo-page .modal-header h2 {
+        color: #ffffff !important;
+    }
+
+    .todo-page .modern-input {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        color: #ffffff !important;
+        border-radius: 14px !important;
     }
 }

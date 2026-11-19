@@ -29,7 +29,7 @@ export default function MyTodoList() {
     const completedCount = safeTodos.filter(t => t.status === 'Completed').length;
 
     return (
-        <div className="dashboard-wrapper page-animate">
+        <div className="dashboard-wrapper page-animate todo-page">
             <header className="team-hero stagger-1">
                 <div className="hero-text-content">
                     <h1 className="hero-greeting">Personal <span className="highlight-name">To-Do List</span></h1>
@@ -41,7 +41,7 @@ export default function MyTodoList() {
             </header>
 
             <section className="kpi-grid stagger-2">
-                {isLoading ? Array.from({length: 3}).map((_, i) => <div key={i} className="skeleton skeleton-card" style={{ height: '140px' }}></div>) : (
+                {isLoading ? Array.from({ length: 3 }).map((_, i) => <div key={i} className="skeleton skeleton-card" style={{ height: '140px' }}></div>) : (
                     <>
                         <div className="kpi-card-modern">
                             <div className="kpi-top"><div className="kpi-icon-pill orange">Pending</div></div>
@@ -68,10 +68,10 @@ export default function MyTodoList() {
 
                         {isLoading ? (
                             <div className="todo-list-modern">
-                                {Array.from({length: 4}).map((_, i) => (
+                                {Array.from({ length: 4 }).map((_, i) => (
                                     <div key={i} className="todo-card-item">
-                                        <div className="skeleton skeleton-avatar" style={{width: '6px', height: '40px', borderRadius: '99px'}}></div>
-                                        <div className="todo-main-info" style={{flex: 1}}><div className="skeleton skeleton-text medium"></div><div className="skeleton skeleton-text short"></div></div>
+                                        <div className="skeleton skeleton-avatar" style={{ width: '6px', height: '40px', borderRadius: '99px' }}></div>
+                                        <div className="todo-main-info" style={{ flex: 1 }}><div className="skeleton skeleton-text medium"></div><div className="skeleton skeleton-text short"></div></div>
                                     </div>
                                 ))}
                             </div>
@@ -124,7 +124,7 @@ export default function MyTodoList() {
                     <div className="modal-content pop-in">
                         <div className="modal-header">
                             <h2>Create New Task</h2>
-                            <button className="modal-close" onClick={() => setShowModal(false)}><X size={24}/></button>
+                            <button className="modal-close" onClick={() => setShowModal(false)}><X size={24} /></button>
                         </div>
                         <form onSubmit={handleCreate} className="modern-form">
                             <div className="form-group">

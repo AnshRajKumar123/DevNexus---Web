@@ -127,7 +127,6 @@
     border-radius: 50%;
 }
 
-/* CHANGED: Replaced Purple with Dark Blue */
 .planning .status-dot {
     background: #1e3a8a;
 }
@@ -169,7 +168,6 @@
     font-weight: 600;
 }
 
-/* --- General Spacing & Utilities --- */
 .mt-2 {
     margin-top: 2rem;
 }
@@ -207,7 +205,7 @@
     align-items: center;
 }
 
-/* --- Idea Board Structure --- */
+/* Idea Board */
 .idea-board-item {
     display: flex;
     justify-content: space-between;
@@ -239,7 +237,7 @@
     font-size: 0.75rem;
 }
 
-/* --- Search Bar --- */
+/* Search Bar */
 .search-container {
     position: relative;
     width: 100%;
@@ -271,7 +269,7 @@
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-/* --- Project Full Grid Modal --- */
+/* Modals */
 .modal-large {
     max-width: 700px !important;
 }
@@ -358,69 +356,275 @@
     height: 220px;
 }
 
-/* Dark mode overrides */
+/* Dark mode overrides (Desktop) */
 body.dark-mode .project-card-modern {
-    background: #1e293b;
-    border-color: #334155;
+    background: #0a0a0a;
+    border-color: #1a1a1a;
 }
 
 body.dark-mode .proj-cat-badge {
-    background: #0f172a;
+    background: #111111;
     color: #cbd5e1;
 }
 
 body.dark-mode .proj-card-footer {
-    border-top-color: #334155;
+    border-top-color: #1a1a1a;
 }
 
 body.dark-mode .tech-pill {
-    background: rgba(37, 99, 235, 0.1);
-    border-color: rgba(37, 99, 235, 0.3);
+    background: #111111;
+    border-color: #333333;
+    color: #60a5fa;
 }
 
 body.dark-mode .search-bar-modern {
-    background: #0f172a;
-    border-color: #334155;
+    background: #111111;
+    border-color: #1a1a1a;
     color: white;
 }
 
 body.dark-mode .detail-row {
-    background: #0f172a;
-    border-color: #334155;
+    background: #0a0a0a;
+    border-color: #1a1a1a;
 }
 
-body.dark-mode .detail-value {
+body.dark-mode .detail-value,
+body.dark-mode .proj-card-body h4,
+body.dark-mode .detail-section h4 {
     color: #f8fafc;
 }
 
-/* --- MOBILE RESPONSIVENESS FIXES --- */
 @media (max-width: 1024px) {
     .dashboard-wrapper {
         padding-bottom: 6.5rem !important;
     }
 }
 
+/* =========================================================
+   MOBILE APPLE LIQUID GLASSMORPHISM PROJECTS PAGE (<= 768px)
+   ========================================================= */
 @media (max-width: 768px) {
-    .projects-grid-modern {
-        grid-template-columns: 1fr;
+
+    body:has(.projects-page),
+    body:has(.projects-page) .main-content-wrapper,
+    body:has(.projects-page) .main-content {
+        background-color: #000000 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
     }
 
-    .idea-board-item {
+    body:has(.projects-page) .mobile-top-navbar,
+    body.dark-mode:has(.projects-page) .mobile-top-navbar {
+        background: transparent !important;
+        border-bottom: none !important;
+        box-shadow: none !important;
+    }
+
+    .projects-page.dashboard-wrapper {
+        max-width: 100% !important;
+        padding: 0 0 calc(5.5rem + env(safe-area-inset-bottom)) 0 !important;
+        gap: 1.25rem !important;
+        background: #000000;
+        min-height: 100dvh;
+    }
+
+    /* Deep Dark Blue Hero */
+    .projects-page .team-hero {
+        border-radius: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: calc(5.25rem + env(safe-area-inset-top)) 1.25rem 2rem 1.25rem !important;
+        background: linear-gradient(180deg, #0b1d42 0%, #07132c 52%, #000000 100%) !important;
+        position: relative;
+        overflow: hidden;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1.15rem !important;
+    }
+
+    .projects-page .team-hero::before {
+        content: "";
+        position: absolute;
+        top: 10%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 240px;
+        height: 240px;
+        background-image: radial-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+        background-size: 11px 11px;
+        mask-image: radial-gradient(circle, #000 20%, transparent 70%);
+        -webkit-mask-image: radial-gradient(circle, #000 20%, transparent 70%);
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .projects-page .team-hero .hero-greeting {
+        color: #ffffff !important;
+        font-size: 1.85rem !important;
+        font-weight: 900 !important;
+    }
+
+    .projects-page .team-hero .highlight-name {
+        background: linear-gradient(180deg, #ffffff 30%, rgba(255, 255, 255, 0.6) 100%) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+    }
+
+    .projects-page .team-hero .hero-subtitle {
+        color: rgba(255, 255, 255, 0.62) !important;
+        font-size: 0.84rem !important;
+    }
+
+    .projects-page .team-hero .btn-modern-primary {
+        border-radius: 999px !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-weight: 800 !important;
+        box-shadow: 0 8px 22px rgba(255, 255, 255, 0.16);
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    .projects-page .dashboard-grid {
+        padding: 0 1rem;
+    }
+
+    .projects-page .premium-widget {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        overflow: visible !important;
+    }
+
+    .projects-page .premium-widget::before {
+        display: none !important;
+    }
+
+    .projects-page .widget-header {
+        padding: 0 0 1rem 0 !important;
+        border-bottom: none !important;
+    }
+
+    .projects-page .widget-header h3 {
+        color: rgba(255, 255, 255, 0.6) !important;
+        font-size: 0.72rem !important;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+    }
+
+    /* Liquid Glass Search Bar */
+    .projects-page .search-bar-modern {
+        border-radius: 999px !important;
+        background: rgba(255, 255, 255, 0.08) !important;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        color: #ffffff !important;
+        padding: 0.8rem 2.75rem 0.8rem 1.25rem !important;
+    }
+
+    .projects-page .search-bar-modern::placeholder {
+        color: rgba(255, 255, 255, 0.45);
+    }
+
+    /* Liquid Glass Project Cards */
+    .projects-page .projects-grid-modern {
+        grid-template-columns: 1fr;
+        padding: 0 !important;
+        gap: 0.9rem;
+    }
+
+    .projects-page .project-card-modern {
+        border-radius: 22px !important;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 100%) !important;
+        backdrop-filter: blur(24px) saturate(160%);
+        -webkit-backdrop-filter: blur(24px) saturate(160%);
+        border: 1px solid rgba(255, 255, 255, 0.16) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 10px 26px rgba(0, 0, 0, 0.45) !important;
+    }
+
+    .projects-page .project-card-modern::before {
+        display: none !important;
+    }
+
+    .projects-page .proj-cat-badge {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        color: #ffffff !important;
+    }
+
+    .projects-page .proj-card-body h4 {
+        color: #ffffff !important;
+    }
+
+    .projects-page .proj-card-body p {
+        color: rgba(255, 255, 255, 0.62) !important;
+    }
+
+    .projects-page .tech-pill {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.16) !important;
+        color: rgba(255, 255, 255, 0.85) !important;
+        border-radius: 99px;
+        padding: 0.22rem 0.65rem;
+    }
+
+    .projects-page .proj-card-footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    /* Idea Board Glass Cards */
+    .projects-page .idea-board-item {
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
+        padding: 1rem !important;
+        border-radius: 20px;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        margin-bottom: 0.75rem;
     }
 
-    .idea-action-btns {
+    .projects-page .idea-action-btns {
         width: 100%;
     }
 
-    .idea-action-btns button {
+    .projects-page .idea-action-btns button {
         flex: 1;
         justify-content: center;
+        border-radius: 999px;
     }
 
-    .detail-row {
+    /* Liquid Glass Modals */
+    .projects-page .modal-content {
+        width: 92% !important;
+        max-width: 400px !important;
+        padding: 1.5rem !important;
+        border-radius: 26px !important;
+        background: linear-gradient(160deg, rgba(255, 255, 255, 0.14) 0%, rgba(10, 10, 10, 0.9) 100%) !important;
+        backdrop-filter: blur(32px) saturate(190%) !important;
+        -webkit-backdrop-filter: blur(32px) saturate(190%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.22) !important;
+        color: #ffffff !important;
+    }
+
+    .projects-page .modal-header-title,
+    .projects-page .modal-header h2,
+    .projects-page .detail-section h4,
+    .projects-page .detail-value {
+        color: #ffffff !important;
+    }
+
+    .projects-page .detail-row {
         flex-direction: column;
+        background: rgba(255, 255, 255, 0.07) !important;
+        border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    }
+
+    .projects-page .modern-input {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        color: #ffffff !important;
+        border-radius: 14px !important;
     }
 }
