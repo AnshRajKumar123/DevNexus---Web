@@ -584,6 +584,7 @@ body.dark-mode .empty-icon-wrapper {
 
 /* --- UNLOCK NATIVE WINDOW SCROLL ON MOBILE (AUTO-HIDE CHROME URL BAR) --- */
 @media (max-width: 768px) {
+
     html,
     body {
         height: auto;
@@ -604,5 +605,296 @@ body.dark-mode .empty-icon-wrapper {
     .main-content {
         overflow-y: visible;
         overflow-x: hidden;
+    }
+}
+
+/* =========================================================
+   GLOBAL APPLE LIQUID GLASS POPUPS & TOASTS (MOBILE <= 768px)
+   Professional Blue / Green / Red Accents — No Neon/Purple
+   ========================================================= */
+@media (max-width: 768px) {
+
+    /* 1. Heavy Frosted Backdrop (prevents page UI from bleeding through) */
+    html body .modal-overlay {
+        background: rgba(2, 6, 16, 0.76) !important;
+        backdrop-filter: blur(20px) saturate(140%) !important;
+        -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
+        padding: 1rem !important;
+        z-index: 9999 !important;
+    }
+
+    /* 2. Unified Apple Liquid Glass Modal Shell */
+    html body .modal-overlay .modal-content,
+    html body .modal-overlay .mp-glass-modal,
+    html body .modal-overlay .poll-votes-modal,
+    html body .modal-overlay .pin-duration-modal,
+    html body .modal-overlay .delete-action-modal {
+        width: 100% !important;
+        max-width: 410px !important;
+        max-height: 86dvh !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        padding: 1.5rem !important;
+        border-radius: 28px !important;
+        background: linear-gradient(165deg,
+                rgba(20, 30, 52, 0.86) 0%,
+                rgba(10, 15, 28, 0.92) 52%,
+                rgba(5, 8, 15, 0.96) 100%) !important;
+        backdrop-filter: blur(40px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.16) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.28) !important;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.22),
+            inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+            0 28px 60px rgba(0, 0, 0, 0.82) !important;
+        color: #f8fafc !important;
+    }
+
+    html body .modal-overlay .modal-content::before {
+        display: none !important;
+    }
+
+    /* Team modal keeps its internal header/body padding clean */
+    html body .modal-overlay .team-modal-large {
+        padding: 0 !important;
+    }
+
+    /* 3. Modal Headers & Dividers */
+    html body .modal-overlay .modal-header,
+    html body .modal-overlay .modal-header-extended,
+    html body .modal-overlay .team-modal-header,
+    html body .modal-overlay .poll-modal-header,
+    html body .modal-overlay .poll-votes-modal-header,
+    html body .modal-overlay .mp-modal-head {
+        background: transparent !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+        padding-bottom: 1rem !important;
+        margin-bottom: 1.25rem !important;
+    }
+
+    html body .modal-overlay .team-modal-header {
+        padding: 1.35rem 1.5rem 1rem 1.5rem !important;
+        margin-bottom: 0 !important;
+    }
+
+    /* 4. High-Contrast Crisp Typography (Fixes ALL unreadable text) */
+    html body .modal-overlay h2,
+    html body .modal-overlay h3,
+    html body .modal-overlay h4,
+    html body .modal-overlay .modal-header-title,
+    html body .modal-overlay .detail-section h4,
+    html body .modal-overlay .detail-value,
+    html body .modal-overlay .flow-icon-header h4 {
+        color: #ffffff !important;
+    }
+
+    html body .modal-overlay p,
+    html body .modal-overlay .detail-section p,
+    html body .modal-overlay .mp-modal-desc,
+    html body .modal-overlay .flow-icon-header p {
+        color: rgba(241, 245, 249, 0.86) !important;
+        line-height: 1.55 !important;
+    }
+
+    html body .modal-overlay label,
+    html body .modal-overlay .modal-header-subtitle,
+    html body .modal-overlay .detail-label,
+    html body .modal-overlay .meta-tag,
+    html body .modal-overlay .poll-section-label {
+        color: rgba(203, 213, 225, 0.78) !important;
+    }
+
+    html body .modal-overlay .modal-header-subtitle strong,
+    html body .modal-overlay .mp-modal-desc strong {
+        color: #ffffff !important;
+    }
+
+    /* 5. Circular Liquid Glass Close Button */
+    html body .modal-overlay .modal-close,
+    html body .modal-overlay .mp-modal-close,
+    html body .modal-overlay .modal-close-btn {
+        width: 34px !important;
+        height: 34px !important;
+        border-radius: 50% !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+        color: #ffffff !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
+    }
+
+    html body .modal-overlay .modal-close svg,
+    html body .modal-overlay .modal-close-btn svg {
+        color: #ffffff !important;
+    }
+
+    /* 6. Recessed Liquid Glass Inputs & Selects */
+    html body .modal-overlay .modern-input,
+    html body .modal-overlay .poll-input,
+    html body .modal-overlay .mp-glass-input,
+    html body .modal-overlay .mp-phone-wrap {
+        background: rgba(255, 255, 255, 0.07) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        border-radius: 14px !important;
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff;
+        color-scheme: dark;
+    }
+
+    html body .modal-overlay .modern-input::placeholder,
+    html body .modal-overlay .poll-input::placeholder,
+    html body .modal-overlay .mp-glass-input::placeholder {
+        color: rgba(203, 213, 225, 0.5) !important;
+        -webkit-text-fill-color: rgba(203, 213, 225, 0.5);
+    }
+
+    html body .modal-overlay .modern-input:focus,
+    html body .modal-overlay .poll-input:focus,
+    html body .modal-overlay .mp-glass-input:focus {
+        background: rgba(255, 255, 255, 0.11) !important;
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25) !important;
+    }
+
+    html body .modal-overlay .modern-input:disabled,
+    html body .modal-overlay .mp-glass-input.locked {
+        background: rgba(255, 255, 255, 0.04) !important;
+        color: rgba(203, 213, 225, 0.55) !important;
+        -webkit-text-fill-color: rgba(203, 213, 225, 0.55);
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    html body .modal-overlay select.modern-input option {
+        background: #0b1220;
+        color: #f8fafc;
+    }
+
+    /* 7. Inner Detail Cards & Professional Accent Pills (Blue / Green / Red) */
+    html body .modal-overlay .detail-row {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-radius: 18px !important;
+        padding: 1rem 1.15rem !important;
+        gap: 1rem !important;
+    }
+
+    html body .modal-overlay .tech-pill {
+        background: rgba(37, 99, 235, 0.18) !important;
+        border: 1px solid rgba(96, 165, 250, 0.34) !important;
+        color: #dbeafe !important;
+        border-radius: 999px !important;
+        padding: 0.28rem 0.72rem !important;
+        font-size: 0.74rem !important;
+    }
+
+    /* Status Badges inside Modals */
+    html body .modal-overlay .badge-completed {
+        background: rgba(16, 185, 129, 0.2) !important;
+        border: 1px solid rgba(52, 211, 153, 0.42) !important;
+        color: #a7f3d0 !important;
+    }
+
+    html body .modal-overlay .badge-in-progress,
+    html body .modal-overlay .badge-planning {
+        background: rgba(37, 99, 235, 0.22) !important;
+        border: 1px solid rgba(96, 165, 250, 0.42) !important;
+        color: #bfdbfe !important;
+    }
+
+    html body .modal-overlay .badge-pending,
+    html body .modal-overlay .badge-on-hold {
+        background: rgba(217, 119, 6, 0.22) !important;
+        border: 1px solid rgba(251, 191, 36, 0.4) !important;
+        color: #fde68a !important;
+    }
+
+    html body .modal-overlay .badge-rejected {
+        background: rgba(220, 38, 38, 0.22) !important;
+        border: 1px solid rgba(248, 113, 113, 0.42) !important;
+        color: #fecaca !important;
+    }
+
+    /* 8. Liquid Glass Action Buttons (Professional Blue / Neutral / Red) */
+    html body .modal-overlay .btn-modern-primary,
+    html body .modal-overlay .mp-glass-pill-btn.solid,
+    html body .modal-overlay .poll-send-btn {
+        background: linear-gradient(145deg, #2563eb 0%, #1d4ed8 100%) !important;
+        border: 1px solid rgba(147, 197, 253, 0.38) !important;
+        color: #ffffff !important;
+        border-radius: 999px !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 8px 20px rgba(29, 78, 216, 0.38) !important;
+        font-weight: 700 !important;
+    }
+
+    html body .modal-overlay .btn-modern-secondary,
+    html body .modal-overlay .mp-glass-pill-btn {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        color: #f1f5f9 !important;
+        border-radius: 999px !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    }
+
+    html body .modal-overlay .btn-modern-danger {
+        background: rgba(220, 38, 38, 0.2) !important;
+        border: 1px solid rgba(248, 113, 113, 0.42) !important;
+        color: #fecaca !important;
+        border-radius: 999px !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    }
+
+    /* 9. Upgraded Liquid Glass Dynamic Island Toast */
+    .dynamic-island {
+        backdrop-filter: blur(26px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(26px) saturate(180%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 14px 32px rgba(0, 0, 0, 0.55) !important;
+    }
+
+    .island-loading {
+        background: rgba(15, 23, 42, 0.86) !important;
+        border-color: rgba(147, 197, 253, 0.32) !important;
+    }
+
+    .island-success {
+        background: rgba(6, 78, 59, 0.84) !important;
+        border-color: rgba(52, 211, 153, 0.4) !important;
+    }
+
+    .island-error {
+        background: rgba(127, 29, 29, 0.86) !important;
+        border-color: rgba(248, 113, 113, 0.42) !important;
+    }
+
+    /* --- MOBILE LIQUID GLASS 404 PAGE --- */
+    .not-found-page {
+        background:
+            radial-gradient(circle at 50% 15%, #0b1d42 0%, #050d21 40%, #000000 75%),
+            #000000 !important;
+        color: #ffffff !important;
+    }
+
+    .not-found-page h1 {
+        color: #ffffff !important;
+    }
+
+    .not-found-page h2 {
+        color: rgba(255, 255, 255, 0.9) !important;
+    }
+
+    .not-found-page p {
+        color: rgba(255, 255, 255, 0.62) !important;
+    }
+
+    .not-found-home-btn {
+        border-radius: 999px !important;
+        background: linear-gradient(145deg, #2563eb 0%, #1d4ed8 100%) !important;
+        border: 1px solid rgba(147, 197, 253, 0.38) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 10px 24px rgba(29, 78, 216, 0.4) !important;
+        color: #ffffff !important;
     }
 }
