@@ -37,6 +37,7 @@ export default function Dashboard() {
     }, []);
 
     const firstName = currentUser?.name ? currentUser.name.split(' ')[0] : 'User';
+    const isMainAdmin = currentUser?.isSupremeAdmin;
     const now = new Date();
     const currentDate = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
     const shortMobileDate = `${now.getDate()} ${now.toLocaleDateString('en-US', { month: 'short' })}, ${now.toLocaleDateString('en-US', { weekday: 'short' })}`;
@@ -49,8 +50,14 @@ export default function Dashboard() {
     const priorityWeight = { 'High': 3, 'Medium': 2, 'Low': 1 };
     const sortedTodos = [...userTodos].sort((a, b) => (priorityWeight[b.priority] || 2) - (priorityWeight[a.priority] || 2));
 
-    const totalProjects = projects.length;
-    const ongoingProjects = projects.filter(p => p.status === 'In Progress').length;
+    // Only count active projects visible to the current user (hides Admin Private projects from members)
+    const visibleProjects = projects.filter(p =>
+        (isMainAdmin || !p.isPrivate) &&
+        p.status !== 'Pending Approval' &&
+        p.status !== 'Rejected'
+    );
+    const totalProjects = visibleProjects.length;
+    const ongoingProjects = visibleProjects.filter(p => p.status === 'In Progress').length;
 
     const pendingIdeas = projects.filter(p => {
         if (p.status === 'Pending Approval') return true;

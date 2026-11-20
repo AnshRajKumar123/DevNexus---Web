@@ -356,6 +356,70 @@
     height: 220px;
 }
 
+/* --- HORIZONTAL STATUS FILTER PILLS (DESKTOP + DARK MODE) --- */
+.proj-filter-scroll {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.proj-filter-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.proj-filter-pill {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.48rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.proj-filter-pill:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #1e3a8a;
+}
+
+.proj-filter-pill.active {
+    background: #1e3a8a;
+    border-color: #1e3a8a;
+    color: #ffffff;
+}
+
+.proj-filter-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    background: rgba(15, 23, 42, 0.08);
+    color: inherit;
+}
+
+.proj-filter-pill.active .proj-filter-count {
+    background: rgba(255, 255, 255, 0.22);
+    color: #ffffff;
+}
+
 /* Dark mode overrides (Desktop) */
 body.dark-mode .project-card-modern {
     background: #0a0a0a;
@@ -392,6 +456,27 @@ body.dark-mode .detail-value,
 body.dark-mode .proj-card-body h4,
 body.dark-mode .detail-section h4 {
     color: #f8fafc;
+}
+
+body.dark-mode .proj-filter-pill {
+    background: #111111;
+    border-color: #262626;
+    color: #a3a3a3;
+}
+
+body.dark-mode .proj-filter-pill:hover {
+    background: #1a1a1a;
+    color: #ffffff;
+}
+
+body.dark-mode .proj-filter-pill.active {
+    background: #2563eb;
+    border-color: #3b82f6;
+    color: #ffffff;
+}
+
+body.dark-mode .proj-filter-count {
+    background: rgba(255, 255, 255, 0.1);
 }
 
 @media (max-width: 1024px) {
@@ -527,6 +612,40 @@ body.dark-mode .detail-section h4 {
         color: rgba(255, 255, 255, 0.45);
     }
 
+    /* Liquid Glass Horizontal Status Filter Pills */
+    .projects-page .proj-filter-scroll {
+        gap: 0.5rem;
+        padding: 0.1rem 0 0.35rem 0;
+    }
+
+    .projects-page .proj-filter-pill {
+        padding: 0.5rem 0.9rem;
+        background: rgba(255, 255, 255, 0.08) !important;
+        backdrop-filter: blur(20px) saturate(160%);
+        -webkit-backdrop-filter: blur(20px) saturate(160%);
+        border: 1px solid rgba(255, 255, 255, 0.16) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.78) !important;
+        font-size: 0.78rem;
+    }
+
+    .projects-page .proj-filter-count {
+        background: rgba(255, 255, 255, 0.14) !important;
+        color: #ffffff !important;
+    }
+
+    .projects-page .proj-filter-pill.active {
+        background: #ffffff !important;
+        border-color: #ffffff !important;
+        color: #000000 !important;
+        box-shadow: 0 6px 18px rgba(255, 255, 255, 0.2);
+    }
+
+    .projects-page .proj-filter-pill.active .proj-filter-count {
+        background: rgba(0, 0, 0, 0.12) !important;
+        color: #000000 !important;
+    }
+
     /* Liquid Glass Project Cards */
     .projects-page .projects-grid-modern {
         grid-template-columns: 1fr;
@@ -628,4 +747,3 @@ body.dark-mode .detail-section h4 {
         border-radius: 14px !important;
     }
 }
-

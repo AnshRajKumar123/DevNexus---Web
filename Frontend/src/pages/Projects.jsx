@@ -16,6 +16,7 @@ export default function Projects() {
     const [showModal, setShowModal] = useState(false);
     const [viewingProject, setViewingProject] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState('All');
     const [commentInput, setCommentInput] = useState('');
 
     // Form State
@@ -239,11 +240,26 @@ export default function Projects() {
     // Hide Private projects from non-admin members
     const visibleProjects = displayProjects.filter(p => isMainAdmin || !p.isPrivate);
 
-    const activeProjectsRaw = visibleProjects.filter(p => p.status !== 'Pending Approval' && p.status !== 'Rejected');
-    const activeProjects = activeProjectsRaw.filter(p =>
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.desc.toLowerCase().includes(searchQuery.toLowerCase())
+    const activeProjectsRaw = visibleProjects.filter(
+        p => p.status !== 'Pending Approval' && p.status !== 'Rejected'
     );
+
+    const statusTabs = [
+        { key: 'All', label: 'All', count: activeProjectsRaw.length },
+        { key: 'In Progress', label: 'In Progress', count: activeProjectsRaw.filter(p => p.status === 'In Progress').length },
+        { key: 'Completed', label: 'Completed', count: activeProjectsRaw.filter(p => p.status === 'Completed').length },
+        { key: 'On Hold', label: 'On Hold', count: activeProjectsRaw.filter(p => p.status === 'On Hold').length },
+        { key: 'Planning', label: 'Planning', count: activeProjectsRaw.filter(p => p.status === 'Planning').length }
+    ];
+
+    const activeProjects = activeProjectsRaw.filter(p => {
+        const matchesStatus = statusFilter === 'All' || p.status === statusFilter;
+        const matchesSearch =
+            p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            p.desc.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesStatus && matchesSearch;
+    });
+
     const pendingIdeas = displayProjects.filter(p => p.status === 'Pending Approval');
 
     return (
@@ -281,6 +297,19 @@ export default function Projects() {
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />
                                 <Search size={18} className="search-icon" />
+                            </div>
+                            <div className="proj-filter-scroll">
+                                {statusTabs.map(tab => (
+                                    <button
+                                        key={tab.key}
+                                        type="button"
+                                        className={`proj-filter-pill ${statusFilter === tab.key ? 'active' : ''}`}
+                                        onClick={() => setStatusFilter(tab.key)}
+                                    >
+                                        <span>{tab.label}</span>
+                                        <span className="proj-filter-count">{tab.count}</span>
+                                    </button>
+                                ))}
                             </div>
                         </div>
 
