@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {
     Briefcase, Plus, Lightbulb, Rocket, Layout, Code2, Terminal, CheckCircle2,
-    X, Trash2, CalendarDays, Edit3, Save, Search
+    X, Trash2, CalendarDays, Edit3, Save, Search, ExternalLink, Lock, Globe,
+    MessageSquare, Send, RotateCcw
 } from 'lucide-react';
 import { useData } from '../context/DataContext';
+import { pushNotification } from '../utils/notifications';
 import '../styles/Projects.css';
 
 export default function Projects() {
@@ -14,6 +16,7 @@ export default function Projects() {
     const [showModal, setShowModal] = useState(false);
     const [viewingProject, setViewingProject] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const [commentInput, setCommentInput] = useState('');
 
     // Form State
     const [editingId, setEditingId] = useState(null);
@@ -23,6 +26,8 @@ export default function Projects() {
     const [desc, setDesc] = useState('');
     const [techStack, setTechStack] = useState('');
     const [deadline, setDeadline] = useState('');
+    const [liveUrl, setLiveUrl] = useState('');
+    const [isPrivate, setIsPrivate] = useState(false);
 
     const [localProjects, setLocalProjects] = useState([]);
     const displayProjects = projects.length > 0 ? projects : localProjects;
@@ -32,6 +37,15 @@ export default function Projects() {
         return () => clearTimeout(timer);
     }, []);
 
+    // Keep viewingProject in sync when projects state updates
+    useEffect(() => {
+        if (viewingProject) {
+            const id = viewingProject._id || viewingProject.id;
+            const fresh = displayProjects.find(p => (p._id || p.id) === id);
+            if (fresh) setViewingProject(fresh);
+        }
+    }, [displayProjects]);
+
     const resetForm = () => {
         setEditingId(null);
         setName('');
@@ -40,6 +54,8 @@ export default function Projects() {
         setDesc('');
         setTechStack('');
         setDeadline('');
+        setLiveUrl('');
+        setIsPrivate(false);
     };
 
     const handleOpenAdd = () => {
@@ -57,6 +73,8 @@ export default function Projects() {
         setDesc(proj.desc);
         setTechStack(proj.techStack ? proj.techStack.join(', ') : '');
         setDeadline(proj.deadline || '');
+        setLiveUrl(proj.liveUrl || '');
+        setIsPrivate(Boolean(proj.isPrivate));
         setShowModal(true);
     };
 
@@ -70,6 +88,8 @@ export default function Projects() {
             desc,
             techStack: techStack.split(',').map(s => s.trim()).filter(Boolean),
             deadline,
+            liveUrl: liveUrl.trim(),
+            isPrivate: isMainAdmin ? isPrivate : false,
             createdBy: currentUser?.name || 'Unknown'
         };
 
@@ -79,11 +99,21 @@ export default function Projects() {
                     if (updateProject) updateProject(editingId, payload);
                     else setLocalProjects(prev => prev.map(p => (p.id === editingId ? { ...p, ...payload } : p)));
                 } else {
-                    if (addProject) addProject(payload);
-                    else setLocalProjects(prev => [{ id: Date.now(), ...payload }, ...prev]);
+                    if (addProject) addProject({ ...payload, comments: [], restartRequests: [] });
+                    else setLocalProjects(prev => [{ id: Date.now(), ...payload, comments: [], restartRequests: [] }, ...prev]);
+
+                    if (!payload.isPrivate) {
+                        pushNotification({
+                            type: 'project',
+                            title: isMainAdmin ? `New Project: ${name}` : `New Idea Pitched: ${name}`,
+                            message: desc.substring(0, 90),
+                            createdBy: currentUser?.name,
+                            path: '/projects'
+                        });
+                    }
                 }
                 resolve('done');
-            }, 600);
+            }, 400);
         });
 
         window.island.promise(saveOp, {
@@ -119,6 +149,86 @@ export default function Projects() {
         }
     };
 
+    // Add comment to a project
+    const handleAddComment = (e) => {
+        e.preventDefault();
+        if (!commentInput.trim() || !viewingProject) return;
+
+        const id = viewingProject._id || viewingProject.id;
+        const newComment = {
+            id: Date.now().toString(),
+            author: currentUser?.name || 'Member',
+            text: commentInput.trim(),
+            createdAt: new Date().toISOString()
+        };
+        const updatedComments = [...(viewingProject.comments || []), newComment];
+
+        if (updateProject) updateProject(id, { comments: updatedComments });
+        else setLocalProjects(prev => prev.map(p => ((p._id || p.id) === id ? { ...p, comments: updatedComments } : p)));
+
+        setViewingProject(prev => ({ ...prev, comments: updatedComments }));
+        setCommentInput('');
+
+        pushNotification({
+            type: 'project',
+            title: `New Comment on ${viewingProject.name}`,
+            message: newComment.text.substring(0, 90),
+            createdBy: currentUser?.name,
+            path: '/projects'
+        });
+        window.island.success('Comment posted! 💬');
+    };
+
+    // Member request to restart an "On Hold" project
+    const handleRequestRestart = (e, proj) => {
+        if (e) e.stopPropagation();
+        const id = proj._id || proj.id;
+        const existing = proj.restartRequests || [];
+        const userName = currentUser?.name || 'Member';
+
+        if (existing.includes(userName)) {
+            window.island.success('You already requested to restart this project.');
+            return;
+        }
+
+        const updatedRequests = [...existing, userName];
+        if (updateProject) updateProject(id, { restartRequests: updatedRequests });
+        else setLocalProjects(prev => prev.map(p => ((p._id || p.id) === id ? { ...p, restartRequests: updatedRequests } : p)));
+
+        if (viewingProject && (viewingProject._id || viewingProject.id) === id) {
+            setViewingProject(prev => ({ ...prev, restartRequests: updatedRequests }));
+        }
+
+        pushNotification({
+            type: 'project',
+            title: `Restart Request: ${proj.name}`,
+            message: `${userName} wants to restart this On Hold project.`,
+            createdBy: userName,
+            path: '/projects'
+        });
+        window.island.success('Restart request sent to team! 🚀');
+    };
+
+    const handleResumeNow = (e, proj) => {
+        if (e) e.stopPropagation();
+        const id = proj._id || proj.id;
+        if (updateProject) updateProject(id, { status: 'In Progress', restartRequests: [] });
+        else setLocalProjects(prev => prev.map(p => ((p._id || p.id) === id ? { ...p, status: 'In Progress', restartRequests: [] } : p)));
+
+        if (viewingProject && (viewingProject._id || viewingProject.id) === id) {
+            setViewingProject(prev => ({ ...prev, status: 'In Progress', restartRequests: [] }));
+        }
+
+        pushNotification({
+            type: 'project',
+            title: `Project Resumed: ${proj.name}`,
+            message: `${proj.name} is now back In Progress.`,
+            createdBy: currentUser?.name,
+            path: '/projects'
+        });
+        window.island.success(`${proj.name} is back In Progress! ✅`);
+    };
+
     const renderCategoryIcon = (cat) => {
         if (cat.includes('Web')) return <Layout size={18} color="#3b82f6" />;
         if (cat.includes('App') || cat.includes('Mobile')) return <Terminal size={18} color="#10b981" />;
@@ -126,13 +236,14 @@ export default function Projects() {
         return <Code2 size={18} color="#f59e0b" />;
     };
 
-    const activeProjectsRaw = displayProjects.filter(p => p.status !== 'Pending Approval' && p.status !== 'Rejected');
+    // Hide Private projects from non-admin members
+    const visibleProjects = displayProjects.filter(p => isMainAdmin || !p.isPrivate);
 
+    const activeProjectsRaw = visibleProjects.filter(p => p.status !== 'Pending Approval' && p.status !== 'Rejected');
     const activeProjects = activeProjectsRaw.filter(p =>
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.desc.toLowerCase().includes(searchQuery.toLowerCase())
     );
-
     const pendingIdeas = displayProjects.filter(p => p.status === 'Pending Approval');
 
     return (
@@ -156,8 +267,6 @@ export default function Projects() {
 
             <section className="dashboard-grid stagger-2">
                 <div className="grid-col grid-span-2">
-
-                    {/* ACTIVE PROJECTS WIDGET */}
                     <div className="premium-widget">
                         <div className="widget-header widget-header-column">
                             <div className="header-top-row">
@@ -190,23 +299,30 @@ export default function Projects() {
                                 {activeProjects.map(proj => {
                                     const idToUse = proj._id || proj.id;
                                     const statusClass = proj.status.replace(/\s+/g, '-').toLowerCase();
+                                    const restartVotes = proj.restartRequests || [];
+                                    const hasRequested = restartVotes.includes(currentUser?.name);
+                                    const commentCount = (proj.comments || []).length;
 
                                     return (
-                                        <div key={idToUse} className="project-card-modern fade-in-row" onClick={() => {
-                                            setViewingProject(proj);
-                                            window.island.success(`Project ${proj.name} selected ✅`);
-                                        }}>
+                                        <div key={idToUse} className="project-card-modern fade-in-row" onClick={() => setViewingProject(proj)}>
                                             <div className="proj-card-header">
                                                 <div className="proj-cat-badge">
                                                     {renderCategoryIcon(proj.category)}
                                                     <span>{proj.category}</span>
                                                 </div>
-                                                {isMainAdmin && (
-                                                    <div className="proj-actions">
-                                                        <button onClick={(e) => handleOpenEdit(e, proj)}><Edit3 size={14} /></button>
-                                                        <button onClick={(e) => handleDelete(e, idToUse)} className="danger-btn"><Trash2 size={14} /></button>
-                                                    </div>
-                                                )}
+                                                <div className="proj-actions">
+                                                    {isMainAdmin && proj.isPrivate && (
+                                                        <span className="proj-visibility-pill private" title="Private (Supreme Admin Only)">
+                                                            <Lock size={11} /> Private
+                                                        </span>
+                                                    )}
+                                                    {isMainAdmin && (
+                                                        <>
+                                                            <button onClick={(e) => handleOpenEdit(e, proj)}><Edit3 size={14} /></button>
+                                                            <button onClick={(e) => handleDelete(e, idToUse)} className="danger-btn"><Trash2 size={14} /></button>
+                                                        </>
+                                                    )}
+                                                </div>
                                             </div>
 
                                             <div className="proj-card-body">
@@ -219,6 +335,39 @@ export default function Projects() {
                                                             <span key={i} className="tech-pill">{tech}</span>
                                                         ))}
                                                         {proj.techStack.length > 3 && <span className="tech-pill">+{proj.techStack.length - 3}</span>}
+                                                    </div>
+                                                )}
+
+                                                {/* Live Website Link & Comment Counter Row */}
+                                                <div className="proj-extra-row">
+                                                    {proj.liveUrl && (
+                                                        <a
+                                                            href={proj.liveUrl}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            className="proj-live-link-btn"
+                                                            onClick={e => e.stopPropagation()}
+                                                        >
+                                                            <ExternalLink size={12} /> Live Site
+                                                        </a>
+                                                    )}
+                                                    <span className="proj-comment-count">
+                                                        <MessageSquare size={12} /> {commentCount} {commentCount === 1 ? 'Comment' : 'Comments'}
+                                                    </span>
+                                                </div>
+
+                                                {/* On Hold Restart Button for All Members */}
+                                                {proj.status === 'On Hold' && (
+                                                    <div className="proj-restart-bar" onClick={e => e.stopPropagation()}>
+                                                        <button
+                                                            className={`proj-restart-btn ${hasRequested ? 'requested' : ''}`}
+                                                            onClick={(e) => handleRequestRestart(e, proj)}
+                                                        >
+                                                            <RotateCcw size={13} />
+                                                            {hasRequested
+                                                                ? `Restart Requested (${restartVotes.length})`
+                                                                : `Request to Restart${restartVotes.length > 0 ? ` (${restartVotes.length})` : ''}`}
+                                                        </button>
                                                     </div>
                                                 )}
                                             </div>
@@ -278,16 +427,16 @@ export default function Projects() {
                 </div>
             </section>
 
-            {/* --- FULL GRID PROJECT DETAILS POPUP --- */}
+            {/* --- PROJECT DETAILS + COMMENTS + LIVE LINK + RESTART POPUP --- */}
             {viewingProject && (
                 <div className="modal-overlay fade-in" onClick={() => setViewingProject(null)}>
                     <div className="modal-content pop-in project-details-modal modal-large" onClick={e => e.stopPropagation()}>
-
                         <div className="modal-header modal-header-extended">
                             <div>
                                 <h2 className="modal-header-title">{viewingProject.name}</h2>
                                 <span className="meta-tag modal-header-subtitle">
                                     {viewingProject.category} • Pitched by <strong>{viewingProject.createdBy}</strong>
+                                    {viewingProject.isPrivate && ' • Private'}
                                 </span>
                             </div>
                             <button className="modal-close" onClick={() => setViewingProject(null)}><X size={24} /></button>
@@ -298,6 +447,15 @@ export default function Projects() {
                                 <h4>Description & Objectives</h4>
                                 <p>{viewingProject.desc}</p>
                             </div>
+
+                            {viewingProject.liveUrl && (
+                                <div className="detail-section">
+                                    <h4>Live Website</h4>
+                                    <a href={viewingProject.liveUrl} target="_blank" rel="noreferrer" className="btn-modern-primary proj-modal-live-btn">
+                                        <ExternalLink size={15} /> Visit Live Website
+                                    </a>
+                                </div>
+                            )}
 
                             {viewingProject.techStack && viewingProject.techStack.length > 0 && (
                                 <div className="detail-section">
@@ -322,12 +480,68 @@ export default function Projects() {
                                     </span>
                                 </div>
                             </div>
+
+                            {/* On Hold Restart Action inside Modal */}
+                            {viewingProject.status === 'On Hold' && (
+                                <div className="proj-modal-restart-box">
+                                    <div>
+                                        <h4>Project is On Hold</h4>
+                                        <p>
+                                            {(viewingProject.restartRequests || []).length > 0
+                                                ? `${viewingProject.restartRequests.length} member(s) requested to restart: ${viewingProject.restartRequests.join(', ')}`
+                                                : 'Want to get this project moving again?'}
+                                        </p>
+                                    </div>
+                                    <div className="proj-restart-modal-btns">
+                                        <button className="btn-modern-secondary" onClick={(e) => handleRequestRestart(e, viewingProject)}>
+                                            <RotateCcw size={14} /> Request Restart
+                                        </button>
+                                        {isMainAdmin && (
+                                            <button className="btn-modern-primary" onClick={(e) => handleResumeNow(e, viewingProject)}>
+                                                Resume Now
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Project Comments Section */}
+                            <div className="detail-section proj-comments-section">
+                                <h4><MessageSquare size={15} style={{ display: 'inline', marginRight: '6px' }} /> Comments ({(viewingProject.comments || []).length})</h4>
+                                <div className="proj-comments-list">
+                                    {(viewingProject.comments || []).length === 0 ? (
+                                        <p className="proj-no-comments">No comments yet. Start the discussion!</p>
+                                    ) : (
+                                        viewingProject.comments.map((c, idx) => (
+                                            <div key={c.id || idx} className="proj-comment-item">
+                                                <div className="proj-comment-head">
+                                                    <strong>{c.author}</strong>
+                                                    <span>{c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''}</span>
+                                                </div>
+                                                <p>{c.text}</p>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                                <form onSubmit={handleAddComment} className="proj-comment-form">
+                                    <input
+                                        type="text"
+                                        value={commentInput}
+                                        onChange={e => setCommentInput(e.target.value)}
+                                        placeholder="Write a comment..."
+                                        className="modern-input"
+                                    />
+                                    <button type="submit" className="btn-modern-primary proj-comment-send">
+                                        <Send size={15} />
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* --- Advanced Project Edit/Create Modal --- */}
+            {/* --- Create / Edit Project Modal --- */}
             {showModal && (
                 <div className="modal-overlay fade-in">
                     <div className="modal-content pop-in modal-medium">
@@ -373,9 +587,36 @@ export default function Projects() {
                             </div>
 
                             <div className="form-group">
+                                <label>Live Website URL (Optional)</label>
+                                <input type="url" value={liveUrl} onChange={e => setLiveUrl(e.target.value)} className="modern-input" placeholder="https://example.com" />
+                            </div>
+
+                            <div className="form-group">
                                 <label>Tech Stack (Comma separated)</label>
                                 <input type="text" value={techStack} onChange={e => setTechStack(e.target.value)} className="modern-input" placeholder="e.g. React, Node.js, MongoDB" />
                             </div>
+
+                            {isMainAdmin && (
+                                <div className="form-group">
+                                    <label>Visibility</label>
+                                    <div className="visibility-toggle-group">
+                                        <button
+                                            type="button"
+                                            className={`vis-btn ${!isPrivate ? 'active' : ''}`}
+                                            onClick={() => setIsPrivate(false)}
+                                        >
+                                            <Globe size={14} /> Public (All Members)
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className={`vis-btn ${isPrivate ? 'active private' : ''}`}
+                                            onClick={() => setIsPrivate(true)}
+                                        >
+                                            <Lock size={14} /> Private (Admin Only)
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="form-group">
                                 <label>Description & Objectives</label>

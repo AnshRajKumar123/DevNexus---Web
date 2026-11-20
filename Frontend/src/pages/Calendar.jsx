@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Calendar as CalIcon, Plus, Video, MapPin, Clock, Users, X, CalendarDays } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import '../styles/Calendar.css';
+import { pushNotification } from '../utils/notifications';
 
 export default function Calendar() {
     const { events, addEvent, currentUser } = useData();
@@ -25,6 +26,13 @@ export default function Calendar() {
         setDate('');
         setTime('');
         setType('Google Meet');
+        pushNotification({
+            type: 'calendar',
+            title: `New Meeting: ${title}`,
+            message: `${type} on ${formatDate(date)} at ${time}`,
+            createdBy: currentUser?.name || 'Admin',
+            path: '/calendar'
+        });
         setShowModal(false);
     };
 
@@ -86,19 +94,19 @@ export default function Calendar() {
                                             <span>{ev.time}</span>
                                             <span className="cal-date-sub">{formatDate(ev.date)}</span>
                                         </div>
-                                        
+
                                         <div className="calendar-main-info">
                                             <h4>{ev.title}</h4>
                                             <div className="calendar-meta-tags">
                                                 <span className={`event-type-badge-modern ${ev.type === 'In Person' ? 'type-physical' : 'type-virtual'}`}>
-                                                    {ev.type === 'In Person' ? <MapPin size={12}/> : <Video size={12}/>} {ev.type}
+                                                    {ev.type === 'In Person' ? <MapPin size={12} /> : <Video size={12} />} {ev.type}
                                                 </span>
                                                 <span className="meta-tag">• Scheduled by: <strong>{ev.createdBy || 'Admin'}</strong></span>
                                             </div>
                                         </div>
 
                                         <div className="calendar-attendees-col">
-                                            <span className="attendees-pill"><Users size={12}/> All Team Members</span>
+                                            <span className="attendees-pill"><Users size={12} /> All Team Members</span>
                                         </div>
                                     </div>
                                 ))}
@@ -114,29 +122,29 @@ export default function Calendar() {
                     <div className="modal-content pop-in">
                         <div className="modal-header">
                             <h2>Schedule New Event</h2>
-                            <button className="modal-close" onClick={() => setShowModal(false)}><X size={24}/></button>
+                            <button className="modal-close" onClick={() => setShowModal(false)}><X size={24} /></button>
                         </div>
-                        
+
                         <form onSubmit={handleSubmit} className="modern-form">
                             <div className="form-group">
                                 <label>Event Title</label>
-                                <input type="text" value={title} onChange={e=>setTitle(e.target.value)} className="modern-input" required placeholder="e.g. Q4 Strategy Planning" />
+                                <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="modern-input" required placeholder="e.g. Q4 Strategy Planning" />
                             </div>
-                            
+
                             <div className="form-group-row">
                                 <div className="form-group flex-1">
                                     <label>Date</label>
-                                    <input type="date" value={date} onChange={e=>setDate(e.target.value)} className="modern-input" required />
+                                    <input type="date" value={date} onChange={e => setDate(e.target.value)} className="modern-input" required />
                                 </div>
                                 <div className="form-group flex-1">
                                     <label>Time</label>
-                                    <input type="time" value={time} onChange={e=>setTime(e.target.value)} className="modern-input" required />
+                                    <input type="time" value={time} onChange={e => setTime(e.target.value)} className="modern-input" required />
                                 </div>
                             </div>
 
                             <div className="form-group">
                                 <label>Event Location / Type</label>
-                                <select value={type} onChange={e=>setType(e.target.value)} className="modern-input" required>
+                                <select value={type} onChange={e => setType(e.target.value)} className="modern-input" required>
                                     <option value="Google Meet">Google Meet</option>
                                     <option value="Zoom">Zoom</option>
                                     <option value="In Person">In Person (Office)</option>

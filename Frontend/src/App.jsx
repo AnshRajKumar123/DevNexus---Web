@@ -17,6 +17,7 @@ import ScrollToTop from './components/ScrollToTop';
 import { useData } from './context/DataContext';
 import { DashPic } from './assets/assets';
 import { Sparkles, Loader2, Home, AlertTriangle, CheckCircle2, X } from 'lucide-react';
+import Notifications from './pages/Notifications.jsx';
 
 // --- GLOBAL CUSTOM DYNAMIC ISLAND API ---
 window.island = {
@@ -237,6 +238,7 @@ export default function App() {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/projects" element={<Projects />} />
                     <Route path="/chat" element={<ChatHub />} />
+                    <Route path="/notifications" element={<Notifications />} />
                 </Route>
                 <Route path="*" element={<NotFound404 />} />
             </Routes>

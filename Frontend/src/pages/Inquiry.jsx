@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { FileQuestion, Plus, X, MessageSquarePlus, PlayCircle, CheckCircle2, AlertCircle, User, Layers } from 'lucide-react';
-import { useData } from '../context/DataContext'; 
+import { useData } from '../context/DataContext';
 import '../styles/Inquiry.css';
+import { pushNotification } from '../utils/notifications';
 
 export default function Inquiry() {
-    const { inquiries, addInquiry, updateInquiryStatus, team, currentUser } = useData(); 
+    const { inquiries, addInquiry, updateInquiryStatus, team, currentUser } = useData();
 
     const [isLoading, setIsLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -19,15 +20,22 @@ export default function Inquiry() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        addInquiry({ 
-            title, 
-            description: desc, 
+        addInquiry({
+            title,
+            description: desc,
             assignedTo,
-            reportedBy: currentUser?.name 
+            reportedBy: currentUser?.name
         });
         setTitle('');
         setDesc('');
         setAssignedTo('All Members');
+        pushNotification({
+            type: 'inquiry',
+            title: `New Task Assigned: ${title}`,
+            message: `Assigned to ${assignedTo}`,
+            createdBy: currentUser?.name || 'Admin',
+            path: '/inquiry'
+        });
         setShowModal(false);
     };
 
@@ -80,9 +88,9 @@ export default function Inquiry() {
                         ) : (
                             <div className="inquiry-list-modern">
                                 {inquiries.map((inq) => {
-                                    const canManageTask = 
-                                        inq.assignedTo === currentUser?.name || 
-                                        inq.assignedTo === 'All Members' || 
+                                    const canManageTask =
+                                        inq.assignedTo === currentUser?.name ||
+                                        inq.assignedTo === 'All Members' ||
                                         currentUser?.isSupremeAdmin;
 
                                     const statusClass = inq.status ? inq.status.replace(/\s+/g, '-').toLowerCase() : 'pending';
@@ -90,12 +98,12 @@ export default function Inquiry() {
                                     return (
                                         <div key={inq._id || inq.id} className="inquiry-card-item fade-in-row">
                                             <div className={`status-pill-indicator ${statusClass}`}></div>
-                                            
+
                                             <div className="inquiry-main-info">
                                                 <h4>{inq.title}</h4>
                                                 <p>{inq.description}</p>
                                                 <div className="inquiry-meta-tags">
-                                                    <span className="meta-tag"><User size={12}/> {inq.assignedTo}</span>
+                                                    <span className="meta-tag"><User size={12} /> {inq.assignedTo}</span>
                                                     <span className="meta-tag">• Created by: {inq.reportedBy || 'Admin'}</span>
                                                 </div>
                                             </div>
@@ -142,18 +150,18 @@ export default function Inquiry() {
                     <div className="modal-content pop-in">
                         <div className="modal-header">
                             <h2>Assign New Task</h2>
-                            <button className="modal-close" onClick={() => setShowModal(false)}><X size={24}/></button>
+                            <button className="modal-close" onClick={() => setShowModal(false)}><X size={24} /></button>
                         </div>
-                        
+
                         <form onSubmit={handleSubmit} className="modern-form">
                             <div className="form-group">
                                 <label>Task / Issue Title</label>
-                                <input 
-                                  type="text" 
-                                  value={title} 
-                                  onChange={(e) => setTitle(e.target.value)} 
-                                  className="modern-input"
-                                  placeholder="e.g. Update Hero Section" required 
+                                <input
+                                    type="text"
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    className="modern-input"
+                                    placeholder="e.g. Update Hero Section" required
                                 />
                             </div>
                             <div className="form-group">
@@ -167,12 +175,12 @@ export default function Inquiry() {
                             </div>
                             <div className="form-group">
                                 <label>Task Details</label>
-                                <textarea 
-                                  rows="4" 
-                                  value={desc} 
-                                  onChange={(e) => setDesc(e.target.value)} 
-                                  className="modern-input"
-                                  placeholder="Provide full instructions..." required
+                                <textarea
+                                    rows="4"
+                                    value={desc}
+                                    onChange={(e) => setDesc(e.target.value)}
+                                    className="modern-input"
+                                    placeholder="Provide full instructions..." required
                                 ></textarea>
                             </div>
                             <div className="form-actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1.5rem' }}>

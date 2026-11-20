@@ -18,6 +18,9 @@ const WebsiteSchema = new mongoose.Schema({
     url: { type: String, required: true },
     desc: String,
     img: String,
+
+    devices: { type: [String], default: ['Desktop', 'Mobile'] },
+    isPrivate: { type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now }
 });
 

@@ -3,11 +3,13 @@ import { NavLink, Link, useLocation } from 'react-router-dom';
 import {
     Sun, MessageCircle, Calendar,
     Globe, Users, MessageSquare, Link as LinkIcon, Plug,
-    CheckCircle2, Menu, X, Briefcase
+    CheckCircle2, Menu, X, Briefcase,
+    Bell
 } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import '../styles/Sidebar.css';
 import { DashPic } from '../assets/assets';
+import { getUnreadNotificationCount } from '../utils/notifications';
 
 const API_URL = `${import.meta.env.VITE_API_URL}/api`;
 
@@ -63,6 +65,17 @@ export default function Sidebar() {
         return () => clearInterval(interval);
     }, [currentUser]);
 
+    const [notifCount, setNotifCount] = useState(getUnreadNotificationCount());
+    useEffect(() => {
+        const sync = () => setNotifCount(getUnreadNotificationCount());
+        window.addEventListener('devnexus-notifications-updated', sync);
+        window.addEventListener('storage', sync);
+        return () => {
+            window.removeEventListener('devnexus-notifications-updated', sync);
+            window.removeEventListener('storage', sync);
+        };
+    }, []);
+
     const menuSections = [
         {
             label: 'Home',
@@ -79,6 +92,7 @@ export default function Sidebar() {
                     path: '/chat',
                     badge: unreadCount > 0 ? unreadCount : null
                 },
+                { title: 'Notifications', icon: <Bell size={18} />, path: '/notifications', badge: notifCount > 0 ? notifCount : null },
             ]
         },
         {

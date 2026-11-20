@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Link as LinkIcon, Plus, Trash2, ExternalLink, X, Compass, Globe } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import '../styles/QuickLinks.css';
+import { pushNotification } from '../utils/notifications';
 
 export default function QuickLinks() {
     const { links, addLink, removeLink, currentUser } = useData();
     const [isLoading, setIsLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
-    
+
     const [title, setTitle] = useState('');
     const [url, setUrl] = useState('');
 
@@ -20,6 +21,13 @@ export default function QuickLinks() {
         e.preventDefault();
         addLink({ title, url });
         setTitle(''); setUrl('');
+        pushNotification({
+            type: 'link',
+            title: `New Quick Link: ${title}`,
+            message: url,
+            createdBy: currentUser?.name || 'Admin',
+            path: '/links'
+        });
         setShowModal(false);
     };
 
@@ -72,13 +80,13 @@ export default function QuickLinks() {
                         ) : (
                             <div className="links-list-modern">
                                 {links.map(link => {
-                                    const idToUse = link._id || link.id; 
+                                    const idToUse = link._id || link.id;
                                     return (
                                         <div key={idToUse} className="link-card-item fade-in-row">
                                             <div className="link-icon-box">
                                                 <Globe size={18} color="#2563eb" />
                                             </div>
-                                            
+
                                             <div className="link-main-info">
                                                 <h4>{link.title}</h4>
                                                 <a href={link.url} target="_blank" rel="noreferrer" className="link-url-text">{link.url}</a>
@@ -111,17 +119,17 @@ export default function QuickLinks() {
                     <div className="modal-content pop-in">
                         <div className="modal-header">
                             <h2>Add Quick Link</h2>
-                            <button className="modal-close" onClick={() => setShowModal(false)}><X size={24}/></button>
+                            <button className="modal-close" onClick={() => setShowModal(false)}><X size={24} /></button>
                         </div>
-                        
+
                         <form onSubmit={handleAdd} className="modern-form">
                             <div className="form-group">
                                 <label>Link Title</label>
-                                <input type="text" value={title} onChange={e=>setTitle(e.target.value)} className="modern-input" required placeholder="e.g. Figma Design System" />
+                                <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="modern-input" required placeholder="e.g. Figma Design System" />
                             </div>
                             <div className="form-group">
                                 <label>Target URL</label>
-                                <input type="url" value={url} onChange={e=>setUrl(e.target.value)} className="modern-input" required placeholder="https://figma.com/..." />
+                                <input type="url" value={url} onChange={e => setUrl(e.target.value)} className="modern-input" required placeholder="https://figma.com/..." />
                             </div>
                             <div className="form-actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1.5rem' }}>
                                 <button type="button" className="btn-modern-secondary hover-pop" onClick={() => setShowModal(false)}>Cancel</button>

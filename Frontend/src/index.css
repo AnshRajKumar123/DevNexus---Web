@@ -9,6 +9,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: var(--Font1);
+    user-select: none;
     -webkit-user-select: none;
 }
 
@@ -930,11 +931,9 @@ body.dark-mode .empty-icon-wrapper {
     }
 }
 
-
 /* =========================================================
    PREMIUM MOBILE INTERACTION & TOUCH OPTIMIZATION
    ========================================================= */
-
 @media (max-width: 768px) {
 
     /* 1. REMOVE MOBILE TAP HIGHLIGHT */
@@ -1037,14 +1036,12 @@ body.dark-mode .empty-icon-wrapper {
     .analytics-card:hover {
         box-shadow: none;
     }
-
 }
 
 /* =========================================================
    DESKTOP HOVER ONLY
    Prevents hover effects from affecting touch devices
    ========================================================= */
-
 @media (hover: hover) and (pointer: fine) {
 
     .hover-pop:hover {
@@ -1055,13 +1052,11 @@ body.dark-mode .empty-icon-wrapper {
     .analytics-card:hover {
         transform: translateY(-2px);
     }
-
 }
 
 /* =========================================================
    ACCESSIBILITY: KEYBOARD FOCUS
    ========================================================= */
-
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
@@ -1075,7 +1070,6 @@ select:focus-visible,
 /* =========================================================
    REDUCE MOTION FOR USERS WHO PREFER IT
    ========================================================= */
-
 @media (prefers-reduced-motion: reduce) {
 
     *,
@@ -1086,5 +1080,283 @@ select:focus-visible,
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
     }
+}
 
+/* --- VISIBILITY & DEVICE TOGGLES (PROJECTS & LIVE WEBSITE) --- */
+.visibility-toggle-group,
+.device-toggle-group {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.vis-btn,
+.device-select-btn {
+    flex: 1;
+    min-width: 90px;
+    padding: 0.55rem 0.85rem;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 0.78rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.vis-btn.active,
+.device-select-btn.active {
+    background: #1e3a8a;
+    border-color: #1e3a8a;
+    color: #ffffff;
+}
+
+.vis-btn.active.private {
+    background: #991b1b;
+    border-color: #dc2626;
+    color: #ffffff;
+}
+
+.proj-visibility-pill.private,
+.site-private-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 99px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    background: rgba(220, 38, 38, 0.18);
+    border: 1px solid rgba(248, 113, 113, 0.4);
+    color: #ef4444;
+}
+
+.site-private-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: rgba(15, 23, 42, 0.8);
+    color: #fca5a5;
+}
+
+.website-device-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.65rem;
+}
+
+.device-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 99px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #e2e8f0;
+}
+
+/* --- PROJECTS EXTRA ROW, RESTART & COMMENTS --- */
+.proj-extra-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.proj-live-link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.28rem 0.7rem;
+    border-radius: 99px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+    text-decoration: none;
+}
+
+.proj-comment-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.proj-restart-bar {
+    margin-bottom: 0.85rem;
+}
+
+.proj-restart-btn {
+    width: 100%;
+    padding: 0.5rem 0.85rem;
+    border-radius: 10px;
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 0.78rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    cursor: pointer;
+}
+
+.proj-restart-btn.requested {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+    color: #047857;
+}
+
+.proj-modal-live-btn {
+    display: inline-flex !important;
+    text-decoration: none;
+    width: fit-content;
+}
+
+.proj-modal-restart-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 14px;
+    background: rgba(217, 119, 6, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.35);
+}
+
+.proj-modal-restart-box h4 {
+    margin: 0;
+    font-size: 0.92rem;
+}
+
+.proj-modal-restart-box p {
+    margin: 0.2rem 0 0 0;
+    font-size: 0.8rem;
+}
+
+.proj-restart-modal-btns {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.proj-comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 0.85rem;
+}
+
+.proj-comment-item {
+    padding: 0.7rem 0.9rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.proj-comment-head {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+}
+
+.proj-comment-item p {
+    margin: 0;
+    font-size: 0.84rem;
+}
+
+.proj-no-comments {
+    font-size: 0.82rem;
+    color: #94a3b8;
+    margin: 0;
+}
+
+.proj-comment-form {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.proj-comment-send {
+    padding: 0 1rem !important;
+    flex-shrink: 0;
+}
+
+/* Desktop Dark Mode Overrides for Toggles, Pills & Comments */
+body.dark-mode .device-pill,
+body.dark-mode .proj-live-link-btn,
+body.dark-mode .proj-restart-btn,
+body.dark-mode .vis-btn,
+body.dark-mode .device-select-btn {
+    background: #111111;
+    border-color: #333333;
+    color: #e2e8f0;
+}
+
+body.dark-mode .vis-btn.active,
+body.dark-mode .device-select-btn.active {
+    background: #2563eb;
+    border-color: #3b82f6;
+    color: #ffffff;
+}
+
+body.dark-mode .vis-btn.active.private {
+    background: #991b1b;
+    border-color: #dc2626;
+    color: #ffffff;
+}
+
+body.dark-mode .proj-restart-btn.requested {
+    background: #064e3b;
+    border-color: #059669;
+    color: #a7f3d0;
+}
+
+/* Mobile Liquid Glass Overrides for Toggles, Pills & Comments */
+@media (max-width: 768px) {
+
+    .device-pill,
+    .proj-live-link-btn,
+    .proj-restart-btn,
+    .vis-btn,
+    .device-select-btn {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border-color: rgba(255, 255, 255, 0.18) !important;
+        color: #f1f5f9 !important;
+    }
+
+    .vis-btn.active,
+    .device-select-btn.active {
+        background: #2563eb !important;
+        border-color: #60a5fa !important;
+        color: #ffffff !important;
+    }
+
+    .vis-btn.active.private {
+        background: rgba(220, 38, 38, 0.35) !important;
+        border-color: rgba(248, 113, 113, 0.55) !important;
+        color: #fecaca !important;
+    }
+
+    .proj-restart-btn.requested {
+        background: rgba(16, 185, 129, 0.22) !important;
+        border-color: rgba(52, 211, 153, 0.45) !important;
+        color: #a7f3d0 !important;
+    }
 }
