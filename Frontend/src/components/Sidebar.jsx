@@ -65,16 +65,24 @@ export default function Sidebar() {
         return () => clearInterval(interval);
     }, [currentUser]);
 
-    const [notifCount, setNotifCount] = useState(getUnreadNotificationCount());
+    const [notifCount, setNotifCount] = useState(0);
+
     useEffect(() => {
-        const sync = () => setNotifCount(getUnreadNotificationCount());
-        window.addEventListener('devnexus-notifications-updated', sync);
-        window.addEventListener('storage', sync);
-        return () => {
-            window.removeEventListener('devnexus-notifications-updated', sync);
-            window.removeEventListener('storage', sync);
+        if (!currentUser?.email) return;
+
+        const syncNotifs = async () => {
+            const count = await getUnreadNotificationCount(currentUser.email);
+            setNotifCount(count);
         };
-    }, []);
+
+        syncNotifs();
+        const interval = setInterval(syncNotifs, 5000);
+        window.addEventListener('devnexus-notifications-updated', syncNotifs);
+        return () => {
+            clearInterval(interval);
+            window.removeEventListener('devnexus-notifications-updated', syncNotifs);
+        };
+    }, [currentUser]);
 
     const menuSections = [
         {

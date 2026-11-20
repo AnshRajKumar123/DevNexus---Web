@@ -49,6 +49,7 @@ const todoRoutes = require('./src/routes/todoRoutes');
 const integrationRoutes = require('./src/routes/integrationRoutes');
 const chatRoutes = require('./src/routes/chatRoutes.js');
 const projectRoutes = require('./src/routes/projectRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 
 // Mount Routes
 app.use('/api/auth', authRoutes);
@@ -62,6 +63,7 @@ app.use('/api/todos', todoRoutes);
 app.use('/api/integrations', integrationRoutes);
 app.use('/api/chats', chatRoutes);
 app.use('/api/projects', projectRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 const PORT = process.env.PORT || 5001;
 mongoose.connect(process.env.MONGO_URI)
