@@ -16,6 +16,7 @@ const API_URL = `${import.meta.env.VITE_API_URL}/api`;
 export default function Sidebar() {
     const { currentUser, isDarkMode, toggleTheme } = useData();
     const [unreadCount, setUnreadCount] = useState(0);
+    const [notifCount, setNotifCount] = useState(0);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const location = useLocation();
 
@@ -65,8 +66,6 @@ export default function Sidebar() {
         return () => clearInterval(interval);
     }, [currentUser]);
 
-    const [notifCount, setNotifCount] = useState(0);
-
     useEffect(() => {
         if (!currentUser?.email) return;
 
@@ -100,7 +99,12 @@ export default function Sidebar() {
                     path: '/chat',
                     badge: unreadCount > 0 ? unreadCount : null
                 },
-                { title: 'Notifications', icon: <Bell size={18} />, path: '/notifications', badge: notifCount > 0 ? notifCount : null },
+                {
+                    title: 'Notifications',
+                    icon: <Bell size={18} />,
+                    path: '/notifications',
+                    badge: notifCount > 0 ? notifCount : null
+                },
             ]
         },
         {
@@ -149,14 +153,29 @@ export default function Sidebar() {
                     <span className="brand-text">DevNexus</span>
                 </div>
 
-                <button
-                    className="mobile-hamburger-btn"
-                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                    aria-label="Toggle Menu"
-                    type="button"
-                >
-                    {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-                </button>
+                <div className="mobile-top-actions">
+                    <NavLink
+                        to="/notifications"
+                        className={({ isActive }) => isActive ? "mobile-notif-btn active" : "mobile-notif-btn"}
+                        aria-label="Notifications"
+                    >
+                        <Bell size={19} />
+                        {notifCount > 0 && (
+                            <span className="mobile-top-badge">
+                                {notifCount > 99 ? '99+' : notifCount}
+                            </span>
+                        )}
+                    </NavLink>
+
+                    <button
+                        className="mobile-hamburger-btn"
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        aria-label="Toggle Menu"
+                        type="button"
+                    >
+                        {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                    </button>
+                </div>
             </div>
 
             {/* --- MOBILE RIGHT SIDE SLIDE-OUT DRAWER --- */}
