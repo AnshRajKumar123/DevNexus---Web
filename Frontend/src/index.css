@@ -1,15 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Moon+Dance&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Libertinus+Sans:ital,wght@0,400;0,700;1,400&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Playwrite+HU:wght@100..400&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Moon+Dance&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Libertinus+Sans:ital,wght@0,400;0,700;1,400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playwrite+HU:wght@100..400&display=swap");
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: var(--Font1);
-    user-select: none;
+    -webkit-user-select: none;
 }
 
 :root {
@@ -25,7 +25,9 @@ html,
 body {
     background-color: #f3f4f6;
     color: #1f2937;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family:
+        -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+        sans-serif;
 }
 
 /* Dashboard Shell Layout */
@@ -106,7 +108,9 @@ body {
 }
 
 .hover-pop {
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s;
+    transition:
+        transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        background-color 0.2s;
 }
 
 .hover-pop:hover {
@@ -121,7 +125,9 @@ body {
 .analytics-card,
 .inquiry-form-card,
 .inquiry-list-card {
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    transition:
+        box-shadow 0.3s ease,
+        transform 0.3s ease;
 }
 
 .widget-card:hover,
@@ -154,7 +160,10 @@ body {
 
 .skeleton {
     background: #e2e8f0;
-    background-image: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+    background-image: linear-gradient(90deg,
+            #e2e8f0 25%,
+            #f1f5f9 50%,
+            #e2e8f0 75%);
     background-size: 1000px 100%;
     animation: shimmer 2s infinite linear forwards;
     border-radius: 8px;
@@ -291,7 +300,12 @@ body.dark-mode .profile-settings-card::before {
     left: -2px;
     right: -2px;
     bottom: -2px;
-    background: linear-gradient(45deg, #ff0080, #ff8c00, #40e0d0, #8a2be2, #ff0080);
+    background: linear-gradient(45deg,
+            #ff0080,
+            #ff8c00,
+            #40e0d0,
+            #8a2be2,
+            #ff0080);
     background-size: 400%;
     z-index: -1;
     filter: blur(12px);
@@ -407,7 +421,10 @@ body.dark-mode .btn-secondary:hover {
 
 body.dark-mode .skeleton {
     background: #111111;
-    background-image: linear-gradient(90deg, #111111 25%, #1a1a1a 50%, #111111 75%);
+    background-image: linear-gradient(90deg,
+            #111111 25%,
+            #1a1a1a 50%,
+            #111111 75%);
 }
 
 /* 7. Empty States */
@@ -456,9 +473,13 @@ body.dark-mode .empty-icon-wrapper {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    box-shadow:
+        0 15px 35px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
     overflow: hidden;
-    transition: background-color 0.4s ease, border-color 0.4s ease;
+    transition:
+        background-color 0.4s ease,
+        border-color 0.4s ease;
 }
 
 .island-loading {
@@ -467,12 +488,16 @@ body.dark-mode .empty-icon-wrapper {
 
 .island-success {
     background: #064e3b;
-    box-shadow: 0 15px 35px rgba(6, 78, 59, 0.3), 0 0 0 1px rgba(16, 185, 129, 0.4);
+    box-shadow:
+        0 15px 35px rgba(6, 78, 59, 0.3),
+        0 0 0 1px rgba(16, 185, 129, 0.4);
 }
 
 .island-error {
     background: #7f1d1d;
-    box-shadow: 0 15px 35px rgba(127, 29, 29, 0.3), 0 0 0 1px rgba(239, 68, 68, 0.4);
+    box-shadow:
+        0 15px 35px rgba(127, 29, 29, 0.3),
+        0 0 0 1px rgba(239, 68, 68, 0.4);
 }
 
 .island-text {
@@ -826,7 +851,9 @@ body.dark-mode .empty-icon-wrapper {
         border: 1px solid rgba(147, 197, 253, 0.38) !important;
         color: #ffffff !important;
         border-radius: 999px !important;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 8px 20px rgba(29, 78, 216, 0.38) !important;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.28),
+            0 8px 20px rgba(29, 78, 216, 0.38) !important;
         font-weight: 700 !important;
     }
 
@@ -852,7 +879,9 @@ body.dark-mode .empty-icon-wrapper {
         backdrop-filter: blur(26px) saturate(180%) !important;
         -webkit-backdrop-filter: blur(26px) saturate(180%) !important;
         border: 1px solid rgba(255, 255, 255, 0.18) !important;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 14px 32px rgba(0, 0, 0, 0.55) !important;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.22),
+            0 14px 32px rgba(0, 0, 0, 0.55) !important;
     }
 
     .island-loading {
@@ -894,7 +923,168 @@ body.dark-mode .empty-icon-wrapper {
         border-radius: 999px !important;
         background: linear-gradient(145deg, #2563eb 0%, #1d4ed8 100%) !important;
         border: 1px solid rgba(147, 197, 253, 0.38) !important;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 10px 24px rgba(29, 78, 216, 0.4) !important;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.28),
+            0 10px 24px rgba(29, 78, 216, 0.4) !important;
         color: #ffffff !important;
     }
+}
+
+
+/* =========================================================
+   PREMIUM MOBILE INTERACTION & TOUCH OPTIMIZATION
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    /* 1. REMOVE MOBILE TAP HIGHLIGHT */
+    *,
+    *::before,
+    *::after {
+        -webkit-tap-highlight-color: transparent !important;
+    }
+
+    /* 2. BETTER TOUCH RESPONSE */
+    button,
+    a,
+    [role="button"],
+    [role="tab"],
+    [role="menuitem"],
+    input[type="button"],
+    input[type="submit"],
+    input[type="reset"],
+    .hover-pop,
+    .nav-link {
+        touch-action: manipulation;
+    }
+
+    /* 3. REMOVE UNWANTED TAP FLASH FROM INTERACTIVE ELEMENTS */
+    button:active,
+    a:active,
+    [role="button"]:active,
+    [role="tab"]:active,
+    [role="menuitem"]:active,
+    .hover-pop:active,
+    .nav-link:active {
+        -webkit-tap-highlight-color: transparent !important;
+    }
+
+    /* 4. PREVENT TOUCH HOVER EFFECTS FROM STICKING */
+    .hover-pop:hover,
+    .widget-card:hover,
+    .analytics-card:hover {
+        transform: none;
+    }
+
+    /* 5. KEEP PRESS ANIMATIONS SMOOTH */
+    .hover-pop:active {
+        transform: scale(0.97);
+        transition: transform 0.12s ease;
+    }
+
+    button:active,
+    .btn-modern-primary:active,
+    .btn-modern-secondary:active,
+    .btn-modern-danger:active {
+        transform: scale(0.97);
+        transition: transform 0.12s ease;
+    }
+
+    /* 6. PREVENT ACCIDENTAL TEXT SELECTION ON UI */
+    button,
+    a,
+    [role="button"],
+    .nav-link,
+    .status-badge {
+        user-select: none;
+        -webkit-user-select: none;
+    }
+
+    /* 7. ALLOW TEXT SELECTION IN INPUTS */
+    input,
+    textarea,
+    select,
+    [contenteditable="true"] {
+        user-select: text;
+        -webkit-user-select: text;
+        -webkit-tap-highlight-color: transparent !important;
+    }
+
+    /* 8. SMOOTH SCROLLING */
+    .main-content,
+    .modal-content,
+    .team-modal-large,
+    .poll-votes-modal {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+
+    /* 9. PREVENT HORIZONTAL OVERFLOW */
+    html,
+    body {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    /* 10. BETTER TOUCH TARGETS */
+    button,
+    [role="button"] {
+        cursor: pointer;
+    }
+
+    /* 11. REMOVE UNNECESSARY HOVER SHADOWS ON TOUCH */
+    .widget-card:hover,
+    .analytics-card:hover {
+        box-shadow: none;
+    }
+
+}
+
+/* =========================================================
+   DESKTOP HOVER ONLY
+   Prevents hover effects from affecting touch devices
+   ========================================================= */
+
+@media (hover: hover) and (pointer: fine) {
+
+    .hover-pop:hover {
+        transform: scale(1.02);
+    }
+
+    .widget-card:hover,
+    .analytics-card:hover {
+        transform: translateY(-2px);
+    }
+
+}
+
+/* =========================================================
+   ACCESSIBILITY: KEYBOARD FOCUS
+   ========================================================= */
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[role="button"]:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 3px;
+}
+
+/* =========================================================
+   REDUCE MOTION FOR USERS WHO PREFER IT
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
 }
