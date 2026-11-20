@@ -49,7 +49,7 @@ const todoRoutes = require('./src/routes/todoRoutes');
 const integrationRoutes = require('./src/routes/integrationRoutes');
 const chatRoutes = require('./src/routes/chatRoutes.js');
 const projectRoutes = require('./src/routes/projectRoutes');
-const notificationRoutes = require('./routes/notificationRoutes');
+const notificationRoutes = require('./src/routes/notificationRoutes');
 
 // Mount Routes
 app.use('/api/auth', authRoutes);
