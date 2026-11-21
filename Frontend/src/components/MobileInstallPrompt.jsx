@@ -10,10 +10,6 @@ export default function MobileInstallPrompt() {
     const [isInstalling, setIsInstalling] = useState(false);
 
     useEffect(() => {
-        // Only run on mobile viewports
-        const isMobile = window.innerWidth <= 768;
-        if (!isMobile) return;
-
         // Do not show if already running as installed standalone PWA
         const isStandalone =
             window.matchMedia('(display-mode: standalone)').matches ||
@@ -50,10 +46,9 @@ export default function MobileInstallPrompt() {
         window.addEventListener('beforeinstallprompt', handleBeforeInstall);
         window.addEventListener('appinstalled', handleInstalled);
 
-        // Show popup smoothly after a short delay on mobile browsers
         const showTimer = setTimeout(() => {
             setIsVisible(true);
-        }, 1200);
+        }, 1000);
 
         return () => {
             clearTimeout(showTimer);
@@ -87,7 +82,6 @@ export default function MobileInstallPrompt() {
                 setIsInstalling(false);
             }
         } else {
-            // If Chrome suppressed the native prompt or user is on iOS Safari, show 2-step guide
             setShowFallbackSteps(true);
         }
     };
@@ -116,7 +110,7 @@ export default function MobileInstallPrompt() {
                     </div>
                     <div className="mip-text">
                         <h3>Download DevNexus App</h3>
-                        <p>Install on your phone for full-screen liquid glass UI, instant load & push alerts.</p>
+                        <p>Install on your phone for full-screen liquid glass UI, instant load &amp; push alerts.</p>
                     </div>
                 </div>
 
@@ -129,7 +123,7 @@ export default function MobileInstallPrompt() {
                 {showFallbackSteps ? (
                     <div className="mip-fallback-box">
                         <p>
-                            Tap Chrome's <MoreVertical size={13} style={{ display: 'inline', verticalAlign: 'middle' }} /> menu at the top right and select <strong>Install app</strong> (or <strong>Add to Home screen</strong>).
+                            Tap Chrome&apos;s <MoreVertical size={13} style={{ display: 'inline', verticalAlign: 'middle' }} /> menu at the top right and select <strong>Install app</strong> (or <strong>Add to Home screen</strong>).
                         </p>
                         <button type="button" className="mip-secondary-btn" onClick={handleDismiss}>
                             Got it

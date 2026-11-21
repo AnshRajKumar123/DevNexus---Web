@@ -55,6 +55,18 @@ export default function Login() {
 
     return (
         <div className="login-wrapper">
+            {/* --- FULLSCREEN CIRCULAR LOADING OVERLAY --- */}
+            {isLoading && (
+                <div className="login-circle-loader-overlay" role="status" aria-live="polite">
+                    <div className="login-circle-loader-card">
+                        <div className="login-spinner-ring">
+                            <img src={DashPic.WebLogo} alt="DevNexus" className="login-spinner-logo" />
+                        </div>
+                        <p className="login-spinner-text">Signing in...</p>
+                    </div>
+                </div>
+            )}
+
             {toast.show && (
                 <div className={`security-toast pop-in toast-${toast.type}`}>
                     {toast.type === 'warning' && <AlertTriangle size={20} />}
@@ -168,53 +180,45 @@ export default function Login() {
                     <form className="login-form" onSubmit={handleSignIn}>
                         <div className="input-group">
                             <label htmlFor="email">Work Email</label>
-                            {isLoading ? (
-                                <div className="skeleton skeleton-text" style={{ height: '46px', width: '100%', borderRadius: '8px', marginBottom: 0 }}></div>
-                            ) : (
-                                <div className="login-input-wrap">
-                                    <Mail size={17} className="mobile-input-icon" />
-                                    <input
-                                        type="email"
-                                        id="email"
-                                        autoComplete="email"
-                                        placeholder="enter your email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        required
-                                        disabled={attempts >= 5}
-                                    />
-                                </div>
-                            )}
+                            <div className="login-input-wrap">
+                                <Mail size={17} className="mobile-input-icon" />
+                                <input
+                                    type="email"
+                                    id="email"
+                                    autoComplete="email"
+                                    placeholder="enter your email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                    disabled={attempts >= 5 || isLoading}
+                                />
+                            </div>
                         </div>
 
                         <div className="input-group">
                             <label htmlFor="password">Password</label>
-                            {isLoading ? (
-                                <div className="skeleton skeleton-text" style={{ height: '46px', width: '100%', borderRadius: '8px', marginBottom: 0 }}></div>
-                            ) : (
-                                <div className="password-input-container login-input-wrap">
-                                    <Lock size={17} className="mobile-input-icon" />
-                                    <input
-                                        type={showPassword ? 'text' : 'password'}
-                                        id="password"
-                                        autoComplete="current-password"
-                                        placeholder="••••••••"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        required
-                                        disabled={attempts >= 5}
-                                    />
-                                    <button
-                                        type="button"
-                                        className="password-toggle-btn"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        tabIndex="-1"
-                                        disabled={attempts >= 5}
-                                    >
-                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                                    </button>
-                                </div>
-                            )}
+                            <div className="password-input-container login-input-wrap">
+                                <Lock size={17} className="mobile-input-icon" />
+                                <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    id="password"
+                                    autoComplete="current-password"
+                                    placeholder="••••••••"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                    disabled={attempts >= 5 || isLoading}
+                                />
+                                <button
+                                    type="button"
+                                    className="password-toggle-btn"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    tabIndex="-1"
+                                    disabled={attempts >= 5 || isLoading}
+                                >
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
                         </div>
 
                         <div className="login-options">
@@ -233,15 +237,11 @@ export default function Login() {
                             <a href="#" className="forgot-password">Forgot password?</a>
                         </div>
 
-                        {isLoading ? (
-                            <div className="skeleton skeleton-btn" style={{ height: '46px', width: '100%', borderRadius: '8px', marginTop: '0.5rem' }}></div>
-                        ) : (
-                            <button type="submit" className="login-button hover-pop" disabled={attempts >= 5}>
-                                <span className="login-btn-shimmer" aria-hidden="true"></span>
-                                <span>Sign In</span>
-                                <ArrowRight size={18} className="mobile-btn-arrow" />
-                            </button>
-                        )}
+                        <button type="submit" className="login-button hover-pop" disabled={attempts >= 5 || isLoading}>
+                            <span className="login-btn-shimmer" aria-hidden="true"></span>
+                            <span>{isLoading ? 'Signing In...' : 'Sign In'}</span>
+                            <ArrowRight size={18} className="mobile-btn-arrow" />
+                        </button>
                     </form>
                 </div>
             </div>

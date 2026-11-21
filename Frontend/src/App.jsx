@@ -13,7 +13,7 @@ import Profile from './pages/Profile';
 import MyTodoList from './pages/MyTodoList';
 import ChatHub from './pages/ChatHub.jsx';
 import Projects from './pages/Projects';
-import ScrollToTop from './components/ScrollToTop'; 
+import ScrollToTop from './components/ScrollToTop';
 import { useData } from './context/DataContext';
 import { DashPic } from './assets/assets';
 import MobileInstallPrompt from './components/MobileInstallPrompt';
@@ -101,10 +101,10 @@ const NotFound404 = () => (
     </div>
 );
 
-// CLEANED LAYOUT: Removed all inline background colors and padding that caused white lines!
 const DashboardLayout = () => (
     <div className="dashboard-container">
         <CustomDynamicIsland />
+        <MobileInstallPrompt />
         <Sidebar />
         <div className="main-content-wrapper">
             <main className="main-content">
@@ -187,7 +187,14 @@ export default function App() {
         );
     }
 
-    if (!currentUser) return <Login />;
+    if (!currentUser) {
+        return (
+            <>
+                <Login />
+                <MobileInstallPrompt />
+            </>
+        );
+    }
 
     if (showSplash) {
         const fallbackName = currentUser.name || currentUser.email.split('@')[0];
