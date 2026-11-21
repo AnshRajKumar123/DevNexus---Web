@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 
     <!-- Standard Meta Tags -->
     <title>DevNexus | Team Dashboard</title>
@@ -48,9 +49,18 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/firebase-messaging-sw.js').catch(() => {});
+                navigator.serviceWorker.register('/firebase-messaging-sw.js').catch(() => { });
             });
         }
+    </script>
+
+    <script>
+        window.__deferredInstallPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            window.__deferredInstallPrompt = e;
+            window.dispatchEvent(new CustomEvent('pwa-install-ready'));
+        });
     </script>
 </body>
 

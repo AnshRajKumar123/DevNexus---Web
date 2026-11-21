@@ -1,0 +1,257 @@
+.mip-overlay {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .mip-overlay {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        position: fixed;
+        inset: 0;
+        z-index: 2147483000;
+        padding: 1rem 1rem calc(1.25rem + env(safe-area-inset-bottom)) 1rem;
+        background: rgba(0, 0, 0, 0.58);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        animation: mipFadeIn 0.28s ease-out forwards;
+    }
+
+    .mip-card {
+        position: relative;
+        width: 100%;
+        max-width: 390px;
+        padding: 1.35rem 1.3rem 1.2rem 1.3rem;
+        border-radius: 28px;
+        background: linear-gradient(165deg,
+                rgba(22, 34, 62, 0.9) 0%,
+                rgba(10, 15, 28, 0.95) 55%,
+                rgba(4, 7, 14, 0.98) 100%);
+        backdrop-filter: blur(36px) saturate(190%);
+        -webkit-backdrop-filter: blur(36px) saturate(190%);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-top: 1px solid rgba(255, 255, 255, 0.32);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.25),
+            0 24px 60px rgba(0, 0, 0, 0.8);
+        color: #ffffff;
+        animation: mipSlideUp 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .mip-close-btn {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .mip-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.24rem 0.65rem;
+        border-radius: 999px;
+        background: rgba(37, 99, 235, 0.22);
+        border: 1px solid rgba(96, 165, 250, 0.38);
+        color: #bfdbfe;
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+        margin-bottom: 0.9rem;
+    }
+
+    .mip-app-row {
+        display: flex;
+        align-items: center;
+        gap: 0.95rem;
+        margin-bottom: 1rem;
+    }
+
+    .mip-logo-ring {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        padding: 3px;
+        background: linear-gradient(145deg, rgba(96, 165, 250, 0.6), rgba(255, 255, 255, 0.12));
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+        flex-shrink: 0;
+    }
+
+    .mip-logo {
+        width: 100%;
+        height: 100%;
+        border-radius: 13px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .mip-text h3 {
+        margin: 0 0 0.25rem 0;
+        font-size: 1.08rem;
+        font-weight: 800;
+        color: #ffffff;
+    }
+
+    .mip-text p {
+        margin: 0;
+        font-size: 0.78rem;
+        line-height: 1.45;
+        color: rgba(226, 232, 240, 0.72);
+    }
+
+    .mip-perks {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.4rem;
+        padding: 0.6rem 0.75rem;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 1.05rem;
+    }
+
+    .mip-perks span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.28rem;
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: #a7f3d0;
+    }
+
+    .mip-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.55rem;
+    }
+
+    /* Animated Shimmer Download Button (Vengeance / Forge UI style) */
+    .mip-download-btn {
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        padding: 0.88rem 1.25rem;
+        border-radius: 999px;
+        border: 1px solid rgba(147, 197, 253, 0.45);
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 55%, #1e3a8a 100%);
+        color: #ffffff;
+        font-size: 0.94rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.55rem;
+        cursor: pointer;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.35),
+            0 10px 26px rgba(37, 99, 235, 0.45);
+        transition: transform 0.15s ease;
+    }
+
+    .mip-download-btn:active {
+        transform: scale(0.97);
+    }
+
+    .mip-btn-shimmer {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 60%;
+        height: 100%;
+        background: linear-gradient(110deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.35) 50%,
+                transparent 100%);
+        animation: mipShimmer 2.6s infinite ease-in-out;
+        pointer-events: none;
+    }
+
+    .mip-later-btn {
+        width: 100%;
+        padding: 0.55rem;
+        background: transparent;
+        border: none;
+        color: rgba(203, 213, 225, 0.65);
+        font-size: 0.78rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        cursor: pointer;
+    }
+
+    .mip-fallback-box {
+        padding: 0.85rem 1rem;
+        border-radius: 16px;
+        background: rgba(37, 99, 235, 0.14);
+        border: 1px solid rgba(96, 165, 250, 0.3);
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .mip-fallback-box p {
+        margin: 0;
+        font-size: 0.8rem;
+        line-height: 1.5;
+        color: #e2e8f0;
+    }
+
+    .mip-secondary-btn {
+        align-self: flex-end;
+        padding: 0.45rem 1rem;
+        border-radius: 999px;
+        background: #ffffff;
+        color: #000000;
+        border: none;
+        font-size: 0.78rem;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    @keyframes mipFadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes mipSlideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px) scale(0.96);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    @keyframes mipShimmer {
+        0% {
+            left: -80%;
+        }
+
+        55% {
+            left: 140%;
+        }
+
+        100% {
+            left: 140%;
+        }
+    }
+}

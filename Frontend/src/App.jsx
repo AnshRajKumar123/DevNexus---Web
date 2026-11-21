@@ -16,6 +16,7 @@ import Projects from './pages/Projects';
 import ScrollToTop from './components/ScrollToTop'; 
 import { useData } from './context/DataContext';
 import { DashPic } from './assets/assets';
+import MobileInstallPrompt from './components/MobileInstallPrompt';
 import { Sparkles, Loader2, Home, AlertTriangle, CheckCircle2, X } from 'lucide-react';
 import Notifications from './pages/Notifications.jsx';
 
